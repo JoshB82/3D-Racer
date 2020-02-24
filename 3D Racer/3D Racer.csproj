@@ -65,6 +65,9 @@
     <None Include="Algebra\Matrices\Calculations.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Shapes\Cube.cs" />
+    <Compile Include="Shapes\Shape scaling.cs" />
+    <Compile Include="Shapes\Shape translate.cs" />
     <Compile Include="Shapes\Shapes.cs" />
     <Compile Include="Shapes\Vertex Operators.cs" />
     <Compile Include="Shapes\Vertex.cs" />
