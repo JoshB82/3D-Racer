@@ -36,9 +36,9 @@
 
         public static Vertex operator *(Matrix m, Vertex v)
         {
-            double[] result = new double[3];
+            float[] result = new float[3];
 
-            double[] row = new double[m.Cols];
+            float[] row = new float[m.Cols];
 
             for (int i = 0; i < m.Rows; i++)
             {

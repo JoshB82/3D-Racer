@@ -4,7 +4,7 @@
     {
         public int Rows { get; set; }
         public int Cols { get; set; }
-        public double[,] Data { get; set; }
+        public float[,] Data { get; set; }
 
         /// <summary>
         /// Creates a zeroed matrix of specified size.
@@ -15,7 +15,7 @@
         {
             Rows = rows;
             Cols = cols;
-            Data = new double[rows, cols];
+            Data = new float[rows, cols];
         }
 
         /// <summary>
@@ -25,7 +25,7 @@
         public Matrix(int rows_and_cols)
         {
             Rows = Cols = rows_and_cols;
-            Data = new double[rows_and_cols, rows_and_cols];
+            Data = new float[rows_and_cols, rows_and_cols];
             for (int i = 0; i < Rows; i++) Data[i, i] = 1;
         }
 
@@ -33,7 +33,7 @@
         /// Creates a matrix from a data array.
         /// </summary>
         /// <param name="data">Array containing matrix data</param>
-        public Matrix(double[,] data)
+        public Matrix(float[,] data)
         {
             Rows = data.GetLength(0);
             Cols = data.GetLength(1);
@@ -47,10 +47,10 @@
         /// <param name="i2">Top right value</param>
         /// <param name="i3">Bottom left value</param>
         /// <param name="i4">Bottom right value</param>
-        public Matrix(double i1, double i2, double i3, double i4)
+        public Matrix(float i1, float i2, float i3, float i4)
         {
             Rows = Cols = 2;
-            Data = new double[2, 2] { { i1, i2 }, { i3, i4 } };
+            Data = new float[2, 2] { { i1, i2 }, { i3, i4 } };
         }
 
         /// <summary>
@@ -65,10 +65,10 @@
         /// <param name="i7">Bottom left value</param>
         /// <param name="i8">Bottom centre value</param>
         /// <param name="i9">Bottom right value</param>
-        public Matrix(double i1, double i2, double i3, double i4, double i5, double i6, double i7, double i8, double i9)
+        public Matrix(float i1, float i2, float i3, float i4, float i5, float i6, float i7, float i8, float i9)
         {
             Rows = Cols = 3;
-            Data = new double[3, 3] { { i1, i2, i3 }, { i4, i5, i6 }, { i7, i8, i9 } };
+            Data = new float[3, 3] { { i1, i2, i3 }, { i4, i5, i6 }, { i7, i8, i9 } };
         }
 
         /// <summary>
@@ -79,7 +79,7 @@
         {
             Rows = v.Data.Length;
             Cols = 1;
-            Data = new double[Rows, Cols];
+            Data = new float[Rows, Cols];
             for (int i = 0; i < Rows; i++) Data[i, 1] = v.Data[i];
         }
 
@@ -87,10 +87,7 @@
         /// Returns matrix as an array.
         /// </summary>
         /// <returns></returns>
-        public double[,] MatrixToArray()
-        {
-            return Data;
-        }
+        public float[,] MatrixToArray() => Data;
 
         /// <summary>
         /// Changes a single value of an entry in a matrix.
@@ -99,7 +96,7 @@
         /// <param name="row">Row number (from 1 to number of rows)</param>
         /// <param name="col">Column number (from 1 to number of columns)</param>
         /// <param name="newValue">The new value to be implemented into the matrix</param>
-        public void ChangeSingleValue(int row, int col, double new_value)
+        public void ChangeSingleValue(int row, int col, float new_value)
         {
             Data[row - 1, col - 1] = new_value;
         }
@@ -110,7 +107,7 @@
         /// <param name="row">Row number (from 1 to number of rows)</param>
         /// <param name="col">Column number (from 1 to number of columns)</param>
         /// <returns></returns>
-        public double GetSingleValue(int row, int col)
+        public float GetSingleValue(int row, int col)
         {
             return Data[row - 1, col - 1];
         }

@@ -2,26 +2,26 @@
 {
     public sealed class Cube : Shape
     {
-        public Cube(double x, double y, double z, double side_length,
+        public Cube(float x, float y, float z, float side_length,
             string vertex_colour = "000000",
             string edge_colour = "000000",
             string face_colour = "000000")
         {
-            Origin = new Vertex(x, y, z, null, false);
+            Origin = new Vector(x, y, z);
             Type = "Cube";
             Visible = true;
             Selected = false;
 
             Vertices = new Vertex[8]
             {
-                new Vertex(x - side_length / 2, y - side_length / 2, z - side_length / 2, vertex_colour), // 0
-                new Vertex(x + side_length / 2, y - side_length / 2, z - side_length / 2, vertex_colour), // 1
-                new Vertex(x + side_length / 2, y + side_length / 2, z - side_length / 2, vertex_colour), // 2
-                new Vertex(x - side_length / 2, y + side_length / 2, z - side_length / 2, vertex_colour), // 3
-                new Vertex(x - side_length / 2, y - side_length / 2, z + side_length / 2, vertex_colour), // 4
-                new Vertex(x + side_length / 2, y - side_length / 2, z + side_length / 2, vertex_colour), // 5
-                new Vertex(x + side_length / 2, y + side_length / 2, z + side_length / 2, vertex_colour), // 6
-                new Vertex(x - side_length / 2, y + side_length / 2, z + side_length / 2, vertex_colour) // 7
+                new Vertex(0, 0, 0, vertex_colour), // 0
+                new Vertex(1, 0, 0, vertex_colour), // 1
+                new Vertex(1, 1, 0, vertex_colour), // 2
+                new Vertex(0, 1, 0, vertex_colour), // 3
+                new Vertex(0, 0, 1, vertex_colour), // 4
+                new Vertex(1, 0, 1, vertex_colour), // 5
+                new Vertex(1, 1, 1, vertex_colour), // 6
+                new Vertex(0, 1, 1, vertex_colour) // 7
             };
 
             Edges = new Edge[18]
@@ -61,6 +61,13 @@
                 new Face(9, 5, 17, face_colour), // 10
                 new Face(17, 0, 13, face_colour) // 11
             };
+
+            Matrix scale = Transform.Scale(side_length, side_length, side_length);
+            Matrix translation = Transform.Translate(x, y, z);
+            Model_to_world = translation * scale;
+            ApplyWorldMatrix();
+            Camera_Origin = Origin;
+            Camera_Vertices = Vertices;
         }
     }
 }

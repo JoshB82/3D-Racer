@@ -51,10 +51,10 @@ namespace _3D_Racer
 
             int num_rows = m1.Data.GetLength(0);
             int num_cols = m2.Data.GetLength(1);
-            double[,] product = new double[num_rows, num_cols];
+            float[,] product = new float[num_rows, num_cols];
 
-            double[] row = new double[m1.Data.GetLength(1)];
-            double[] col = new double[m2.Data.GetLength(0)];
+            float[] row = new float[m1.Data.GetLength(1)];
+            float[] col = new float[m2.Data.GetLength(0)];
 
             for (int i = 0; i < num_rows; i++)
                 for (int j = 0; j < num_cols; j++)
@@ -73,7 +73,7 @@ namespace _3D_Racer
         /// <param name="s">Scalar</param>
         /// <param name="m">Matrix</param>
         /// <returns>Product of a scalar and matrix.</returns>
-        public static Matrix operator *(double s, Matrix m)
+        public static Matrix operator *(float s, Matrix m)
         {
             for (int i = 0; i < m.Rows; i++)
                 for (int j = 0; j < m.Cols; j++)

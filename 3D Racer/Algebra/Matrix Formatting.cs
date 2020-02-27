@@ -12,15 +12,15 @@ namespace _3D_Racer
         /// <param name="to_join">Matrix to be joined.</param>
         public void ConcatMatrixAtBottom(Matrix to_join)
         {
-            double[,] data_top = Data;
-            double[,] data_bottom = to_join.MatrixToArray();
+            float[,] data_top = Data;
+            float[,] data_bottom = to_join.MatrixToArray();
 
             int num_rows = data_top.GetLength(0) + data_bottom.GetLength(0);
             int num_cols = data_top.GetLength(1);
 
             if (num_cols != data_bottom.GetLength(1)) throw new Exception("The number of columns do not match.");
 
-            double[,] new_array = new double[num_rows, num_cols];
+            float[,] new_array = new float[num_rows, num_cols];
             int i1;
             for (int j = 0; j < num_cols; j++)
             {
@@ -40,15 +40,15 @@ namespace _3D_Racer
         /// <param name="to_join">Matrix to be joined.</param>
         public void ConcatMatrixAtRight(Matrix to_join)
         {
-            double[,] data_left = Data;
-            double[,] data_right = to_join.MatrixToArray();
+            float[,] data_left = Data;
+            float[,] data_right = to_join.MatrixToArray();
 
             int num_rows = data_left.GetLength(0);
             int num_cols = data_left.GetLength(1) + data_right.GetLength(1);
 
             if (num_rows != data_right.GetLength(0)) throw new Exception("The number of rows do not match.");
 
-            double[,] new_array = new double[num_rows, num_cols];
+            float[,] new_array = new float[num_rows, num_cols];
             int j1;
             for (int i = 0; i < num_rows; i++)
             {
@@ -70,12 +70,12 @@ namespace _3D_Racer
         /// <param name="split_matrix_right">The 'right' matrix after the split.</param>
         public void SplitMatrixAtColumn(Matrix to_split, int num_cols_left, out Matrix split_matrix_left, out Matrix split_matrix_right)
         {
-            double[,] data = to_split.MatrixToArray();
+            float[,] data = to_split.MatrixToArray();
             int num_rows = data.GetLength(0);
             int num_cols = data.GetLength(1);
             int num_cols_right = num_cols - num_cols_left;
-            double[,] data_left = new double[num_rows, num_cols_left];
-            double[,] data_right = new double[num_rows, num_cols_right];
+            float[,] data_left = new float[num_rows, num_cols_left];
+            float[,] data_right = new float[num_rows, num_cols_right];
             int j1;
             for (int i = 0; i < num_rows; i++)
             {
@@ -97,12 +97,12 @@ namespace _3D_Racer
         /// <param name="split_matrix_bottom">The 'bottom' matrix after the split.</param>
         public void SplitMatrixAtRow(Matrix to_split, int num_rows_top, out Matrix split_matrix_top, out Matrix split_matrix_bottom)
         {
-            double[,] data = to_split.MatrixToArray();
+            float[,] data = to_split.MatrixToArray();
             int num_rows = data.GetLength(0);
             int num_cols = data.GetLength(1);
             int num_rows_bottom = num_rows - num_rows_top;
-            double[,] data_top = new double[num_rows_top, num_cols];
-            double[,] data_bottom = new double[num_rows_bottom, num_cols];
+            float[,] data_top = new float[num_rows_top, num_cols];
+            float[,] data_bottom = new float[num_rows_bottom, num_cols];
             int i1;
             for (int j = 0; j < num_rows; j++)
             {
@@ -134,16 +134,16 @@ namespace _3D_Racer
         /// <param name="num_cols">The number of columns to be added.</param>
         public void AddColumns(int num_cols)
         {
-            double[,] old_array = MatrixToArray();
+            float[,] old_array = MatrixToArray();
             int rows = old_array.GetLength(0);
             int cols = old_array.GetLength(1);
-            double[,] new_array = null;
+            float[,] new_array = null;
 
             switch (Math.Sign(num_cols))
             {
                 case -1:
                     // Columns are being deleted
-                    new_array = new double[rows, cols + num_cols];
+                    new_array = new float[rows, cols + num_cols];
                     for (int i = 0; i < rows; i++)
                         for (int j = 0; j < cols + num_cols; j++)
                             new_array[i, j] = old_array[i, j];
@@ -153,7 +153,7 @@ namespace _3D_Racer
                     return;
                 case 1:
                     // Columns are being added
-                    new_array = new double[rows, cols + num_cols];
+                    new_array = new float[rows, cols + num_cols];
                     for (int i = 0; i < rows; i++)
                         for (int j = 0; j < cols; j++)
                             new_array[i, j] = old_array[i, j];
@@ -170,16 +170,16 @@ namespace _3D_Racer
         /// <param name="num_rows">The number of rows to be added.</param>
         public void AddRows(int num_rows)
         {
-            double[,] old_array = MatrixToArray();
+            float[,] old_array = MatrixToArray();
             int rows = old_array.GetLength(0);
             int cols = old_array.GetLength(1);
-            double[,] new_array = null;
+            float[,] new_array = null;
 
             switch (Math.Sign(num_rows))
             {
                 case -1:
                     // Rows are being deleted
-                    new_array = new double[rows + num_rows, cols];
+                    new_array = new float[rows + num_rows, cols];
                     for (int i = 0; i < rows + num_rows; i++)
                         for (int j = 0; j < cols; j++)
                             new_array[i, j] = old_array[i, j];
@@ -189,7 +189,7 @@ namespace _3D_Racer
                     return;
                 case 1:
                     // Rows are being added
-                    new_array = new double[rows + num_rows, cols];
+                    new_array = new float[rows + num_rows, cols];
                     for (int i = 0; i < rows; i++)
                         for (int j = 0; j < cols; j++)
                             new_array[i, j] = old_array[i, j];
@@ -204,7 +204,7 @@ namespace _3D_Racer
         /// </summary>
         public void OutputMatrixDebug()
         {
-            double[,] data = MatrixToArray();
+            float[,] data = MatrixToArray();
             int last_pos = data.GetLength(0) * data.GetLength(1);
 
             string output_text = "( ";

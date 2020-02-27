@@ -15,9 +15,11 @@ namespace _3D_Racer
         private int selected_shape;
         private bool mouse_down;
 
-        private const double rotation_dampener = 0.005;
-        private const double grav_acc = -9.81;
+        private const float rotation_dampener = 0.005f;
+        private const float grav_acc = -9.81f;
 
+        private Camera Current_camera;
+        
         public MainForm()
         {
             InitializeComponent();
@@ -29,6 +31,9 @@ namespace _3D_Racer
             default_cube.Selected = true;
             Entity_List.Add(default_cube);
             Debug.WriteLine("Cube created!");
+
+            World_Point origin = new World_Point(0, 0, 0);
+            Current_camera = new Orthogonal_Camera(200, 200, 200, origin, 100, 100, 50, 250);
         }
 
         private void Game_Loop()
@@ -70,11 +75,12 @@ namespace _3D_Racer
                 List<Shape> temp_list = Entity_List;
                 foreach (Shape shape in temp_list)
                 {
+
                     foreach (Edge edge in shape.Edges)
                     {
-                        if (edge.Visible) g.DrawLine(pen, (float)shape.Vertices[edge.P1].X, (float)shape.Vertices[edge.P1].Y, (float)shape.Vertices[edge.P2].X, (float)shape.Vertices[edge.P2].Y);
-                        if (shape.Vertices[edge.P1].Visible) if (shape.Selected) g.FillEllipse(red_brush, (float)shape.Vertices[edge.P1].X - radius / 2, (float)shape.Vertices[edge.P1].Y - radius / 2, radius, radius); else g.FillEllipse(blue_brush, (float)shape.Vertices[edge.P1].X - radius / 2, (float)shape.Vertices[edge.P1].Y - radius / 2, radius, radius);
-                        if (shape.Vertices[edge.P2].Visible) if (shape.Selected) g.FillEllipse(red_brush, (float)shape.Vertices[edge.P2].X - radius / 2, (float)shape.Vertices[edge.P2].Y - radius / 2, radius, radius); else g.FillEllipse(blue_brush, (float)shape.Vertices[edge.P2].X - radius / 2, (float)shape.Vertices[edge.P2].Y - radius / 2, radius, radius);
+                        if (edge.Visible) g.DrawLine(pen, shape.Vertices[edge.P1].X, shape.Vertices[edge.P1].Y, shape.Vertices[edge.P2].X, shape.Vertices[edge.P2].Y);
+                        if (shape.Vertices[edge.P1].Visible) if (shape.Selected) g.FillEllipse(red_brush, shape.Vertices[edge.P1].X - radius / 2, shape.Vertices[edge.P1].Y - radius / 2, radius, radius); else g.FillEllipse(blue_brush, (float)shape.Vertices[edge.P1].X - radius / 2, (float)shape.Vertices[edge.P1].Y - radius / 2, radius, radius);
+                        if (shape.Vertices[edge.P2].Visible) if (shape.Selected) g.FillEllipse(red_brush, shape.Vertices[edge.P2].X - radius / 2, shape.Vertices[edge.P2].Y - radius / 2, radius, radius); else g.FillEllipse(blue_brush, (float)shape.Vertices[edge.P2].X - radius / 2, (float)shape.Vertices[edge.P2].Y - radius / 2, radius, radius);
                     }
                 }
             }
@@ -120,8 +126,8 @@ namespace _3D_Racer
                 prev_x = e.X;
                 prev_y = e.Y;
                 Debug.WriteLine("Rotating... (" + delta_x + ", " + delta_y + ")");
-                Entity_List[selected_shape].RotateX(delta_y * rotation_dampener);
-                Entity_List[selected_shape].RotateY(delta_x * rotation_dampener);
+                Matrix rotation = Transform.RotateX(delta_y * rotation_dampener) * Transform.RotateY(delta_x * rotation_dampener);
+                Entity_List[selected_shape].Model_to_world = rotation * Entity_List[selected_shape].Model_to_world;
             }
         }
 

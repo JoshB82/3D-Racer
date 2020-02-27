@@ -2,9 +2,11 @@
 {
     public partial class Vertex : Vector
     {
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Z { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
+        public int W { get; set; } = 1;
+
         public string Colour { get; set; }
         public bool Visible { get; set; }
 
@@ -15,7 +17,7 @@
         /// <param name="y">y - co-ordinate of the vertex.</param>
         /// <param name="z">z - co-ordinate of the vertex.</param>
         /// <param name="colour">Six digit hexadecimal colour value.</param>
-        public Vertex(double x, double y, double z, string colour = "000000", bool visibility = true) : base( x, y, z )
+        public Vertex(float x, float y, float z, string colour = "000000", bool visibility = true) : base( x, y, z )
         {
             X = x;
             Y = y;

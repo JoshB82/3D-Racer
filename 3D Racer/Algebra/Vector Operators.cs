@@ -10,11 +10,11 @@ namespace _3D_Racer
         /// <param name="m1">First addend</param>
         /// <param name="m2">Second addend</param>
         /// <returns>Sum of two vectors.</returns>
-        public static Vector operator +(Vector m1, Vector m2)
+        public static Vector operator +(Vector v1, Vector v2)
         {
-            if (m1.Size != m2.Size) throw new Exception("The matrix dimensions do not match.");
-            for (int i = 0; i < m1.Size; i++) m1.Data[i] += m2.Data[i];
-            return m1;
+            if (v1.Size != v2.Size) throw new Exception("The vector dimensions do not match.");
+            for (int i = 0; i < v1.Size; i++) v1.Data[i] += v2.Data[i];
+            return v1;
         }
 
         /// <summary>
@@ -23,11 +23,11 @@ namespace _3D_Racer
         /// <param name="m1">Minuend</param>
         /// <param name="m2">Subtrahend</param>
         /// <returns>Difference of two vectors.</returns>
-        public static Vector operator -(Vector m1, Vector m2)
+        public static Vector operator -(Vector v1, Vector v2)
         {
-            if (m1.Size != m2.Size) throw new Exception("The matrix dimensions do not match.");
-            for (int i = 0; i < m1.Size; i++) m1.Data[i] -= m2.Data[i];
-            return m1;
+            if (v1.Size != v2.Size) throw new Exception("The vector dimensions do not match.");
+            for (int i = 0; i < v1.Size; i++) v1.Data[i] -= v2.Data[i];
+            return v1;
         }
 
         /// <summary>
@@ -36,15 +36,12 @@ namespace _3D_Racer
         /// <param name="m1">First vector</param>
         /// <param name="m2">Second vector</param>
         /// <returns>Dot product of two vectors.</returns>
-        public static double operator *(Vector m1, Vector m2)
+        public static float operator *(Vector v1, Vector v2)
         {
-            if (m1.Size != m2.Size) throw new Exception("The number of elements in each vector must be the same.");
+            if (v1.Size != v2.Size) throw new Exception("The number of elements in each vector must be the same.");
 
-            double total = 0;
-
-            for (int i = 0; i < m1.Size; i++)
-                total += m1.Data[i] * m2.Data[i];
-
+            float total = 0;
+            for (int i = 0; i < v1.Size; i++) total += v1.Data[i] * v2.Data[i];
             return total;
         }
 
@@ -56,9 +53,9 @@ namespace _3D_Racer
         /// <returns>Product of a matrix and a vector</returns>
         public static Vector operator *(Matrix m, Vector v)
         {
-            double[] result = new double[v.Size];
+            float[] result = new float[v.Size];
 
-            double[] row = new double[m.Cols];
+            float[] row = new float[m.Cols];
 
             for (int i = 0; i < m.Rows; i++)
             {
