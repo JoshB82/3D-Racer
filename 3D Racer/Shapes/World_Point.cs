@@ -5,7 +5,6 @@
         public World_Point(float x, float y, float z)
         {
             Origin = new Vector(x, y, z);
-            Type = "Point";
             Visible = true;
             Selected = false;
 
@@ -15,7 +14,6 @@
 
             Matrix translation = Transform.Translate(x, y, z);
             Model_to_world = translation;
-            ApplyWorldMatrix();
             Camera_Origin = Origin;
             Camera_Vertices = null;
         }

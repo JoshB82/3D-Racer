@@ -8,7 +8,7 @@ namespace _3D_Racer
         /// Returns a matrix for rotation about the x-axis
         /// </summary>
         /// <param name="angle">Angle to rotate</param>
-        public static Matrix RotateX(float angle)
+        public static Matrix Rotate_X(float angle)
         {
             float sin_angle = (float)Math.Sin(angle);
             float cos_angle = (float)Math.Cos(angle);
@@ -24,7 +24,7 @@ namespace _3D_Racer
         /// Returns a matrix for rotation about the y-axis
         /// </summary>
         /// <param name="angle">Angle to rotate</param>
-        public static Matrix RotateY(float angle)
+        public static Matrix Rotate_Y(float angle)
         {
             float sin_angle = (float)Math.Sin(angle);
             float cos_angle = (float)Math.Cos(angle);
@@ -40,7 +40,7 @@ namespace _3D_Racer
         /// Returns a matrix for rotation about the z-axis
         /// </summary>
         /// <param name="angle">Angle to rotate</param>
-        public static Matrix RotateZ(float angle)
+        public static Matrix Rotate_Z(float angle)
         {
             float sin_angle = (float)Math.Sin(angle);
             float cos_angle = (float)Math.Cos(angle);

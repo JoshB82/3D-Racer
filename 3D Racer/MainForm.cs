@@ -67,22 +67,8 @@ namespace _3D_Racer
 
             using (Graphics g = Graphics.FromImage(temp))
             {
-                Pen pen = new Pen(Color.Black);
-                SolidBrush red_brush = new SolidBrush(Color.Red);
-                SolidBrush blue_brush = new SolidBrush(Color.Blue);
-                int radius = 10;
-
                 List<Shape> temp_list = Entity_List;
-                foreach (Shape shape in temp_list)
-                {
-
-                    foreach (Edge edge in shape.Edges)
-                    {
-                        if (edge.Visible) g.DrawLine(pen, shape.Vertices[edge.P1].X, shape.Vertices[edge.P1].Y, shape.Vertices[edge.P2].X, shape.Vertices[edge.P2].Y);
-                        if (shape.Vertices[edge.P1].Visible) if (shape.Selected) g.FillEllipse(red_brush, shape.Vertices[edge.P1].X - radius / 2, shape.Vertices[edge.P1].Y - radius / 2, radius, radius); else g.FillEllipse(blue_brush, (float)shape.Vertices[edge.P1].X - radius / 2, (float)shape.Vertices[edge.P1].Y - radius / 2, radius, radius);
-                        if (shape.Vertices[edge.P2].Visible) if (shape.Selected) g.FillEllipse(red_brush, shape.Vertices[edge.P2].X - radius / 2, shape.Vertices[edge.P2].Y - radius / 2, radius, radius); else g.FillEllipse(blue_brush, (float)shape.Vertices[edge.P2].X - radius / 2, (float)shape.Vertices[edge.P2].Y - radius / 2, radius, radius);
-                    }
-                }
+                foreach (Shape shape in temp_list) shape.Draw_Shape(Current_camera, g);
             }
 
             Canvas = temp;
@@ -126,8 +112,8 @@ namespace _3D_Racer
                 prev_x = e.X;
                 prev_y = e.Y;
                 Debug.WriteLine("Rotating... (" + delta_x + ", " + delta_y + ")");
-                Matrix rotation = Transform.RotateX(delta_y * rotation_dampener) * Transform.RotateY(delta_x * rotation_dampener);
-                Entity_List[selected_shape].Model_to_world = rotation * Entity_List[selected_shape].Model_to_world;
+                Entity_List[selected_shape].Rotate_X(delta_y * rotation_dampener);
+                Entity_List[selected_shape].Rotate_Y(delta_x * rotation_dampener);
             }
         }
 

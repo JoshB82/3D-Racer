@@ -7,12 +7,12 @@
             string edge_colour = "000000",
             string face_colour = "000000")
         {
-            Origin = new Vector(x, y, z);
-            Type = "Cube";
             Visible = true;
             Selected = false;
 
-            Vertices = new Vertex[8]
+            Model_Origin = new Vector(0, 0, 0);
+            
+            Model_Vertices = new Vertex[8]
             {
                 new Vertex(0, 0, 0, vertex_colour), // 0
                 new Vertex(1, 0, 0, vertex_colour), // 1
@@ -65,9 +65,6 @@
             Matrix scale = Transform.Scale(side_length, side_length, side_length);
             Matrix translation = Transform.Translate(x, y, z);
             Model_to_world = translation * scale;
-            ApplyWorldMatrix();
-            Camera_Origin = Origin;
-            Camera_Vertices = Vertices;
         }
     }
 }

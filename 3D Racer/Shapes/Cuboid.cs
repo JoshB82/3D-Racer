@@ -5,7 +5,6 @@
         public Cuboid(float x, float y, float z, float length, float width, float height, string colour)
         {
             Origin = new Vertex(x, y, z, null, false);
-            Type = "Cuboid";
             Visible = true;
             Selected = false;
         }

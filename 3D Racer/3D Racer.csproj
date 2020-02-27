@@ -68,12 +68,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shapes\Camera.cs" />
     <Compile Include="Shapes\Cube.cs" />
-    <Compile Include="Shapes\Cuboid.cs" />
+    <Compile Include="Shapes\Shape rotation.cs" />
+    <Compile Include="Shapes\Shape scaling.cs" />
+    <Compile Include="Shapes\Shape translation %28not finished%29.cs" />
     <Compile Include="Shapes\World_Point.cs" />
     <Compile Include="Shapes\Transform rotation.cs" />
     <Compile Include="Shapes\Transform scaling.cs" />
     <Compile Include="Shapes\Transform translation.cs" />
-    <Compile Include="Shapes\Shapes.cs" />
+    <Compile Include="Shapes\Shape.cs" />
     <Compile Include="Shapes\Vertex Operators.cs" />
     <Compile Include="Shapes\Vertex.cs" />
     <EmbeddedResource Include="MainForm.resx">

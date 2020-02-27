@@ -8,6 +8,7 @@
         public int W { get; set; } = 1;
 
         public string Colour { get; set; }
+        public float Radius { get; set; }
         public bool Visible { get; set; }
 
         /// <summary>
@@ -45,18 +46,18 @@
 
     public class Face
     {
-        public int E1 { get; set; }
-        public int E2 { get; set; }
-        public int E3 { get; set; }
+        public int P1 { get; set; }
+        public int P2 { get; set; }
+        public int P3 { get; set; }
         public string Colour { get; set; }
         public bool Visible { get; set; }
         public int z_index { get; set; }
 
-        public Face(int e1, int e2, int e3, string colour = "000000", bool visibility = true)
+        public Face(int p1, int p2, int p3, string colour = "000000", bool visibility = true)
         {
-            E1 = e1;
-            E2 = e2;
-            E3 = e3;
+            P1 = p1;
+            P2 = p2;
+            P3 = p3;
             Colour = colour;
             Visible = visibility;
         }
