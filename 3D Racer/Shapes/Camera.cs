@@ -5,22 +5,26 @@
         /// <summary>
         /// Location of camera in world space
         /// </summary>
-        public Vector Origin { get; set; }
-        public Vector Direction { get; set; }
+        public Vector Model_Origin { get; set; }
+        public Vector World_Origin { get; set; }
+        public Vector Camera_Origin { get; set; }
 
+        public Vector World_Direction { get; set; }
+
+        public Matrix Model_to_world { get; set; }
         public Matrix World_to_camera { get; protected set; }
         public Matrix Camera_to_screen { get; protected set; }
         public Matrix World_to_screen { get; protected set; }
 
         public Camera(float x, float y, float z, Vector direction)
         {
-            Origin = new Vector(x, y, z);
-            Direction = direction;
-            Matrix rotation = Transform.Rotation_Between_Vectors(direction, Vector.Unit_Negative_Z);
-            World_to_camera = Transform.Translate(-x, -y, -z) * rotation;
+            Model_Origin = new Vector(0, 0, 0, 1);
+            Model_to_world = Transform.Translate(x, y, z);
+            World_to_camera = Transform.Translate(-x, -y, -z) * Transform.Rotation_Between_Vectors(direction, Vector.Unit_Negative_Z);
+            World_Direction = direction;
         }
 
-        public Camera(float x, float y, float z, Shape shape) : this(x, y, z, shape.Origin - new Vector(x, y, z)) {}
+        public Camera(float x, float y, float z, Shape shape) : this(x, y, z, shape.World_Origin - new Vector(x, y, z)) {}
 
         public void Recalculate_Matrix()
         {

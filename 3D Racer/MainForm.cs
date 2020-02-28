@@ -23,10 +23,7 @@ namespace _3D_Racer
         public MainForm()
         {
             InitializeComponent();
-            Thread graphics_thread = new Thread(Game_Loop);
-            graphics_thread.Start();
-            graphics_thread.IsBackground = true;
-
+            
             Cube default_cube = new Cube(200, 200, 100, 100, "000000");
             default_cube.Selected = true;
             Entity_List.Add(default_cube);
@@ -34,6 +31,10 @@ namespace _3D_Racer
 
             World_Point origin = new World_Point(0, 0, 0);
             Current_camera = new Orthogonal_Camera(200, 200, 200, origin, 100, 100, 50, 250);
+
+            Thread graphics_thread = new Thread(Game_Loop);
+            graphics_thread.Start();
+            graphics_thread.IsBackground = true;
         }
 
         private void Game_Loop()

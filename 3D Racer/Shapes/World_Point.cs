@@ -4,18 +4,18 @@
     {
         public World_Point(float x, float y, float z)
         {
-            Origin = new Vector(x, y, z);
+            Model_Origin = new Vector(0, 0, 0);
+            
             Visible = true;
             Selected = false;
 
-            Vertices = null;
+            Model_Vertices = null;
             Edges = null;
             Faces = null;
 
             Matrix translation = Transform.Translate(x, y, z);
             Model_to_world = translation;
-            Camera_Origin = Origin;
-            Camera_Vertices = null;
+            Apply_World_Matrices();
         }
     }
 }

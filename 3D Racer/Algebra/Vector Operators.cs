@@ -53,8 +53,9 @@ namespace _3D_Racer
         /// <returns>Product of a matrix and a vector</returns>
         public static Vector operator *(Matrix m, Vector v)
         {
-            float[] result = new float[v.Size];
+            if (m.Cols != v.Size) throw new Exception("The number of columns in the matrix must equal the number of elements in the vector.");
 
+            float[] result = new float[v.Size];
             float[] row = new float[m.Cols];
 
             for (int i = 0; i < m.Rows; i++)

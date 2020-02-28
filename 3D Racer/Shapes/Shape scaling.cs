@@ -38,7 +38,7 @@
         /// <param name="scale_factor_x">Scale factor for x-direction</param>
         /// <param name="scale_factor_y">Scale factor for y-direction</param>
         /// <param name="scale_factor_z">Scale factor for z-direction</param>
-        public void Scale_Z(float scale_factor_x, float scale_factor_y, float scale_factor_z)
+        public void Scale(float scale_factor_x, float scale_factor_y, float scale_factor_z)
         {
             Matrix scaling_x = Transform.Scale_X(scale_factor_x);
             Matrix scaling_y = Transform.Scale_Y(scale_factor_y);

@@ -45,41 +45,56 @@ namespace _3D_Racer
         public bool Visible { get; set; }
         public bool Selected { get; set; }
 
-        public void Apply_Matrices(Camera camera)
+        public void Apply_World_Matrices()
         {
             World_Origin = Model_to_world * Model_Origin;
-            for (int i = 0; i < Model_Vertices.Length; i++) World_Vertices[i] = Model_to_world * Model_Vertices[i];
-            Camera_Origin = camera.World_to_screen * World_Origin;
-            for (int i = 0; i < Model_Vertices.Length; i++) Camera_Vertices[i] = camera.World_to_screen * World_Vertices[i];
+            if (Model_Vertices != null) for (int i = 0; i < Model_Vertices.Length; i++) World_Vertices[i] = Model_to_world * Model_Vertices[i];
         }
 
-        public void Draw_Shape(Camera camera, Graphics g)
+        public void Apply_Camera_Matrices(Camera camera)
         {
-            Apply_Matrices(camera);
+            camera.Recalculate_Matrix();
+            Camera_Origin = camera.World_to_screen * World_Origin;
+            if (World_Vertices != null) for (int i = 0; i < Model_Vertices.Length; i++) Camera_Vertices[i] = camera.World_to_screen * World_Vertices[i];
+        }
+
+        public void Draw_Shape(Camera camera , Graphics g)
+        {
+            Apply_World_Matrices();
+            Apply_Camera_Matrices(camera);
 
             using (SolidBrush green_brush = new SolidBrush(Color.Green))
             using (SolidBrush blue_brush = new SolidBrush(Color.Blue))
             using (Pen pen = new Pen(Color.Black))
             {
                 // Draw vertices
-                foreach (Vertex vertex in Camera_Vertices)
+                if (Camera_Vertices != null)
                 {
-                    if (vertex.Visible) g.FillEllipse(blue_brush, vertex.X - vertex.Radius / 2, vertex.Y - vertex.Radius / 2, vertex.Radius, vertex.Radius);
+                    foreach (Vertex vertex in Camera_Vertices)
+                    {
+                        if (vertex.Visible) g.FillEllipse(blue_brush, vertex.X - vertex.Radius / 2, vertex.Y - vertex.Radius / 2, vertex.Radius, vertex.Radius);
+                    }
                 }
 
                 // Draw edges
-                foreach (Edge edge in Edges)
+                if (Edges != null)
                 {
-                    if (edge.Visible) g.DrawLine(pen, Camera_Vertices[edge.P1].X, Camera_Vertices[edge.P1].Y, Camera_Vertices[edge.P2].X, Camera_Vertices[edge.P2].Y);
+                    foreach (Edge edge in Edges)
+                    {
+                        if (edge.Visible) g.DrawLine(pen, Camera_Vertices[edge.P1].X, Camera_Vertices[edge.P1].Y, Camera_Vertices[edge.P2].X, Camera_Vertices[edge.P2].Y);
+                    }
                 }
 
                 // Draw faces
-                foreach (Face face in Faces)
+                if (Faces != null)
                 {
-                    if (face.Visible) g.FillPolygon(green_brush, new PointF[3] {
+                    foreach (Face face in Faces)
+                    {
+                        if (face.Visible) g.FillPolygon(green_brush, new PointF[3] {
                         new PointF(Camera_Vertices[face.P1].X, Camera_Vertices[face.P1].Y),
                         new PointF(Camera_Vertices[face.P2].X, Camera_Vertices[face.P2].Y),
                         new PointF(Camera_Vertices[face.P3].X, Camera_Vertices[face.P3].Y) });
+                    }
                 }
             }
         }

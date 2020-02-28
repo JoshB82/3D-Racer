@@ -10,7 +10,7 @@
             Visible = true;
             Selected = false;
 
-            Model_Origin = new Vector(0, 0, 0);
+            Model_Origin = new Vector(0, 0, 0, 1);
             
             Model_Vertices = new Vertex[8]
             {
@@ -65,6 +65,7 @@
             Matrix scale = Transform.Scale(side_length, side_length, side_length);
             Matrix translation = Transform.Translate(x, y, z);
             Model_to_world = translation * scale;
+            Apply_World_Matrices();
         }
     }
 }

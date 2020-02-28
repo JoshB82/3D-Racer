@@ -70,7 +70,7 @@
     <Compile Include="Shapes\Cube.cs" />
     <Compile Include="Shapes\Shape rotation.cs" />
     <Compile Include="Shapes\Shape scaling.cs" />
-    <Compile Include="Shapes\Shape translation %28not finished%29.cs" />
+    <Compile Include="Shapes\Shape translation.cs" />
     <Compile Include="Shapes\World_Point.cs" />
     <Compile Include="Shapes\Transform rotation.cs" />
     <Compile Include="Shapes\Transform scaling.cs" />
