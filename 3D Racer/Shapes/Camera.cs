@@ -20,11 +20,12 @@
         {
             Model_Origin = new Vector(0, 0, 0, 1);
             Model_to_world = Transform.Translate(x, y, z);
-            World_to_camera = Transform.Translate(-x, -y, -z) * Transform.Rotation_Between_Vectors(direction, Vector.Unit_Negative_Z);
+            Matrix rotation = Transform.Rotation_Between_Vectors(direction, Vector.Unit_Negative_Z);
+            World_to_camera = Transform.Translate(-x, -y, -z) * rotation;
             World_Direction = direction;
         }
 
-        public Camera(float x, float y, float z, Shape shape) : this(x, y, z, shape.World_Origin - new Vector(x, y, z)) {}
+        public Camera(float x, float y, float z, Shape shape) : this(x, y, z, shape.World_Origin - new Vector(x, y, z, 1)) {}
 
         public void Recalculate_Matrix()
         {

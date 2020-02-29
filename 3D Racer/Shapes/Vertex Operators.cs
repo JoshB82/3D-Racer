@@ -36,8 +36,7 @@
 
         public static Vertex operator *(Matrix m, Vertex v)
         {
-            float[] result = new float[3];
-
+            float[] result = new float[m.Rows];
             float[] row = new float[m.Cols];
 
             for (int i = 0; i < m.Rows; i++)
@@ -46,7 +45,7 @@
                 result[i] = new Vector(row) * v;
             }
 
-            return new Vertex(result[0], result[1], result[2], "000000", true);
+            return new Vertex(result[0], result[1], result[2]);
         }
     }
 }

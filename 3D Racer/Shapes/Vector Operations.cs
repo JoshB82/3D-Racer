@@ -8,7 +8,7 @@ namespace _3D_Racer
         {
             float total = 0;
             for (int i = 0; i < Size; i++) total += (float)Math.Pow(Data[i], 2);
-            return total;
+            return (float)Math.Sqrt(total);
         }
 
         public static float Angle_Between_Vectors(Vector v1, Vector v2) => (v1 * v2) / (v1.Magnitude() * v2.Magnitude());

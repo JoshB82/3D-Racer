@@ -34,9 +34,9 @@ namespace _3D_Racer
         public bool Draw_Faces { get; set; } = true;
 
         // Colours
-        public string Vertex_Colour {get; set;}
-        public string Edge_Colour { get; set; }
-        public string Face_Colour { get; set; }
+        public int Vertex_Colour {get; set;}
+        public int Edge_Colour { get; set; }
+        public int Face_Colour { get; set; }
 
         // Object transformations
         public Matrix Model_to_world { get; set; }
@@ -58,42 +58,67 @@ namespace _3D_Racer
             if (World_Vertices != null) for (int i = 0; i < Model_Vertices.Length; i++) Camera_Vertices[i] = camera.World_to_screen * World_Vertices[i];
         }
 
-        public void Draw_Shape(Camera camera , Graphics g)
+        public void Divide_by_W()
+        {
+            for (int i = 0; i < Camera_Vertices.Length; i++)
+            {
+                Camera_Vertices[i].X /= Camera_Vertices[i].W;
+                Camera_Vertices[i].Y /= Camera_Vertices[i].W;
+                Camera_Vertices[i].Z /= Camera_Vertices[i].W;
+                Camera_Vertices[i].W = 1;
+            }
+        }
+
+        public void Scale_to_Screen()
+        {
+            for (int i = 0; i < Camera_Vertices.Length; i++)
+            {
+                Camera_Vertices[i] = Transform.Translate(1, 1, 0) * Camera_Vertices[i];
+                Camera_Vertices[i] = Transform.Scale_X(0.5f) * Camera_Vertices[i];
+                Camera_Vertices[i] = Transform.Scale_Y(0.5f) * Camera_Vertices[i];
+                Camera_Vertices[i] = Transform.Scale_X(MainForm.Canvas_width) * Camera_Vertices[i];
+                Camera_Vertices[i] = Transform.Scale_Y(MainForm.Canvas_height) * Camera_Vertices[i];
+            }
+        }
+
+        public void Draw_Shape(Camera camera, Graphics g)
         {
             Apply_World_Matrices();
             Apply_Camera_Matrices(camera);
+            Divide_by_W();
+            Scale_to_Screen();
 
-            using (SolidBrush green_brush = new SolidBrush(Color.Green))
-            using (SolidBrush blue_brush = new SolidBrush(Color.Blue))
-            using (Pen pen = new Pen(Color.Black))
+            using (SolidBrush face_brush = new SolidBrush(Color.FromArgb(Face_Colour)))
+            using (SolidBrush vertex_brush = new SolidBrush(Color.FromArgb(Vertex_Colour)))
+            using (Pen edge_pen = new Pen(Color.FromArgb(Edge_Colour)))
             {
-                // Draw vertices
-                if (Camera_Vertices != null)
+                // Draw faces
+                if (Camera_Vertices != null && Faces != null && Draw_Faces)
                 {
-                    foreach (Vertex vertex in Camera_Vertices)
+                    foreach (Face face in Faces)
                     {
-                        if (vertex.Visible) g.FillEllipse(blue_brush, vertex.X - vertex.Radius / 2, vertex.Y - vertex.Radius / 2, vertex.Radius, vertex.Radius);
+                        if (face.Visible) g.FillPolygon(vertex_brush, new PointF[3] {
+                        new PointF(Camera_Vertices[face.P1].X, Camera_Vertices[face.P1].Y),
+                        new PointF(Camera_Vertices[face.P2].X, Camera_Vertices[face.P2].Y),
+                        new PointF(Camera_Vertices[face.P3].X, Camera_Vertices[face.P3].Y) });
                     }
                 }
 
                 // Draw edges
-                if (Edges != null)
+                if (Camera_Vertices != null && Edges != null && Draw_Edges)
                 {
                     foreach (Edge edge in Edges)
                     {
-                        if (edge.Visible) g.DrawLine(pen, Camera_Vertices[edge.P1].X, Camera_Vertices[edge.P1].Y, Camera_Vertices[edge.P2].X, Camera_Vertices[edge.P2].Y);
+                        if (edge.Visible) g.DrawLine(edge_pen, Camera_Vertices[edge.P1].X, Camera_Vertices[edge.P1].Y, Camera_Vertices[edge.P2].X, Camera_Vertices[edge.P2].Y);
                     }
                 }
 
-                // Draw faces
-                if (Faces != null)
+                // Draw vertices
+                if (Camera_Vertices != null && Draw_Vertices)
                 {
-                    foreach (Face face in Faces)
+                    foreach (Vertex vertex in Camera_Vertices)
                     {
-                        if (face.Visible) g.FillPolygon(green_brush, new PointF[3] {
-                        new PointF(Camera_Vertices[face.P1].X, Camera_Vertices[face.P1].Y),
-                        new PointF(Camera_Vertices[face.P2].X, Camera_Vertices[face.P2].Y),
-                        new PointF(Camera_Vertices[face.P3].X, Camera_Vertices[face.P3].Y) });
+                        if (vertex.Visible) g.FillEllipse(face_brush, vertex.X - vertex.Radius / 2, vertex.Y - vertex.Radius / 2, vertex.Radius, vertex.Radius);
                     }
                 }
             }

@@ -4,12 +4,13 @@
     {
         public World_Point(float x, float y, float z)
         {
-            Model_Origin = new Vector(0, 0, 0);
+            Model_Origin = new Vector(0, 0, 0, 1);
             
             Visible = true;
             Selected = false;
 
             Model_Vertices = null;
+
             Edges = null;
             Faces = null;
 

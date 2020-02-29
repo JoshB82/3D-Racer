@@ -1,11 +1,13 @@
-﻿namespace _3D_Racer
+﻿using System.Diagnostics;
+
+namespace _3D_Racer
 {
     public sealed class Cube : Shape
     {
         public Cube(float x, float y, float z, float side_length,
-            string vertex_colour = "000000",
-            string edge_colour = "000000",
-            string face_colour = "000000")
+            int vertex_colour = 0x00000000,
+            int edge_colour = 0x00000000,
+            int face_colour = 0x00000000)
         {
             Visible = true;
             Selected = false;
@@ -23,6 +25,9 @@
                 new Vertex(1, 1, 1, vertex_colour), // 6
                 new Vertex(0, 1, 1, vertex_colour) // 7
             };
+
+            Camera_Vertices = new Vertex[8];
+            World_Vertices = new Vertex[8];
 
             Edges = new Edge[18]
             {
@@ -48,24 +53,25 @@
 
             Faces = new Face[12]
             {
-                new Face(0, 1, 2, face_colour), // 0
-                new Face(2, 3, 4, face_colour), // 1
-                new Face(5, 6, 7, face_colour), // 2
-                new Face(7, 8, 1, face_colour), // 3
-                new Face(9, 10, 11, face_colour), // 4
-                new Face(11, 12, 6, face_colour), // 5
-                new Face(13, 4, 14, face_colour), // 6
-                new Face(14, 15, 10, face_colour), // 7
-                new Face(3, 8, 16, face_colour), // 8
-                new Face(16, 12, 15, face_colour), // 9
-                new Face(9, 5, 17, face_colour), // 10
-                new Face(17, 0, 13, face_colour) // 11
+                new Face(0, 3, 2, face_colour), // 0
+                new Face(0, 2, 1, face_colour), // 1
+                new Face(1, 2, 6, face_colour), // 2
+                new Face(1, 6, 5, face_colour), // 3
+                new Face(5, 6, 7, face_colour), // 4
+                new Face(5, 7, 4, face_colour), // 5
+                new Face(4, 7, 3, face_colour), // 6
+                new Face(4, 3, 0, face_colour), // 7
+                new Face(3, 7, 6, face_colour), // 8
+                new Face(3, 6, 2, face_colour), // 9
+                new Face(0, 4, 5, face_colour), // 10
+                new Face(0, 5, 1, face_colour) // 11
             };
 
             Matrix scale = Transform.Scale(side_length, side_length, side_length);
             Matrix translation = Transform.Translate(x, y, z);
             Model_to_world = translation * scale;
             Apply_World_Matrices();
+            Debug.WriteLine("Cube created at (" + x + "," + y + "," + z + ")");
         }
     }
 }

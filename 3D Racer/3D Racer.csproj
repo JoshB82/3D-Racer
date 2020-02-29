@@ -46,21 +46,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Algebra\Matrix Formatting.cs" />
-    <Compile Include="Algebra\Matrix Operations.cs" />
-    <Compile Include="Algebra\Matrix Constructors.cs" />
-    <Compile Include="Algebra\Matrix Operators.cs" />
-    <Compile Include="Algebra\Vector Constructors.cs" />
-    <None Include="Algebra\Vectors\Constructors.cs" />
-    <Compile Include="Algebra\Vector Operations.cs" />
-    <Compile Include="Algebra\Vector Operators.cs" />
+    <Compile Include="Shapes\Matrix Formatting.cs" />
+    <Compile Include="Shapes\Matrix Operations.cs" />
+    <Compile Include="Shapes\Matrix Constructors.cs" />
+    <Compile Include="Shapes\Matrix Operators.cs" />
+    <Compile Include="Shapes\Vector Constructors.cs" />
+    <Compile Include="Shapes\Vector Operations.cs" />
+    <Compile Include="Shapes\Vector Operators.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <None Include="Algebra\Vectors\Calculations.cs" />
     <None Include="Algebra\Matrices\Operations.cs" />
     <None Include="Algebra\Matrices\Constructors.cs" />
     <None Include="Algebra\Matrices\Calculations.cs" />

@@ -20,17 +20,23 @@ namespace _3D_Racer
 
         private Camera Current_camera;
         
+        public static int Canvas_width { get; set; }
+        public static int Canvas_height { get; set; }
+
         public MainForm()
         {
             InitializeComponent();
-            
-            Cube default_cube = new Cube(200, 200, 100, 100, "000000");
+
+            Canvas_width = Canvas_Panel.Width;
+            Canvas_height = Canvas_Panel.Height;
+
+            Cube default_cube = new Cube(0, 0, 0, 100);
             default_cube.Selected = true;
             Entity_List.Add(default_cube);
-            Debug.WriteLine("Cube created!");
 
             World_Point origin = new World_Point(0, 0, 0);
-            Current_camera = new Orthogonal_Camera(200, 200, 200, origin, 100, 100, 50, 250);
+            //Entity_List.Add(origin);
+            Current_camera = new Orthogonal_Camera(200, 200, 200, new Vector(-200,-200,-200), 100, 100, 50, 250);
 
             Thread graphics_thread = new Thread(Game_Loop);
             graphics_thread.Start();
@@ -41,9 +47,7 @@ namespace _3D_Racer
         {
             bool game_running = true;
 
-            int canvas_width = Canvas_Panel.Width;
-            int canvas_height = Canvas_Panel.Height;
-            Canvas = new Bitmap(canvas_width, canvas_height);
+            Canvas = new Bitmap(Canvas_width, Canvas_height);
 
             DateTime start_time = DateTime.Now;
 
@@ -58,13 +62,13 @@ namespace _3D_Racer
                 // Update objects
                 // ApplyImpulse();
                 // Render
-                Render(canvas_width, canvas_height);
+                Render();
             }
         }
 
-        private void Render(int width, int height)
+        private void Render()
         {
-            Bitmap temp = new Bitmap(width, height);
+            Bitmap temp = new Bitmap(Canvas_width, Canvas_height);
 
             using (Graphics g = Graphics.FromImage(temp))
             {
@@ -90,7 +94,7 @@ namespace _3D_Racer
         {
             if (e.Button == MouseButtons.Right)
             {
-                Entity_List.Add(new Cube(e.X, e.Y, 100, 100, "000000"));
+                Entity_List.Add(new Cube(e.X, e.Y, 100, 100));
                 Debug.WriteLine("Cube created!");
             }
         }
