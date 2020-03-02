@@ -77,7 +77,7 @@ namespace _3D_Racer
                     },
                     {
                         rotation_axis.Data[1] * rotation_axis.Data[0] * (1 - cos_angle) + rotation_axis.Data[2] * sin_angle,
-                        cos_angle + (float)Math.Pow(rotation_axis.Data[2], 2) * (1 - cos_angle),
+                        cos_angle + (float)Math.Pow(rotation_axis.Data[1], 2) * (1 - cos_angle),
                         rotation_axis.Data[1] * rotation_axis.Data[2] * (1 - cos_angle) - rotation_axis.Data[0] * sin_angle,
                         0
                     },

@@ -7,8 +7,8 @@ namespace _3D_Racer
         /// <summary>
         /// Element-wise addition of vectors
         /// </summary>
-        /// <param name="m1">First addend</param>
-        /// <param name="m2">Second addend</param>
+        /// <param name="v1">First addend</param>
+        /// <param name="v2">Second addend</param>
         /// <returns>Sum of two vectors.</returns>
         public static Vector operator +(Vector v1, Vector v2)
         {
@@ -20,8 +20,8 @@ namespace _3D_Racer
         /// <summary>
         /// Element-wise subtraction of vectors
         /// </summary>
-        /// <param name="m1">Minuend</param>
-        /// <param name="m2">Subtrahend</param>
+        /// <param name="v1">Minuend</param>
+        /// <param name="v2">Subtrahend</param>
         /// <returns>Difference of two vectors.</returns>
         public static Vector operator -(Vector v1, Vector v2)
         {
@@ -33,8 +33,8 @@ namespace _3D_Racer
         /// <summary>
         /// Dot product of two vectors.
         /// </summary>
-        /// <param name="m1">First vector</param>
-        /// <param name="m2">Second vector</param>
+        /// <param name="v1">First vector</param>
+        /// <param name="v2">Second vector</param>
         /// <returns>Dot product of two vectors.</returns>
         public static float operator *(Vector v1, Vector v2)
         {

@@ -36,7 +36,7 @@ namespace _3D_Racer
 
             World_Point origin = new World_Point(0, 0, 0);
             //Entity_List.Add(origin);
-            Current_camera = new Orthogonal_Camera(200, 200, 200, new Vector(-200,-200,-200), 100, 100, 50, 250);
+            Current_camera = new Perspective_Camera(200, 200, 200, origin, 100, 100, 50, 250);
 
             Thread graphics_thread = new Thread(Game_Loop);
             graphics_thread.Start();

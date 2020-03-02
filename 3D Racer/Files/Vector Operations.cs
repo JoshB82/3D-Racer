@@ -11,7 +11,7 @@ namespace _3D_Racer
             return (float)Math.Sqrt(total);
         }
 
-        public static float Angle_Between_Vectors(Vector v1, Vector v2) => (v1 * v2) / (v1.Magnitude() * v2.Magnitude());
+        public static float Angle_Between_Vectors(Vector v1, Vector v2) => (float)Math.Acos((v1 * v2) / (v1.Magnitude() * v2.Magnitude()));
 
         public void Normalise()
         {

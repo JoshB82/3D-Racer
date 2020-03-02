@@ -8,12 +8,13 @@
         /// </summary>
         public int Size { get; set; }
 
-        public static Vector Unit_X { get; } = new Vector(1, 0, 0);
-        public static Vector Unit_Y { get; } = new Vector(0, 1, 0);
-        public static Vector Unit_Z { get; } = new Vector(0, 0, 1);
-        public static Vector Unit_Negative_X { get; } = new Vector(-1, 0, 0);
-        public static Vector Unit_Negative_Y { get; } = new Vector(0, -1, 0);
-        public static Vector Unit_Negative_Z { get; } = new Vector(0, 0, -1);
+        public static Vector Zero { get; } = new Vector(0, 0, 0, 1);
+        public static Vector Unit_X { get; } = new Vector(1, 0, 0, 1);
+        public static Vector Unit_Y { get; } = new Vector(0, 1, 0, 1);
+        public static Vector Unit_Z { get; } = new Vector(0, 0, 1, 1);
+        public static Vector Unit_Negative_X { get; } = new Vector(-1, 0, 0, 1);
+        public static Vector Unit_Negative_Y { get; } = new Vector(0, -1, 0, 1);
+        public static Vector Unit_Negative_Z { get; } = new Vector(0, 0, -1, 1);
 
         /// <summary>
         /// Creates a vector with a provided number of elements
