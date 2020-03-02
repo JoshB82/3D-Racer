@@ -123,5 +123,10 @@ namespace _3D_Racer
                 }
             }
         }
+
+        public Shape Get_Shape_From_File(string file)
+        {
+            return null;
+        }
     }
 }
