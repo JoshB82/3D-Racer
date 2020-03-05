@@ -33,7 +33,7 @@ namespace _3D_Racer
 
             World_Point origin = new World_Point(0, 0, 0);
             //Entity_List.Add(origin);
-            Current_camera = new Perspective_Camera(200, 200, 200, origin, 100, 100, 50, 250);
+            Current_camera = new Orthogonal_Camera(200, 200, 200, origin, 100, 100, 50, 250);
 
             Thread graphics_thread = new Thread(Game_Loop);
             graphics_thread.Start();
@@ -112,11 +112,13 @@ namespace _3D_Racer
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
+            /*
             Random rnd = new Random();
             int random_object = rnd.Next(0, scene.Count - 1);
             scene[selected_shape].Selected = false;
             scene[random_object].Selected = true;
             selected_shape = random_object;
+            */
         }
 
         private void Canvas_Panel_MouseMove(object sender, MouseEventArgs e)

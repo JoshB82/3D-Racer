@@ -4,7 +4,7 @@
     {
         public World_Point(float x, float y, float z)
         {
-            Model_Origin = new Vector(0, 0, 0, 1);
+            Model_Origin = new Vector4D(0, 0, 0, 1);
             
             Visible = true;
             Selected = false;
@@ -14,7 +14,7 @@
             Edges = null;
             Faces = null;
 
-            Matrix translation = Transform.Translate(x, y, z);
+            Matrix4x4 translation = Transform.Translate(x, y, z);
             Model_to_world = translation;
             Apply_World_Matrices();
         }

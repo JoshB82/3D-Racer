@@ -15,12 +15,14 @@ namespace _3D_Racer
 
         public Scene(int width, int height)
         {
+            Width = width;
+            Height = height;
             Canvas = new Bitmap(width, height);
         }
 
         public void Add(Shape shape)
         {
-            lock(locker) Objects.Add(shape);
+            lock (locker) Objects.Add(shape);
         }
 
         public void Add_From_File(string file)
@@ -29,7 +31,7 @@ namespace _3D_Racer
 
         public void Remove(int ID)
         {
-            lock(locker) Objects.RemoveAll(x => x.ID == ID);
+            lock (locker) Objects.RemoveAll(x => x.ID == ID);
         }
 
         public void Render(PictureBox canvas_box, Camera camera)
@@ -38,10 +40,7 @@ namespace _3D_Racer
 
             using (Graphics g = Graphics.FromImage(temp))
             {
-                lock (locker)
-                {
-                    foreach (Shape shape in Objects) shape.Draw_Shape(g, camera, Width, Height);
-                }
+                lock (locker) foreach (Shape shape in Objects) shape.Draw_Shape(g, camera, Width, Height);
             }
 
             Canvas = temp;

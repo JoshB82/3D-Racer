@@ -24,7 +24,7 @@ namespace _3D_Racer
             World_Direction = direction;
         }
 
-        public Camera(float x, float y, float z, Shape shape) : this(x, y, z, shape.World_Origin - new Vector(x, y, z, 1)) {}
+        public Camera(float x, float y, float z, Shape shape) : this(x, y, z, shape.World_Origin - new Vector4D(x, y, z, 1)) {}
 
         public void Recalculate_Matrix()
         {
@@ -38,10 +38,10 @@ namespace _3D_Racer
             float width, float height, float z_near, float z_far) : base(x, y, z, direction)
         {
             Camera_to_screen = Matrix4x4.IdentityMatrix();
-            Camera_to_screen.ChangeSingleValue(1, 1, 1 / width);
-            Camera_to_screen.ChangeSingleValue(2, 2, 1 / height);
-            Camera_to_screen.ChangeSingleValue(3, 3, -2 / (z_far - z_near));
-            Camera_to_screen.ChangeSingleValue(3, 4, -(z_far + z_near) / (z_far - z_near));
+            Camera_to_screen.Data[0][0] = 2 / width;
+            Camera_to_screen.Data[1][1] = 2 / height;
+            Camera_to_screen.Data[2][2] = -2 / (z_far - z_near);
+            Camera_to_screen.Data[2][3] = -(z_far + z_near) / (z_far - z_near);
             Debug.WriteLine("Orthogonal camera created at (" + x + "," + y + "," + z + ")");
         }
 
@@ -56,32 +56,34 @@ namespace _3D_Racer
             float width, float height, float z_near, float z_far) : base(x, y, z, pointed_at)
         {
             Camera_to_screen = Matrix4x4.IdentityMatrix();
-            Camera_to_screen.ChangeSingleValue(1, 1, 1 / width);
-            Camera_to_screen.ChangeSingleValue(2, 2, 1 / height);
-            Camera_to_screen.ChangeSingleValue(3, 3, -2 / (z_far - z_near));
-            Camera_to_screen.ChangeSingleValue(3, 4, -(z_far + z_near) / (z_far - z_near));
+            Camera_to_screen.Data[0][0] = 2 / width;
+            Camera_to_screen.Data[1][1] = 2 / height;
+            Camera_to_screen.Data[2][2] = -2 / (z_far - z_near);
+            Camera_to_screen.Data[2][3] = -(z_far + z_near) / (z_far - z_near);
             Debug.WriteLine("Orthogonal camera created at (" + x + "," + y + "," + z + ")");
         }
     }
-
+    /*
     public class Perspective_Camera : Camera
     {
-        public Perspective_Camera(float x, float y, float z, Vector direction,
+        public Perspective_Camera(float x, float y, float z, Vector4D direction,
             float fov_x, float fov_y, float z_near, float z_far) : base(x, y, z, direction)
         {
-            /*
+            
             Camera_to_screen = new Matrix(4);
             Camera_to_screen.ChangeSingleValue(1, 1, (float)Math.Atan(fov_x / 2));
             Camera_to_screen.ChangeSingleValue(2, 2, (float)Math.Atan(fov_y / 2));
             Camera_to_screen.ChangeSingleValue(3, 3, -(z_far + z_near) / (z_far - z_near));
             Camera_to_screen.ChangeSingleValue(3, 4, -(2 * z_near * z_far) / (z_far - z_near));
-            */
+            
 
+            
             Camera_to_screen = new Matrix(4);
             Camera_to_screen.ChangeSingleValue(1,1,);
             Camera_to_screen.ChangeSingleValue(3, 3, -(z_far + z_near) / (z_far - z_near));
             Camera_to_screen.ChangeSingleValue(3, 4, -(2 * z_near * z_far) / (z_far - z_near));
             Debug.WriteLine("Perspective camera created at (" + x + "," + y + "," + z + ")");
+            
         }
 
         /// <summary>
@@ -93,12 +95,13 @@ namespace _3D_Racer
         /// <param name="height">The height of the camera's view</param>
         /// <param name="z_near">The closest distance from the camera from which an object can be seen</param>
         /// <param name="z_far">The furthest distance from the camera from which an object can be seen</param>
-        public Perspective_Camera(Vector position, Vector direction, float width, float height, float z_near, float z_far) : base(position.Data[0], position.Data[1], position.Data[2], direction)
+        public Perspective_Camera(Vector4D position, Vector4D direction, float width, float height, float z_near, float z_far) : base(position.Data[0], position.Data[1], position.Data[2], direction)
         {
+            
             Camera_to_screen.ChangeSingleValue(1, 1, 2 * z_near / width);
             Camera_to_screen.ChangeSingleValue(2, 2, 2 * z_near / height);
-
         }
+        
 
         /// <summary>
         /// Create a perspective camera pointed at the origin of a shape
@@ -110,12 +113,15 @@ namespace _3D_Racer
         public Perspective_Camera(float x, float y, float z, Shape pointed_at,
             float fov_x, float fov_y, float z_near, float z_far) : base(x, y, z, pointed_at)
         {
+            
             Camera_to_screen = new Matrix(4);
             Camera_to_screen.ChangeSingleValue(1, 1, (float)Math.Atan(fov_x / 2));
             Camera_to_screen.ChangeSingleValue(2, 2, (float)Math.Atan(fov_y / 2));
             Camera_to_screen.ChangeSingleValue(3, 3, -(z_far + z_near) / (z_far - z_near));
             Camera_to_screen.ChangeSingleValue(3, 4, -(2 * z_near * z_far) / (z_far - z_near));
             Debug.WriteLine("Perspective camera created at (" + x + "," + y + "," + z + ")");
+            
         }
     }
+*/
 }

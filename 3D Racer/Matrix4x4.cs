@@ -4,7 +4,7 @@ namespace _3D_Racer
 {
     public class Matrix4x4
     {
-        public float[][] Data {get; set;}
+        public float[][] Data { get; set; }
 
         /// <summary>
         /// Creates a zeroed 4x4 matrix.
@@ -17,7 +17,11 @@ namespace _3D_Racer
         public static Matrix4x4 IdentityMatrix()
         {
             float[][] data = new float[4][];
-            for (int i = 0; i < 4; i++) data[i][i] = 1;
+            for (int i = 0; i < 4; i++)
+            {
+                data[i] = new float[4];
+                data[i][i] = 1;
+            }
             return new Matrix4x4(data);
         }
 
@@ -58,13 +62,15 @@ namespace _3D_Racer
             float[] col = new float[4];
 
             for (int i = 0; i < 4; i++)
+            {
+                result[i] = new float[4];
                 for (int j = 0; j < 4; j++)
                 {
                     for (int k = 0; k < 4; k++) row[k] = m1.Data[i][k];
                     for (int l = 0; l < 4; l++) col[l] = m2.Data[l][j];
                     result[i][j] = new Vector4D(row) * new Vector4D(col);
                 }
-
+            }
             return new Matrix4x4(result);
         }
 

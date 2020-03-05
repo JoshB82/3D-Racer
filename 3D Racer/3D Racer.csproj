@@ -47,12 +47,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera transformation.cs" />
-    <Compile Include="Files\Matrix Formatting.cs" />
-    <Compile Include="Files\Matrix Operations.cs" />
-    <Compile Include="Files\Matrix Constructors.cs" />
-    <Compile Include="Files\Matrix Operators.cs" />
-    <Compile Include="Files\Vector Constructors.cs" />
-    <Compile Include="Files\Vector Operators.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -73,7 +67,6 @@
     <Compile Include="TransformScaling.cs" />
     <Compile Include="TransformTranslation.cs" />
     <Compile Include="Shape.cs" />
-    <Compile Include="Files\Vertex Operators.cs" />
     <Compile Include="ShapeComponents.cs" />
     <Compile Include="Vector4D.cs" />
     <Compile Include="Vector3D.cs" />
