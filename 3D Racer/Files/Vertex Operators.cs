@@ -1,8 +1,8 @@
 ﻿namespace _3D_Racer
 {
-    public partial class Vertex : Vector
+    public partial class ShapeComponents : Vector
     {
-        public static Vertex operator +(Vertex v1, Vertex v2)
+        public static ShapeComponents operator +(ShapeComponents v1, ShapeComponents v2)
         {
             v1.X += v2.X;
             v1.Y += v2.Y;
@@ -10,7 +10,7 @@
             return v1;
         }
 
-        public static Vertex operator -(Vertex v1, Vertex v2)
+        public static ShapeComponents operator -(ShapeComponents v1, ShapeComponents v2)
         {
             v1.X -= v2.X;
             v1.Y -= v2.Y;
@@ -18,7 +18,7 @@
             return v1;
         }
 
-        public static Vertex operator +(Vertex v1, Vector v2)
+        public static ShapeComponents operator +(ShapeComponents v1, Vector v2)
         {
             v1.X += v2.Data[0];
             v1.Y += v2.Data[1];
@@ -26,7 +26,7 @@
             return v1;
         }
 
-        public static Vertex operator -(Vertex v1, Vector v2)
+        public static ShapeComponents operator -(ShapeComponents v1, Vector v2)
         {
             v1.X -= v2.Data[0];
             v1.Y -= v2.Data[1];
@@ -34,7 +34,7 @@
             return v1;
         }
 
-        public static Vertex operator *(Matrix m, Vertex v)
+        public static ShapeComponents operator *(Matrix m, ShapeComponents v)
         {
             float[] result = new float[m.Rows];
             float[] row = new float[m.Cols];
@@ -45,7 +45,7 @@
                 result[i] = new Vector(row) * v;
             }
 
-            return new Vertex(result[0], result[1], result[2]);
+            return new ShapeComponents(result[0], result[1], result[2]);
         }
     }
 }

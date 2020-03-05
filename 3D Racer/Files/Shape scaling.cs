@@ -45,5 +45,12 @@
             Matrix scaling_z = Transform.Scale_Z(scale_factor_z);
             Model_to_world = scaling_z * scaling_y * scaling_x * Model_to_world;
         }
+
+        /// <summary>
+        /// Scales a shape by the same scale factor in all directions.
+        /// </summary>
+        /// <param name="scale_factor">Factor to scale by</param>
+        /// <returns>Scaling matrix</returns>
+        public void Scale(float scale_factor) => Scale(scale_factor, scale_factor, scale_factor);
     }
 }

@@ -8,9 +8,9 @@ namespace _3D_Racer
         /// <summary>
         /// Parent vertex to all other vertices in object.
         /// </summary>
-        public Vector Model_Origin { get; set; }
-        public Vector World_Origin { get; set; }
-        public Vector Camera_Origin { get; set; }
+        public Vector4D Model_Origin { get; set; }
+        public Vector4D World_Origin { get; set; }
+        public Vector4D Camera_Origin { get; set; }
 
         /// <summary>
         /// Arrays of child vertices.
@@ -39,10 +39,16 @@ namespace _3D_Racer
         public int Face_Colour { get; set; }
 
         // Object transformations
-        public Matrix Model_to_world { get; set; }
+        public Matrix4x4 Model_to_world { get; set; }
         
         // Miscellaneous
+        /// <summary>
+        /// Determines if the shape is visible or not.
+        /// </summary>
         public bool Visible { get; set; }
+        /// <summary>
+        /// Determines if the shape is selected or not.
+        /// </summary>
         public bool Selected { get; set; }
 
         public void Apply_World_Matrices()
@@ -116,7 +122,7 @@ namespace _3D_Racer
                 // Draw vertices
                 if (Camera_Vertices != null && Draw_Vertices)
                 {
-                    foreach (Vertex vertex in Camera_Vertices)
+                    foreach (ShapeComponents vertex in Camera_Vertices)
                     {
                         if (vertex.Visible) g.FillEllipse(face_brush, vertex.X - vertex.Radius / 2, vertex.Y - vertex.Radius / 2, vertex.Radius, vertex.Radius);
                     }

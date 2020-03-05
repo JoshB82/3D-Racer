@@ -10,7 +10,7 @@ namespace _3D_Racer
     public partial class MainForm : Form
     {
         private static readonly object locker = new object();
-        private List<Shape> scene = new List<Shape>();
+        private readonly List<Shape> scene = new List<Shape>();
 
         public Bitmap Canvas { get; set; }
 

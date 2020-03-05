@@ -17,7 +17,7 @@ namespace _3D_Racer
 
         public Matrix Model_to_world { get; protected set; }
         public Matrix World_to_camera { get; protected set; }
-        public Matrix Camera_to_screen { get; protected set; }
+        public Matrix Camera_to_screen { get; protected set; } = new Matrix(4);
         public Matrix World_to_screen { get; protected set; }
 
         public Camera(float x, float y, float z, Vector direction)
@@ -72,12 +72,35 @@ namespace _3D_Racer
         public Perspective_Camera(float x, float y, float z, Vector direction,
             float fov_x, float fov_y, float z_near, float z_far) : base(x, y, z, direction)
         {
+            /*
             Camera_to_screen = new Matrix(4);
             Camera_to_screen.ChangeSingleValue(1, 1, (float)Math.Atan(fov_x / 2));
             Camera_to_screen.ChangeSingleValue(2, 2, (float)Math.Atan(fov_y / 2));
             Camera_to_screen.ChangeSingleValue(3, 3, -(z_far + z_near) / (z_far - z_near));
             Camera_to_screen.ChangeSingleValue(3, 4, -(2 * z_near * z_far) / (z_far - z_near));
+            */
+
+            Camera_to_screen = new Matrix(4);
+            Camera_to_screen.ChangeSingleValue(1,1,);
+            Camera_to_screen.ChangeSingleValue(3, 3, -(z_far + z_near) / (z_far - z_near));
+            Camera_to_screen.ChangeSingleValue(3, 4, -(2 * z_near * z_far) / (z_far - z_near));
             Debug.WriteLine("Perspective camera created at (" + x + "," + y + "," + z + ")");
+        }
+
+        /// <summary>
+        /// Create a perspective camera pointing in a specific direction
+        /// </summary>
+        /// <param name="position">Position of the camera as a vector</param>
+        /// <param name="direction">Direction the camera is facing as a vector</param>
+        /// <param name="width">The width of the camera's view</param>
+        /// <param name="height">The height of the camera's view</param>
+        /// <param name="z_near">The closest distance from the camera from which an object can be seen</param>
+        /// <param name="z_far">The furthest distance from the camera from which an object can be seen</param>
+        public Perspective_Camera(Vector position, Vector direction, float width, float height, float z_near, float z_far) : base(position.Data[0], position.Data[1], position.Data[2], direction)
+        {
+            Camera_to_screen.ChangeSingleValue(1, 1, 2 * z_near / width);
+            Camera_to_screen.ChangeSingleValue(2, 2, 2 * z_near / height);
+
         }
 
         /// <summary>

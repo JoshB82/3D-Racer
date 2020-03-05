@@ -1,12 +1,7 @@
 ﻿namespace _3D_Racer
 {
-    public partial class Vertex : Vector
+    public partial class Vertex : Vector4D
     {
-        public float X { get; set; }
-        public float Y { get; set; }
-        public float Z { get; set; }
-        public float W { get; set; } = 1;
-
         public int Colour { get; set; }
         public float Radius { get; set; }
         public bool Visible { get; set; }
@@ -17,15 +12,20 @@
         /// <param name="x">x - co-ordinate of the vertex.</param>
         /// <param name="y">y - co-ordinate of the vertex.</param>
         /// <param name="z">z - co-ordinate of the vertex.</param>
-        /// <param name="colour">Eight digit hexadecimal colour value.</param>
-        public Vertex(float x, float y, float z, int colour = 0x000000FF, bool visibility = true) : base( x, y, z, 1 )
+        /// <param name="colour">Eight digit hexadecimal ARGB colour value.</param>
+        public Vertex(float x, float y, float z, int colour = 0x000000FF, bool visibility = true, float radius = 10) : base( x, y, z, 1 )
         {
-            X = x;
-            Y = y;
-            Z = z;
             Colour = colour;
+            Radius = radius;
             Visible = visibility;
         }
+
+        #region Vertex Operations (Operator Overloading)
+        public static Vertex operator +(Vertex v1, Vector4D v2) => new Vertex(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z, v1.Colour, v1.Visible, v1.Radius);
+        public static Vertex operator -(Vertex v1, Vector4D v2) => new Vertex(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z, v1.Colour, v1.Visible, v1.Radius);
+        public static Vertex operator *(Vertex v, float scalar) => new Vertex(v.X * scalar, v.Y * scalar, v.Z * scalar, v.Colour, v.Visible, v.Radius);
+        public static Vertex operator /(Vertex v, float scalar) => new Vertex(v.X / scalar, v.Y / scalar, v.Z / scalar, v.Colour, v.Visible, v.Radius);
+        #endregion
     }
 
     public class Edge
@@ -51,7 +51,7 @@
         public int P3 { get; set; }
         public int Colour { get; set; }
         public bool Visible { get; set; }
-        public int z_index { get; set; }
+        public int Z_index { get; set; }
 
         public Face(int p1, int p2, int p3, int colour = 0x0000FF00, bool visibility = true)
         {
