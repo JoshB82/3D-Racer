@@ -80,6 +80,18 @@ namespace _3D_Racer
             return new Vector4D(result);
         }
 
+        public static Vertex operator *(Matrix4x4 m, Vertex v)
+        {
+            float[] result = new float[4];
+            float[] row = new float[4];
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++) row[j] = m.Data[i][j];
+                result[i] = new Vector4D(row) * v;
+            }
+            return new Vertex(result[0], result[1], result[2], v.Colour, v.Visible, v.Radius);
+        }
+
         public static Matrix4x4 operator *(float scalar, Matrix4x4 m)
         {
             for (int i = 0; i < 4; i++) for (int j = 0; j < 4; j++) m.Data[i][j] *= scalar;

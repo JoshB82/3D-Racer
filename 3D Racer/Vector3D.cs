@@ -25,6 +25,16 @@ namespace _3D_Racer
             Z = z;
         }
 
+        #region Common Vectors
+        public static readonly Vector3D Zero = new Vector3D(0, 0, 0);
+        public static readonly Vector3D Unit_X = new Vector3D(1, 0, 0);
+        public static readonly Vector3D Unit_Y = new Vector3D(0, 1, 0);
+        public static readonly Vector3D Unit_Z = new Vector3D(0, 0, 1);
+        public static readonly Vector3D Unit_Negative_X = new Vector3D(-1, 0, 0);
+        public static readonly Vector3D Unit_Negative_Y = new Vector3D(0, -1, 0);
+        public static readonly Vector3D Unit_Negative_Z = new Vector3D(0, 0, -1);
+        #endregion
+
         #region Vector Operations (Operator Overloading)
         public static Vector3D operator +(Vector3D v1, Vector3D v2) => new Vector3D(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z);
         public static Vector3D operator -(Vector3D v1, Vector3D v2) => new Vector3D(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);

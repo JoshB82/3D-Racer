@@ -46,13 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Files\Camera transformation.cs" />
+    <Compile Include="Camera transformation.cs" />
     <Compile Include="Files\Matrix Formatting.cs" />
     <Compile Include="Files\Matrix Operations.cs" />
     <Compile Include="Files\Matrix Constructors.cs" />
     <Compile Include="Files\Matrix Operators.cs" />
     <Compile Include="Files\Vector Constructors.cs" />
-    <Compile Include="Files\Vector Operations.cs" />
     <Compile Include="Files\Vector Operators.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -63,11 +62,12 @@
     <Compile Include="Matrix4x4.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Files\Camera.cs" />
-    <Compile Include="Files\Cube.cs" />
-    <Compile Include="Files\Shape rotation.cs" />
-    <Compile Include="Files\Shape scaling.cs" />
-    <Compile Include="Files\Shape translation.cs" />
+    <Compile Include="Camera.cs" />
+    <Compile Include="Cube.cs" />
+    <Compile Include="Scene.cs" />
+    <Compile Include="ShapeRotation.cs" />
+    <Compile Include="ShapeScaling.cs" />
+    <Compile Include="ShapeTranslation.cs" />
     <Compile Include="Files\World_Point.cs" />
     <Compile Include="TransformRotation.cs" />
     <Compile Include="TransformScaling.cs" />

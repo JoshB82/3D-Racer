@@ -9,10 +9,12 @@ namespace _3D_Racer
             int edge_colour = 0x00000000,
             int face_colour = 0x00000000)
         {
+            ID = Get_Next_ID();
+
             Visible = true;
             Selected = false;
 
-            Model_Origin = new Vector(0, 0, 0, 1);
+            Model_Origin = new Vector4D(0, 0, 0, 1);
             
             Model_Vertices = new Vertex[8]
             {
@@ -67,8 +69,8 @@ namespace _3D_Racer
                 new Face(0, 5, 1, face_colour) // 11
             };
 
-            Matrix scale = Transform.Scale(side_length, side_length, side_length);
-            Matrix translation = Transform.Translate(x, y, z);
+            Matrix4x4 scale = Transform.Scale(side_length, side_length, side_length);
+            Matrix4x4 translation = Transform.Translate(x, y, z);
             Model_to_world = translation * scale;
             Apply_World_Matrices();
             Debug.WriteLine("Cube created at (" + x + "," + y + "," + z + ")");

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
@@ -9,11 +8,6 @@ namespace _3D_Racer
 {
     public partial class MainForm : Form
     {
-        private static readonly object locker = new object();
-        private readonly List<Shape> scene = new List<Shape>();
-
-        public Bitmap Canvas { get; set; }
-
         private int prev_x, prev_y;
         private int selected_shape;
         private bool mouse_down;
@@ -24,17 +18,14 @@ namespace _3D_Racer
         private const int max_frames_per_second = 60;
         private const int max_updates_per_second = 60;
 
+        private Scene scene;
         private Camera Current_camera;
         
-        public static int Canvas_width { get; set; }
-        public static int Canvas_height { get; set; }
-
         public MainForm()
         {
             InitializeComponent();
 
-            Canvas_width = Canvas_Panel.Width;
-            Canvas_height = Canvas_Panel.Height;
+            scene = new Scene(Canvas_Box.Width, Canvas_Box.Height);
 
             Cube default_cube = new Cube(0, 0, 0, 100);
             default_cube.Selected = true;
@@ -53,8 +44,6 @@ namespace _3D_Racer
         private void Game_Loop()
         {
             bool game_running = true;
-
-            Canvas = new Bitmap(Canvas_width, Canvas_height);
 
             long start_time = Get_UNIX_Time_Milliseconds();
             long timer = Get_UNIX_Time_Milliseconds();
@@ -82,7 +71,7 @@ namespace _3D_Racer
                 if (update_delta_time >= update_optimal_time)
                 {
                     // Render
-                    Render();
+                    scene.Render(Canvas_Box, Current_camera);
                     no_updates++;
                 }
 
@@ -100,26 +89,11 @@ namespace _3D_Racer
 
         private static long Get_UNIX_Time_Milliseconds() => (long)(DateTime.Now - new DateTime(1970, 1, 1)).TotalMilliseconds;
 
-        private void Render()
-        {
-            Bitmap temp = new Bitmap(Canvas_width, Canvas_height);
-
-            using (Graphics g = Graphics.FromImage(temp))
-            {
-                lock (locker)
-                {
-                    foreach (Shape shape in scene) shape.Draw_Shape(Current_camera, g);
-                }
-            }
-
-            Canvas = temp;
-            Canvas_Panel.Invalidate();
-        }
         #endregion
 
         private void Canvas_Panel_Paint(object sender, PaintEventArgs e)
         {
-            e.Graphics.DrawImageUnscaled(Canvas, Point.Empty);
+            e.Graphics.DrawImageUnscaled(scene.Canvas, Point.Empty);
         }
 
         private void quitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -131,11 +105,8 @@ namespace _3D_Racer
         {
             if (e.Button == MouseButtons.Right)
             {
-                lock (locker)
-                {
-                    scene.Add(new Cube(e.X, e.Y, 100, 100));
-                    Debug.WriteLine("Cube created!");
-                }
+                scene.Add(new Cube(e.X, e.Y, 100, 100));
+                Debug.WriteLine("Cube created!");
             }
         }
 

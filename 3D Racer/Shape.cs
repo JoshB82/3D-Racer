@@ -4,6 +4,14 @@ namespace _3D_Racer
 {
     public abstract partial class Shape
     {
+        public int ID { get; protected set; }
+        private static int next_id = -1;
+        protected int Get_Next_ID()
+        {
+            next_id++;
+            return next_id;
+        }
+
         // Object structure
         /// <summary>
         /// Parent vertex to all other vertices in object.
@@ -75,24 +83,22 @@ namespace _3D_Racer
             }
         }
 
-        public void Scale_to_Screen()
+        public void Scale_to_Screen(int width, int height)
         {
             for (int i = 0; i < Camera_Vertices.Length; i++)
             {
                 Camera_Vertices[i] = Transform.Translate(1, 1, 0) * Camera_Vertices[i];
-                Camera_Vertices[i] = Transform.Scale_X(0.5f) * Camera_Vertices[i];
-                Camera_Vertices[i] = Transform.Scale_Y(0.5f) * Camera_Vertices[i];
-                Camera_Vertices[i] = Transform.Scale_X(MainForm.Canvas_width) * Camera_Vertices[i];
-                Camera_Vertices[i] = Transform.Scale_Y(MainForm.Canvas_height) * Camera_Vertices[i];
+                Camera_Vertices[i] = Transform.Scale_X(0.5f * width) * Camera_Vertices[i];
+                Camera_Vertices[i] = Transform.Scale_Y(0.5f * height) * Camera_Vertices[i];
             }
         }
 
-        public void Draw_Shape(Camera camera, Graphics g)
+        public void Draw_Shape(Graphics g, Camera camera, int width, int height)
         {
             Apply_World_Matrices();
             Apply_Camera_Matrices(camera);
             Divide_by_W();
-            Scale_to_Screen();
+            Scale_to_Screen(width, height);
 
             using (SolidBrush face_brush = new SolidBrush(Color.FromArgb(Face_Colour)))
             using (SolidBrush vertex_brush = new SolidBrush(Color.FromArgb(Vertex_Colour)))
@@ -122,17 +128,12 @@ namespace _3D_Racer
                 // Draw vertices
                 if (Camera_Vertices != null && Draw_Vertices)
                 {
-                    foreach (ShapeComponents vertex in Camera_Vertices)
+                    foreach (Vertex vertex in Camera_Vertices)
                     {
                         if (vertex.Visible) g.FillEllipse(face_brush, vertex.X - vertex.Radius / 2, vertex.Y - vertex.Radius / 2, vertex.Radius, vertex.Radius);
                     }
                 }
             }
-        }
-
-        public Shape Get_Shape_From_File(string file)
-        {
-            return null;
         }
     }
 }

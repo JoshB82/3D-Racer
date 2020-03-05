@@ -2,33 +2,6 @@
 {
     public partial class Matrix
     {
-        public int Rows { get; set; }
-        public int Cols { get; set; }
-        public float[,] Data { get; set; }
-
-        /// <summary>
-        /// Creates a zeroed matrix of specified size.
-        /// </summary>
-        /// <param name="rows">Number of rows</param>
-        /// <param name="cols">Number of columns</param>
-        public Matrix(int rows, int cols)
-        {
-            Rows = rows;
-            Cols = cols;
-            Data = new float[rows, cols];
-        }
-
-        /// <summary>
-        /// Creates an identity matrix of specified size.
-        /// </summary>
-        /// <param name="rowsAndCols">Number of rows/columns</param>
-        public Matrix(int rows_and_cols)
-        {
-            Rows = Cols = rows_and_cols;
-            Data = new float[rows_and_cols, rows_and_cols];
-            for (int i = 0; i < Rows; i++) Data[i, i] = 1;
-        }
-
         /// <summary>
         /// Creates a matrix from a data array.
         /// </summary>

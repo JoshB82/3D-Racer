@@ -8,7 +8,7 @@
         /// <param name="angle">Angle in radians</param>
         public void Rotate_X(float angle)
         {
-            Matrix rotation = Transform.Rotate_X(angle);
+            Matrix4x4 rotation = Transform.Rotate_X(angle);
             Model_to_world = rotation * Model_to_world;
         }
 
@@ -18,7 +18,7 @@
         /// <param name="angle">Angle in radians</param>
         public void Rotate_Y(float angle)
         {
-            Matrix rotation = Transform.Rotate_Y(angle);
+            Matrix4x4 rotation = Transform.Rotate_Y(angle);
             Model_to_world = rotation * Model_to_world;
         }
 
@@ -28,7 +28,7 @@
         /// <param name="angle">Angle in radians</param>
         public void Rotate_Z(float angle)
         {
-            Matrix rotation = Transform.Rotate_Z(angle);
+            Matrix4x4 rotation = Transform.Rotate_Z(angle);
             Model_to_world = rotation * Model_to_world;
         }
     }

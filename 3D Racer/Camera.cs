@@ -5,25 +5,22 @@ namespace _3D_Racer
 {
     public abstract partial class Camera
     {
-        /// <summary>
-        /// Location of camera in world space
-        /// </summary>
-        public Vector Model_Origin { get; } = Vector.Zero;
-        public Vector World_Origin { get; protected set; }
-        public Vector Camera_Origin { get; protected set; }
+        public Vector4D Model_Origin { get; } = Vector4D.Zero;
+        public Vector4D World_Origin { get; protected set; }
+        public Vector4D Camera_Origin { get; protected set; }
 
-        public Vector Model_Direction { get; } = Vector.Unit_Negative_Z;
-        public Vector World_Direction { get; protected set; }
+        public Vector4D Model_Direction { get; } = Vector4D.Unit_Negative_Z;
+        public Vector4D World_Direction { get; protected set; }
 
-        public Matrix Model_to_world { get; protected set; }
-        public Matrix World_to_camera { get; protected set; }
-        public Matrix Camera_to_screen { get; protected set; } = new Matrix(4);
-        public Matrix World_to_screen { get; protected set; }
+        public Matrix4x4 Model_to_world { get; protected set; }
+        public Matrix4x4 World_to_camera { get; protected set; }
+        public Matrix4x4 Camera_to_screen { get; protected set; } = Matrix4x4.IdentityMatrix();
+        public Matrix4x4 World_to_screen { get; protected set; }
 
-        public Camera(float x, float y, float z, Vector direction)
+        public Camera(float x, float y, float z, Vector4D direction)
         {
             Model_to_world = Transform.Translate(x, y, z) * Transform.Rotation_Between_Vectors(Model_Direction, direction);
-            World_to_camera = Transform.Rotation_Between_Vectors(direction, Vector.Unit_Negative_Z) * Transform.Translate(-x, -y, -z);
+            World_to_camera = Transform.Rotation_Between_Vectors(direction, Vector4D.Unit_Negative_Z) * Transform.Translate(-x, -y, -z);
             World_Direction = direction;
         }
 
@@ -37,10 +34,10 @@ namespace _3D_Racer
 
     public class Orthogonal_Camera : Camera
     {
-        public Orthogonal_Camera(float x, float y, float z, Vector direction,
+        public Orthogonal_Camera(float x, float y, float z, Vector4D direction,
             float width, float height, float z_near, float z_far) : base(x, y, z, direction)
         {
-            Camera_to_screen = new Matrix(4);
+            Camera_to_screen = Matrix4x4.IdentityMatrix();
             Camera_to_screen.ChangeSingleValue(1, 1, 1 / width);
             Camera_to_screen.ChangeSingleValue(2, 2, 1 / height);
             Camera_to_screen.ChangeSingleValue(3, 3, -2 / (z_far - z_near));
@@ -58,7 +55,7 @@ namespace _3D_Racer
         public Orthogonal_Camera(float x, float y, float z, Shape pointed_at,
             float width, float height, float z_near, float z_far) : base(x, y, z, pointed_at)
         {
-            Camera_to_screen = new Matrix(4);
+            Camera_to_screen = Matrix4x4.IdentityMatrix();
             Camera_to_screen.ChangeSingleValue(1, 1, 1 / width);
             Camera_to_screen.ChangeSingleValue(2, 2, 1 / height);
             Camera_to_screen.ChangeSingleValue(3, 3, -2 / (z_far - z_near));

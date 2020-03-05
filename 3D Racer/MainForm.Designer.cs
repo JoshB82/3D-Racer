@@ -32,9 +32,9 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.Canvas_Panel = new System.Windows.Forms.PictureBox();
+            this.Canvas_Box = new System.Windows.Forms.PictureBox();
             this.menuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Canvas_Panel)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Canvas_Box)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -44,8 +44,7 @@
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Padding = new System.Windows.Forms.Padding(6, 2, 0, 2);
-            this.menuStrip1.Size = new System.Drawing.Size(842, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(842, 28);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -55,7 +54,7 @@
             this.newGameToolStripMenuItem,
             this.quitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 26);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 24);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // newGameToolStripMenuItem
@@ -71,26 +70,26 @@
             this.quitToolStripMenuItem.Text = "Quit";
             this.quitToolStripMenuItem.Click += new System.EventHandler(this.quitToolStripMenuItem_Click);
             // 
-            // Canvas_Panel
+            // Canvas_Box
             // 
-            this.Canvas_Panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Canvas_Panel.Location = new System.Drawing.Point(0, 30);
-            this.Canvas_Panel.Name = "Canvas_Panel";
-            this.Canvas_Panel.Size = new System.Drawing.Size(842, 613);
-            this.Canvas_Panel.TabIndex = 1;
-            this.Canvas_Panel.TabStop = false;
-            this.Canvas_Panel.Paint += new System.Windows.Forms.PaintEventHandler(this.Canvas_Panel_Paint);
-            this.Canvas_Panel.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Canvas_Panel_MouseClick);
-            this.Canvas_Panel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Canvas_Panel_MouseDown);
-            this.Canvas_Panel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Canvas_Panel_MouseMove);
-            this.Canvas_Panel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Canvas_Panel_MouseUp);
+            this.Canvas_Box.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Canvas_Box.Location = new System.Drawing.Point(0, 28);
+            this.Canvas_Box.Name = "Canvas_Box";
+            this.Canvas_Box.Size = new System.Drawing.Size(842, 615);
+            this.Canvas_Box.TabIndex = 1;
+            this.Canvas_Box.TabStop = false;
+            this.Canvas_Box.Paint += new System.Windows.Forms.PaintEventHandler(this.Canvas_Panel_Paint);
+            this.Canvas_Box.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Canvas_Panel_MouseClick);
+            this.Canvas_Box.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Canvas_Panel_MouseDown);
+            this.Canvas_Box.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Canvas_Panel_MouseMove);
+            this.Canvas_Box.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Canvas_Panel_MouseUp);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(842, 643);
-            this.Controls.Add(this.Canvas_Panel);
+            this.Controls.Add(this.Canvas_Box);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainForm";
@@ -98,7 +97,7 @@
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Canvas_Panel)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Canvas_Box)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -110,7 +109,7 @@
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newGameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem quitToolStripMenuItem;
-        private System.Windows.Forms.PictureBox Canvas_Panel;
+        private System.Windows.Forms.PictureBox Canvas_Box;
     }
 }
 
