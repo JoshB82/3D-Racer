@@ -1,8 +1,10 @@
-﻿namespace _3D_Racer
+﻿using System.Drawing;
+
+namespace _3D_Racer
 {
     public partial class Vertex : Vector4D
     {
-        public int Colour { get; set; }
+        public Color Colour { get; set; }
         public float Radius { get; set; }
         public bool Visible { get; set; }
 
@@ -13,7 +15,7 @@
         /// <param name="y">y - co-ordinate of the vertex.</param>
         /// <param name="z">z - co-ordinate of the vertex.</param>
         /// <param name="colour">Eight digit hexadecimal ARGB colour value.</param>
-        public Vertex(float x, float y, float z, int colour = 0x000000FF, bool visibility = true, float radius = 10) : base( x, y, z, 1 )
+        public Vertex(float x, float y, float z, Color colour, bool visibility = true, float radius = 10) : base( x, y, z, 1 )
         {
             Colour = colour;
             Radius = radius;
@@ -32,10 +34,10 @@
     {
         public int P1 { get; set; }
         public int P2 { get; set; }
-        public int Colour { get; set; }
+        public Color Colour { get; set; }
         public bool Visible { get; set; }
 
-        public Edge(int p1, int p2, int colour = 0x00000000, bool visibility = true)
+        public Edge(int p1, int p2, Color colour, bool visibility = true)
         {
             P1 = p1;
             P2 = p2;
@@ -49,11 +51,11 @@
         public int P1 { get; set; }
         public int P2 { get; set; }
         public int P3 { get; set; }
-        public int Colour { get; set; }
+        public Color Colour { get; set; }
         public bool Visible { get; set; }
         public int Z_index { get; set; }
 
-        public Face(int p1, int p2, int p3, int colour = 0x0000FF00, bool visibility = true)
+        public Face(int p1, int p2, int p3, Color colour, bool visibility = true)
         {
             P1 = p1;
             P2 = p2;

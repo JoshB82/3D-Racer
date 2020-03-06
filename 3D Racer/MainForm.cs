@@ -9,8 +9,8 @@ namespace _3D_Racer
     public partial class MainForm : Form
     {
         private int prev_x, prev_y;
-        private int selected_shape;
         private bool mouse_down;
+        private int selected_shape;
 
         private const float rotation_dampener = 0.005f;
         private const float grav_acc = -9.81f;
@@ -27,13 +27,13 @@ namespace _3D_Racer
 
             scene = new Scene(Canvas_Box.Width, Canvas_Box.Height);
 
-            Cube default_cube = new Cube(0, 0, 0, 100);
+            Cube default_cube = new Cube(new Vector3D(0, 0, 0), 10);
             default_cube.Selected = true;
             scene.Add(default_cube);
 
             World_Point origin = new World_Point(0, 0, 0);
             //Entity_List.Add(origin);
-            Current_camera = new Orthogonal_Camera(200, 200, 200, origin, 100, 100, 50, 250);
+            Current_camera = new Perspective_Camera(new Vector3D(500, 500, 500), default_cube, 100, 100, 50, 250);
 
             Thread graphics_thread = new Thread(Game_Loop);
             graphics_thread.Start();
@@ -47,7 +47,7 @@ namespace _3D_Racer
 
             long start_time = Get_UNIX_Time_Milliseconds();
             long timer = Get_UNIX_Time_Milliseconds();
-            long frame_delta_time = 0, update_delta_time = 0, now_time = 0;
+            long frame_delta_time = 0, update_delta_time = 0, now_time;
 
             const long frame_optimal_time = 1000 / max_frames_per_second;
             const long update_optimal_time = 1000 / max_updates_per_second;
@@ -105,7 +105,7 @@ namespace _3D_Racer
         {
             if (e.Button == MouseButtons.Right)
             {
-                scene.Add(new Cube(e.X, e.Y, 100, 100));
+                scene.Add(new Cube(new Vector3D(e.X, e.Y, 100), 100));
                 Debug.WriteLine("Cube created!");
             }
         }

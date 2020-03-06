@@ -1,31 +1,35 @@
 ﻿using System.Diagnostics;
+using System.Drawing;
 
 namespace _3D_Racer
 {
     public sealed class Cube : Shape
     {
-        public Cube(float x, float y, float z, float side_length,
-            int vertex_colour = 0x00000000,
-            int edge_colour = 0x00000000,
-            int face_colour = 0x00000000)
+        public Cube(Vector3D position, float side_length,
+            Color? vertex_colour = null,
+            Color? edge_colour = null,
+            Color? face_colour = null)
         {
             ID = Get_Next_ID();
-
-            Visible = true;
+            
+            Vertex_Colour = vertex_colour ?? Color.FromArgb(0xFF,0x00,0x00,0xFF);
+            Edge_Colour = edge_colour ?? Color.FromArgb(0xFF, 0x00, 0x00, 0x00);
+            Face_Colour = face_colour ?? Color.FromArgb(0xFF, 0x00, 0xFF, 0x00);
             Selected = false;
+            Visible = true;
 
             Model_Origin = new Vector4D(0, 0, 0, 1);
             
             Model_Vertices = new Vertex[8]
             {
-                new Vertex(0, 0, 0, vertex_colour), // 0
-                new Vertex(1, 0, 0, vertex_colour), // 1
-                new Vertex(1, 1, 0, vertex_colour), // 2
-                new Vertex(0, 1, 0, vertex_colour), // 3
-                new Vertex(0, 0, 1, vertex_colour), // 4
-                new Vertex(1, 0, 1, vertex_colour), // 5
-                new Vertex(1, 1, 1, vertex_colour), // 6
-                new Vertex(0, 1, 1, vertex_colour) // 7
+                new Vertex(0, 0, 0, Vertex_Colour), // 0
+                new Vertex(1, 0, 0, Vertex_Colour), // 1
+                new Vertex(1, 1, 0, Vertex_Colour), // 2
+                new Vertex(0, 1, 0, Vertex_Colour), // 3
+                new Vertex(0, 0, 1, Vertex_Colour), // 4
+                new Vertex(1, 0, 1, Vertex_Colour), // 5
+                new Vertex(1, 1, 1, Vertex_Colour), // 6
+                new Vertex(0, 1, 1, Vertex_Colour) // 7
             };
 
             Camera_Vertices = new Vertex[8];
@@ -33,47 +37,47 @@ namespace _3D_Racer
 
             Edges = new Edge[18]
             {
-                new Edge(0, 1, edge_colour), // 0
-                new Edge(1, 2, edge_colour), // 1
-                new Edge(0, 2, edge_colour, false), // 2
-                new Edge(2, 3, edge_colour), // 3
-                new Edge(0, 3, edge_colour), // 4
-                new Edge(1, 5, edge_colour), // 5
-                new Edge(5, 6, edge_colour), // 6
-                new Edge(1, 6, edge_colour, false), // 7
-                new Edge(2, 6, edge_colour), // 8
-                new Edge(4, 5, edge_colour), // 9
-                new Edge(4, 7, edge_colour), // 10
-                new Edge(5, 7, edge_colour, false), // 11
-                new Edge(6, 7, edge_colour), // 12
-                new Edge(0, 4, edge_colour), // 13
-                new Edge(3, 4, edge_colour, false),  // 14
-                new Edge(3, 7, edge_colour), // 15
-                new Edge(3, 6, edge_colour, false), // 16
-                new Edge(1, 4, edge_colour, false) // 17
+                new Edge(0, 1, Edge_Colour), // 0
+                new Edge(1, 2, Edge_Colour), // 1
+                new Edge(0, 2, Edge_Colour, false), // 2
+                new Edge(2, 3, Edge_Colour), // 3
+                new Edge(0, 3, Edge_Colour), // 4
+                new Edge(1, 5, Edge_Colour), // 5
+                new Edge(5, 6, Edge_Colour), // 6
+                new Edge(1, 6, Edge_Colour, false), // 7
+                new Edge(2, 6, Edge_Colour), // 8
+                new Edge(4, 5, Edge_Colour), // 9
+                new Edge(4, 7, Edge_Colour), // 10
+                new Edge(5, 7, Edge_Colour, false), // 11
+                new Edge(6, 7, Edge_Colour), // 12
+                new Edge(0, 4, Edge_Colour), // 13
+                new Edge(3, 4, Edge_Colour, false),  // 14
+                new Edge(3, 7, Edge_Colour), // 15
+                new Edge(3, 6, Edge_Colour, false), // 16
+                new Edge(1, 4, Edge_Colour, false) // 17
             };
 
             Faces = new Face[12]
             {
-                new Face(0, 3, 2, face_colour), // 0
-                new Face(0, 2, 1, face_colour), // 1
-                new Face(1, 2, 6, face_colour), // 2
-                new Face(1, 6, 5, face_colour), // 3
-                new Face(5, 6, 7, face_colour), // 4
-                new Face(5, 7, 4, face_colour), // 5
-                new Face(4, 7, 3, face_colour), // 6
-                new Face(4, 3, 0, face_colour), // 7
-                new Face(3, 7, 6, face_colour), // 8
-                new Face(3, 6, 2, face_colour), // 9
-                new Face(0, 4, 5, face_colour), // 10
-                new Face(0, 5, 1, face_colour) // 11
+                new Face(0, 3, 2, Face_Colour), // 0
+                new Face(0, 2, 1, Face_Colour), // 1
+                new Face(1, 2, 6, Face_Colour), // 2
+                new Face(1, 6, 5, Face_Colour), // 3
+                new Face(5, 6, 7, Face_Colour), // 4
+                new Face(5, 7, 4, Face_Colour), // 5
+                new Face(4, 7, 3, Face_Colour), // 6
+                new Face(4, 3, 0, Face_Colour), // 7
+                new Face(3, 7, 6, Face_Colour), // 8
+                new Face(3, 6, 2, Face_Colour), // 9
+                new Face(0, 4, 5, Face_Colour), // 10
+                new Face(0, 5, 1, Face_Colour) // 11
             };
 
             Matrix4x4 scale = Transform.Scale(side_length, side_length, side_length);
-            Matrix4x4 translation = Transform.Translate(x, y, z);
+            Matrix4x4 translation = Transform.Translate(position.X, position.Y, position.Z);
             Model_to_world = translation * scale;
             Apply_World_Matrices();
-            Debug.WriteLine("Cube created at (" + x + "," + y + "," + z + ")");
+            Debug.WriteLine("Cube created at (" + position.X + "," + position.Y + "," + position.Z + ")");
         }
     }
 }

@@ -16,6 +16,12 @@ namespace _3D_Racer
             Y = y;
         }
 
+        public Vector2D(Vector3D v)
+        {
+            X = v.X;
+            Y = v.Y;
+        }
+
         #region Common Vectors
         public static readonly Vector2D Zero = new Vector2D(0, 0);
         public static readonly Vector2D Unit_X = new Vector2D(1, 0);
@@ -27,7 +33,7 @@ namespace _3D_Racer
         #region Vector Operations (Operator Overloading)
         public static Vector2D operator +(Vector2D v1, Vector2D v2) => new Vector2D(v1.X + v2.X, v1.Y + v2.Y);
         public static Vector2D operator -(Vector2D v1, Vector2D v2) => new Vector2D(v1.X - v2.X, v1.Y - v2.Y);
-        public static float operator *(Vector2D v1, Vector2D v2) => v1.X * v2.X + v1.Y + v2.Y;
+        public static float operator *(Vector2D v1, Vector2D v2) => v1.X * v2.X + v1.Y * v2.Y;
         public static Vector2D operator *(Vector2D v, float scalar) => new Vector2D(v.X * scalar, v.Y * scalar);
         public static Vector2D operator /(Vector2D v, float scalar) => new Vector2D(v.X / scalar, v.Y / scalar);
         #endregion

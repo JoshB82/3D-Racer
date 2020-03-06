@@ -42,9 +42,9 @@ namespace _3D_Racer
         public bool Draw_Faces { get; set; } = true;
 
         // Colours
-        public int Vertex_Colour {get; set;}
-        public int Edge_Colour { get; set; }
-        public int Face_Colour { get; set; }
+        public Color Vertex_Colour {get; set;}
+        public Color Edge_Colour { get; set; }
+        public Color Face_Colour { get; set; }
 
         // Object transformations
         public Matrix4x4 Model_to_world { get; set; }
@@ -67,13 +67,19 @@ namespace _3D_Racer
 
         public void Apply_Camera_Matrices(Camera camera)
         {
-            camera.Recalculate_Matrix();
+            Matrix4x4 all = camera.Camera_to_screen * camera.World_to_camera * Model_to_world;
+            camera.World_to_screen = camera.Camera_to_screen * camera.World_to_camera;
             Camera_Origin = camera.World_to_screen * World_Origin;
-            if (World_Vertices != null) for (int i = 0; i < Model_Vertices.Length; i++) Camera_Vertices[i] = camera.World_to_screen * World_Vertices[i];
+            if (World_Vertices != null) for (int i = 0; i < World_Vertices.Length; i++) Camera_Vertices[i] = camera.World_to_screen * World_Vertices[i];
         }
 
         public void Divide_by_W()
         {
+            Camera_Origin.X /= Camera_Origin.W;
+            Camera_Origin.Y /= Camera_Origin.W;
+            Camera_Origin.Z /= Camera_Origin.W;
+            Camera_Origin.W = 1;
+
             for (int i = 0; i < Camera_Vertices.Length; i++)
             {
                 Camera_Vertices[i].X /= Camera_Vertices[i].W;
@@ -85,54 +91,15 @@ namespace _3D_Racer
 
         public void Scale_to_Screen(int width, int height)
         {
+            Camera_Origin = Transform.Translate(1, 1, 0) * Camera_Origin;
+            Camera_Origin = Transform.Scale_X(0.5f * width) * Camera_Origin;
+            Camera_Origin = Transform.Scale_Y(0.5f * height) * Camera_Origin;
+
             for (int i = 0; i < Camera_Vertices.Length; i++)
             {
                 Camera_Vertices[i] = Transform.Translate(1, 1, 0) * Camera_Vertices[i];
                 Camera_Vertices[i] = Transform.Scale_X(0.5f * width) * Camera_Vertices[i];
                 Camera_Vertices[i] = Transform.Scale_Y(0.5f * height) * Camera_Vertices[i];
-            }
-        }
-
-        public void Draw_Shape(Graphics g, Camera camera, int width, int height)
-        {
-            Apply_World_Matrices();
-            Apply_Camera_Matrices(camera);
-            Divide_by_W();
-            Scale_to_Screen(width, height);
-
-            using (SolidBrush face_brush = new SolidBrush(Color.FromArgb(Face_Colour)))
-            using (SolidBrush vertex_brush = new SolidBrush(Color.FromArgb(Vertex_Colour)))
-            using (Pen edge_pen = new Pen(Color.FromArgb(Edge_Colour)))
-            {
-                // Draw faces
-                if (Camera_Vertices != null && Faces != null && Draw_Faces)
-                {
-                    foreach (Face face in Faces)
-                    {
-                        if (face.Visible) g.FillPolygon(vertex_brush, new PointF[3] {
-                        new PointF(Camera_Vertices[face.P1].X, Camera_Vertices[face.P1].Y),
-                        new PointF(Camera_Vertices[face.P2].X, Camera_Vertices[face.P2].Y),
-                        new PointF(Camera_Vertices[face.P3].X, Camera_Vertices[face.P3].Y) });
-                    }
-                }
-
-                // Draw edges
-                if (Camera_Vertices != null && Edges != null && Draw_Edges)
-                {
-                    foreach (Edge edge in Edges)
-                    {
-                        if (edge.Visible) g.DrawLine(edge_pen, Camera_Vertices[edge.P1].X, Camera_Vertices[edge.P1].Y, Camera_Vertices[edge.P2].X, Camera_Vertices[edge.P2].Y);
-                    }
-                }
-
-                // Draw vertices
-                if (Camera_Vertices != null && Draw_Vertices)
-                {
-                    foreach (Vertex vertex in Camera_Vertices)
-                    {
-                        if (vertex.Visible) g.FillEllipse(face_brush, vertex.X - vertex.Radius / 2, vertex.Y - vertex.Radius / 2, vertex.Radius, vertex.Radius);
-                    }
-                }
             }
         }
     }

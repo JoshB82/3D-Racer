@@ -25,6 +25,13 @@ namespace _3D_Racer
             Z = z;
         }
 
+        public Vector3D(Vector4D v)
+        {
+            X = v.X;
+            Y = v.Y;
+            Z = v.Z;
+        }
+
         #region Common Vectors
         public static readonly Vector3D Zero = new Vector3D(0, 0, 0);
         public static readonly Vector3D Unit_X = new Vector3D(1, 0, 0);
@@ -38,7 +45,7 @@ namespace _3D_Racer
         #region Vector Operations (Operator Overloading)
         public static Vector3D operator +(Vector3D v1, Vector3D v2) => new Vector3D(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z);
         public static Vector3D operator -(Vector3D v1, Vector3D v2) => new Vector3D(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);
-        public static float operator *(Vector3D v1, Vector3D v2) => v1.X * v2.X + v1.Y + v2.Y + v1.Z * v2.Z;
+        public static float operator *(Vector3D v1, Vector3D v2) => v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z;
         public static Vector3D operator *(Vector3D v, float scalar) => new Vector3D(v.X * scalar, v.Y * scalar, v.Z * scalar);
         public static Vector3D operator /(Vector3D v, float scalar) => new Vector3D(v.X / scalar, v.Y / scalar, v.Z / scalar);
         #endregion

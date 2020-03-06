@@ -61,10 +61,10 @@ namespace _3D_Racer
         /// <param name="v1"></param>
         /// <param name="v2"></param>
         /// <returns>Rotation matrix</returns>
-        public static Matrix4x4 Rotation_Between_Vectors(Vector4D v1, Vector4D v2)
+        public static Matrix4x4 Rotation_Between_Vectors(Vector3D v1, Vector3D v2)
         {
             // Create a normalised rotation axis
-            Vector4D rotation_axis = v1.Cross_Product(v2).Normalise();
+            Vector3D rotation_axis = v1.Cross_Product(v2).Normalise();
             // Find the angle to rotate and its sine and cosine
             float angle = v1.Angle(v2);
             float sin_angle = (float)Math.Sin(angle);
