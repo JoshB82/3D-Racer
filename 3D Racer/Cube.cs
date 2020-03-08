@@ -19,7 +19,10 @@ namespace _3D_Racer
             Visible = true;
 
             Model_Origin = new Vector4D(0, 0, 0, 1);
-            
+            World_Origin = new Vector4D(position.X, position.Y, position.Z, 1);
+            Model_Direction = Vector3D.Unit_X;
+            World_Direction = Vector3D.Unit_X;
+
             Model_Vertices = new Vertex[8]
             {
                 new Vertex(0, 0, 0, Vertex_Colour), // 0
@@ -73,10 +76,9 @@ namespace _3D_Racer
                 new Face(0, 5, 1, Face_Colour) // 11
             };
 
-            Matrix4x4 scale = Transform.Scale(side_length, side_length, side_length);
-            Matrix4x4 translation = Transform.Translate(position.X, position.Y, position.Z);
-            Model_to_world = translation * scale;
-            Apply_World_Matrices();
+            Scaling = new Vector3D(side_length, side_length, side_length);
+            Translation = new Vector3D(position.X, position.Y, position.Z);
+
             Debug.WriteLine("Cube created at (" + position.X + "," + position.Y + "," + position.Z + ")");
         }
     }

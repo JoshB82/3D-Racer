@@ -14,7 +14,7 @@
             Edges = null;
             Faces = null;
 
-            Matrix4x4 translation = Transform.Translate(x, y, z);
+            Matrix4x4 translation = Transform.Translate(new Vector3D(x, y, z));
             Model_to_world = translation;
             Apply_World_Matrices();
         }

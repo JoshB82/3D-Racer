@@ -27,6 +27,9 @@ namespace _3D_Racer
         public Vertex[] World_Vertices { get; set; }
         public Vertex[] Camera_Vertices { get; set; }
 
+        public Vector3D Model_Direction { get; set; }
+        public Vector3D World_Direction { get; set; }
+
         /// <summary>
         /// Array of edges comprised of two child vertices.
         /// </summary>
@@ -46,9 +49,6 @@ namespace _3D_Racer
         public Color Edge_Colour { get; set; }
         public Color Face_Colour { get; set; }
 
-        // Object transformations
-        public Matrix4x4 Model_to_world { get; set; }
-        
         // Miscellaneous
         /// <summary>
         /// Determines if the shape is visible or not.
@@ -59,6 +59,14 @@ namespace _3D_Racer
         /// </summary>
         public bool Selected { get; set; }
 
+        // Object transformations
+        public Matrix4x4 Model_to_world { get; set; }
+
+        public Vector3D Scaling { get; protected set; }
+        public Vector3D Translation { get; protected set; }
+
+        public void Calculate_Model_to_World_Matrix() => Model_to_world = Transform.Translate(Translation) * Transform.Scale(Scaling.X, Scaling.Y, Scaling.Z) * Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(Model_Direction, World_Direction));
+
         public void Apply_World_Matrices()
         {
             World_Origin = Model_to_world * Model_Origin;
@@ -67,8 +75,6 @@ namespace _3D_Racer
 
         public void Apply_Camera_Matrices(Camera camera)
         {
-            Matrix4x4 all = camera.Camera_to_screen * camera.World_to_camera * Model_to_world;
-            camera.World_to_screen = camera.Camera_to_screen * camera.World_to_camera;
             Camera_Origin = camera.World_to_screen * World_Origin;
             if (World_Vertices != null) for (int i = 0; i < World_Vertices.Length; i++) Camera_Vertices[i] = camera.World_to_screen * World_Vertices[i];
         }
@@ -91,13 +97,13 @@ namespace _3D_Racer
 
         public void Scale_to_Screen(int width, int height)
         {
-            Camera_Origin = Transform.Translate(1, 1, 0) * Camera_Origin;
+            Camera_Origin = Transform.Translate(new Vector3D(1, 1, 0)) * Camera_Origin;
             Camera_Origin = Transform.Scale_X(0.5f * width) * Camera_Origin;
             Camera_Origin = Transform.Scale_Y(0.5f * height) * Camera_Origin;
 
             for (int i = 0; i < Camera_Vertices.Length; i++)
             {
-                Camera_Vertices[i] = Transform.Translate(1, 1, 0) * Camera_Vertices[i];
+                Camera_Vertices[i] = Transform.Translate(new Vector3D(1, 1, 0)) * Camera_Vertices[i];
                 Camera_Vertices[i] = Transform.Scale_X(0.5f * width) * Camera_Vertices[i];
                 Camera_Vertices[i] = Transform.Scale_Y(0.5f * height) * Camera_Vertices[i];
             }

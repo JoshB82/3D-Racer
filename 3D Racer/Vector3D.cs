@@ -48,6 +48,7 @@ namespace _3D_Racer
         public static float operator *(Vector3D v1, Vector3D v2) => v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z;
         public static Vector3D operator *(Vector3D v, float scalar) => new Vector3D(v.X * scalar, v.Y * scalar, v.Z * scalar);
         public static Vector3D operator /(Vector3D v, float scalar) => new Vector3D(v.X / scalar, v.Y / scalar, v.Z / scalar);
+        public static Vector3D operator -(Vector3D v) => new Vector3D(-v.X, -v.Y, -v.Z);
         #endregion
 
         #region Vector Operations (Miscellaneous)

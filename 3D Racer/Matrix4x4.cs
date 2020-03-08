@@ -9,7 +9,11 @@ namespace _3D_Racer
         /// <summary>
         /// Creates a zeroed 4x4 matrix.
         /// </summary>
-        public Matrix4x4() {}
+        public Matrix4x4()
+        {
+            Data = new float[4][];
+            for (int i = 0; i < 4; i++) Data[i] = new float[4];
+        }
 
         /// <summary>
         /// Creates an 4x4 identity matrix.

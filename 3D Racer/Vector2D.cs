@@ -36,6 +36,7 @@ namespace _3D_Racer
         public static float operator *(Vector2D v1, Vector2D v2) => v1.X * v2.X + v1.Y * v2.Y;
         public static Vector2D operator *(Vector2D v, float scalar) => new Vector2D(v.X * scalar, v.Y * scalar);
         public static Vector2D operator /(Vector2D v, float scalar) => new Vector2D(v.X / scalar, v.Y / scalar);
+        public static Vector2D operator -(Vector2D v) => new Vector2D(-v.X, -v.Y);
         #endregion
 
         #region Vector Operations (Miscellaneous)

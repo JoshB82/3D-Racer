@@ -45,12 +45,12 @@
         /// <param name="distance_y">Distance to move by in y-direction</param>
         /// <param name="distance_z">Distance to move by in z-direction</param>
         /// <returns>A translation matrix</returns>
-        public static Matrix4x4 Translate(float distance_x, float distance_y, float distance_z)
+        public static Matrix4x4 Translate(Vector3D distance)
         {
             Matrix4x4 translation = Matrix4x4.IdentityMatrix();
-            translation.Data[0][3] = distance_x;
-            translation.Data[1][3] = distance_y;
-            translation.Data[2][3] = distance_z;
+            translation.Data[0][3] = distance.X;
+            translation.Data[1][3] = distance.Y;
+            translation.Data[2][3] = distance.Z;
             return translation;
         }
     }

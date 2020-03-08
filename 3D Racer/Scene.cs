@@ -27,6 +27,7 @@ namespace _3D_Racer
 
         public void Add_From_File(string file)
         {
+
         }
 
         public void Remove(int ID)
@@ -38,12 +39,15 @@ namespace _3D_Racer
         {
             lock (locker)
             {
+                camera.Calculate_Model_to_World_Matrix();
+                camera.Calculate_World_to_Screen_Matrix();
                 Bitmap temp = new Bitmap(Width, Height);
 
                 using (Graphics g = Graphics.FromImage(temp))
                 {
                     foreach (Shape shape in Objects)
                     {
+                        shape.Calculate_Model_to_World_Matrix();
                         shape.Apply_World_Matrices();
                         shape.Apply_Camera_Matrices(camera);
                         shape.Divide_by_W();
@@ -80,7 +84,6 @@ namespace _3D_Racer
                                 foreach (Vertex vertex in shape.Camera_Vertices)
                                 {
                                     if (vertex.Visible) g.FillEllipse(vertex_brush, vertex.X - vertex.Radius / 2, vertex.Y - vertex.Radius / 2, vertex.Radius, vertex.Radius);
-                                    //g.FillEllipse(new SolidBrush(Color.FromArgb(0,0,0)), 10, 10, 100, 100);
                                 }
                             }
                         }

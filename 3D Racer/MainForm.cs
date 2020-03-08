@@ -27,13 +27,13 @@ namespace _3D_Racer
 
             scene = new Scene(Canvas_Box.Width, Canvas_Box.Height);
 
-            Cube default_cube = new Cube(new Vector3D(0, 0, 0), 10);
+            Cube default_cube = new Cube(new Vector3D(0, 0, 0), 100);
             default_cube.Selected = true;
             scene.Add(default_cube);
 
             World_Point origin = new World_Point(0, 0, 0);
             //Entity_List.Add(origin);
-            Current_camera = new Perspective_Camera(new Vector3D(500, 500, 500), default_cube, 100, 100, 50, 250);
+            Current_camera = new Perspective_Camera(new Vector3D(500, 500, 500), default_cube, 100, 100, 50, 750);
 
             Thread graphics_thread = new Thread(Game_Loop);
             graphics_thread.Start();

@@ -70,8 +70,14 @@ namespace _3D_Racer
             float sin_angle = (float)Math.Sin(angle);
             float cos_angle = (float)Math.Cos(angle);
             // Construct the rotation matrix
-            float[][] data = new float[4][]
-                {
+            if (angle == 0)
+            {
+                return Matrix4x4.IdentityMatrix();
+            }
+            else
+            {
+                float[][] data = new float[4][]
+                    {
                     new float[] {
                         cos_angle + (float)Math.Pow(rotation_axis.X, 2) * (1 - cos_angle),
                         rotation_axis.X * rotation_axis.Y * (1 - cos_angle) - rotation_axis.Z * sin_angle,
@@ -93,8 +99,38 @@ namespace _3D_Racer
                     new float[] {
                         0,0,0,1
                     }
-                };
-            return new Matrix4x4(data);
+                    };
+                return new Matrix4x4(data);
+            }
         }
+
+        public static Quaternion Quaternion_Rotation(Vector3D axis, float angle) => new Quaternion((float)Math.Cos(angle / 2), axis * (float)Math.Sin(angle / 2)).Normalise();
+
+        public static Quaternion Quaternion_Rotation_Between_Vectors(Vector3D v1, Vector3D v2)
+        {
+            Vector3D axis = v1.Cross_Product(v2).Normalise();
+            float angle = v1.Angle(v2);
+            return (angle == 0) ? new Quaternion(1, 0, 0, 0) : Quaternion_Rotation(axis, angle);
+        }
+
+        public static Matrix4x4 Quaternion_to_Matrix(Quaternion q) =>
+            new Matrix4x4(
+                1 - 2 * (float)(Math.Pow(q.Q3, 2) + Math.Pow(q.Q4, 2)),
+                2 * (q.Q2 * q.Q3 - q.Q4 * q.Q1),
+                2 * (q.Q2 * q.Q4 + q.Q3 * q.Q1),
+                0,
+                2 * (q.Q2 * q.Q3 + q.Q4 * q.Q1),
+                1 - 2 * (float)(Math.Pow(q.Q2, 2) + Math.Pow(q.Q4, 2)),
+                2 * (q.Q3 * q.Q4 - q.Q2 * q.Q1),
+                0,
+                2 * (q.Q2 * q.Q4 - q.Q3 * q.Q1),
+                2 * (q.Q3 * q.Q4 + q.Q2 * q.Q1),
+                1 - 2 * (float)(Math.Pow(q.Q2, 2) + Math.Pow(q.Q3, 2)),
+                0,
+                0,
+                0,
+                0,
+                1
+            );
     }
 }
