@@ -17,19 +17,20 @@ namespace _3D_Racer
 
         public Matrix4x4 Model_to_world { get; protected set; }
         public Matrix4x4 World_to_camera { get; protected set; }
-        public Matrix4x4 Camera_to_screen { get; protected set; } = Matrix4x4.IdentityMatrix();
+        public Matrix4x4 Camera_to_screen { get; protected set; }
         public Matrix4x4 World_to_screen { get; set; }
 
-        public float Width { get; set; }
-        public float Height { get; set; }
-        public float Z_Near { get; set; }
-        public float Z_Far { get; set; }
+        public float Width { get; protected set; }
+        public float Height { get; protected set; }
+        public float Z_Near { get; protected set; }
+        public float Z_Far { get; protected set; }
 
         public void Calculate_Model_to_World_Matrix() => Model_to_world = Transform.Translate(Translation) * Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(Model_Direction, World_Direction));
 
         public void Calculate_World_to_Screen_Matrix()
         {
-            World_to_camera = Transform.Translate(-Translation) * Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(World_Direction, Model_Direction));
+            Matrix4x4 rotation = Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(World_Direction, Model_Direction));
+            World_to_camera = Transform.Translate(-Translation) * rotation;
             World_to_screen = Camera_to_screen * World_to_camera;
         }
 
@@ -81,15 +82,6 @@ namespace _3D_Racer
             Debug.WriteLine("Perspective camera created at (" + position.X + "," + position.Y + "," + position.Z + ")");
         }
 
-        /// <summary>
-        /// Create a perspective camera pointing in a specific direction
-        /// </summary>
-        /// <param name="position">Position of the camera as a vector</param>
-        /// <param name="direction">Direction the camera is facing as a vector</param>
-        /// <param name="width">The width of the camera's view</param>
-        /// <param name="height">The height of the camera's view</param>
-        /// <param name="z_near">The closest distance from the camera from which an object can be seen</param>
-        /// <param name="z_far">The furthest distance from the camera from which an object can be seen</param>
         public Perspective_Camera(Vector3D position, Shape pointed_at, float width, float height, float z_near, float z_far) : this(position, new Vector3D(pointed_at.World_Origin) - position, width, height, z_near, z_far) {}
     }
 }

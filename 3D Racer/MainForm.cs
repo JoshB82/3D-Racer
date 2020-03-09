@@ -31,7 +31,7 @@ namespace _3D_Racer
             default_cube.Selected = true;
             scene.Add(default_cube);
 
-            World_Point origin = new World_Point(0, 0, 0);
+            //World_Point origin = new World_Point(0, 0, 0);
             //Entity_List.Add(origin);
             Current_camera = new Perspective_Camera(new Vector3D(500, 500, 500), default_cube, 100, 100, 50, 750);
 
