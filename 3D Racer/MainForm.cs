@@ -27,13 +27,16 @@ namespace _3D_Racer
 
             scene = new Scene(Canvas_Box.Width, Canvas_Box.Height);
 
-            Cube default_cube = new Cube(new Vector3D(0, 0, 0), 100);
+            Cube default_cube = new Cube(new Vector3D(0, 0, 0), 50);
             default_cube.Selected = true;
             scene.Add(default_cube);
 
+            Line test_line = new Line(new Vector3D(0,0,0),new Vector3D(100,0,0));
+            scene.Add(test_line);
+
             //World_Point origin = new World_Point(0, 0, 0);
             //Entity_List.Add(origin);
-            Current_camera = new Perspective_Camera(new Vector3D(500, 500, 500), default_cube, 100, 100, 50, 750);
+            Current_camera = new Perspective_Camera(new Vector3D(500, 0, 0), default_cube, 100, 100, 50, 750);
 
             Thread graphics_thread = new Thread(Game_Loop);
             graphics_thread.Start();
@@ -112,13 +115,31 @@ namespace _3D_Racer
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
-            /*
-            Random rnd = new Random();
-            int random_object = rnd.Next(0, scene.Count - 1);
-            scene[selected_shape].Selected = false;
-            scene[random_object].Selected = true;
-            selected_shape = random_object;
-            */
+            switch(e.KeyCode)
+            {
+                case Keys.W:
+                    // Pan forward
+                    Current_camera.Translate(Current_camera.World_Direction.Normalise() * 30);
+                    break;
+                case Keys.A:
+                    // Pan left
+                    Current_camera.Translate(Current_camera.World_Direction.Cross_Product(Current_camera.World_Direction_Up).Normalise() * -30);
+                    break;
+                case Keys.D:
+                    // Pan right
+                    Current_camera.Translate(Current_camera.World_Direction.Cross_Product(Current_camera.World_Direction_Up).Normalise() * 30);
+                    break;
+                case Keys.S:
+                    // Pan back
+                    Current_camera.Translate(Current_camera.World_Direction.Normalise() * -30);
+                    break;
+                case Keys.Q:
+                    Current_camera.Translate(Current_camera.World_Direction_Up.Normalise() * 30); // UPSIDE DOWN
+                    break;
+                case Keys.E:
+                    Current_camera.Translate(Current_camera.World_Direction_Up.Normalise() * -30); // UPSIDE DOWN
+                    break;
+            }
         }
 
         private void Canvas_Panel_MouseMove(object sender, MouseEventArgs e)

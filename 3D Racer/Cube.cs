@@ -35,8 +35,8 @@ namespace _3D_Racer
                 new Vertex(0, 1, 1, Vertex_Colour) // 7
             };
 
-            Camera_Vertices = new Vertex[8];
             World_Vertices = new Vertex[8];
+            Camera_Vertices = new Vertex[8];
 
             Edges = new Edge[18]
             {

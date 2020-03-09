@@ -99,7 +99,7 @@ namespace _3D_Racer
                 for (int j = 0; j < 4; j++) row[j] = m.Data[i][j];
                 result[i] = new Vector4D(row) * v;
             }
-            return new Vertex(result[0], result[1], result[2], v.Colour, v.Visible, v.Radius);
+            return new Vertex(result[0], result[1], result[2], result[3], v.Colour, v.Visible, v.Radius);
         }
 
         public static Matrix4x4 operator *(float scalar, Matrix4x4 m)

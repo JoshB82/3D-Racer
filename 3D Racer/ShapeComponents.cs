@@ -15,7 +15,14 @@ namespace _3D_Racer
         /// <param name="y">y - co-ordinate of the vertex.</param>
         /// <param name="z">z - co-ordinate of the vertex.</param>
         /// <param name="colour">Eight digit hexadecimal ARGB colour value.</param>
-        public Vertex(float x, float y, float z, Color colour, bool visibility = true, float radius = 10) : base( x, y, z, 1 )
+        public Vertex(float x, float y, float z, Color colour, bool visibility = true, float radius = 10) : base(x, y, z, 1)
+        {
+            Colour = colour;
+            Radius = radius;
+            Visible = visibility;
+        }
+
+        public Vertex(float x, float y, float z, float w, Color colour, bool visibility = true, float radius = 10) : base(x, y, z, w)
         {
             Colour = colour;
             Radius = radius;

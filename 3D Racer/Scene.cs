@@ -41,6 +41,8 @@ namespace _3D_Racer
             {
                 camera.Calculate_Model_to_World_Matrix();
                 camera.Calculate_World_to_Screen_Matrix();
+                camera.Calculate_Up_Vector();
+
                 Bitmap temp = new Bitmap(Width, Height);
 
                 using (Graphics g = Graphics.FromImage(temp))
