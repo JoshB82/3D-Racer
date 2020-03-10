@@ -39,6 +39,7 @@ namespace _3D_Racer
             Translation = position;
             Model_Direction = Vector3D.Unit_Negative_Z;
             World_Direction = direction;
+            Calculate_Up_Vector();
         }
     }
 

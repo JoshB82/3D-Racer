@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace _3D_Racer
@@ -39,7 +40,6 @@ namespace _3D_Racer
         {
             lock (locker)
             {
-                camera.Calculate_Up_Vector();
                 camera.Calculate_Model_to_World_Matrix();
                 camera.Calculate_World_to_Screen_Matrix();
 
@@ -55,7 +55,13 @@ namespace _3D_Racer
                         shape.Divide_by_W();
                         shape.Scale_to_Screen(Width, Height);
                         shape.Change_Y_Axis(Height);
+                    }
 
+                    //List<Shape> Sorted_Objects = Objects.OrderBy(x => x.Camera_Origin).ToList();
+                    List<Shape> Sorted_Objects = Objects;
+
+                    foreach (Shape shape in Sorted_Objects)
+                    {
                         using (SolidBrush face_brush = new SolidBrush(shape.Face_Colour))
                         using (SolidBrush vertex_brush = new SolidBrush(shape.Vertex_Colour))
                         using (Pen edge_pen = new Pen(shape.Edge_Colour))
