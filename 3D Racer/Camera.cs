@@ -10,8 +10,8 @@ namespace _3D_Racer
 
         public Vector3D Model_Direction { get; } = Vector3D.Unit_Negative_Z;
         public Vector3D Model_Direction_Up { get; } = Vector3D.Unit_Y;
-        public Vector3D World_Direction { get; protected set; }
-        public Vector3D World_Direction_Up { get; protected set; }
+        public Vector3D World_Direction { get; set; }
+        public Vector3D World_Direction_Up { get; set; }
 
         public Vector3D Scaling { get; protected set; }
         public Vector3D Translation { get; protected set; }

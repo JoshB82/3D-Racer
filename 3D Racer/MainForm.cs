@@ -40,7 +40,7 @@ namespace _3D_Racer
 
             //World_Point origin = new World_Point(0, 0, 0);
             //Entity_List.Add(origin);
-            Current_camera = new Perspective_Camera(new Vector3D(500, 0, 0), default_cube, 100, 100, 50, 750);
+            Current_camera = new Perspective_Camera(new Vector3D(0, 0, 500), default_cube, 100, 100, 50, 750);
 
             Thread graphics_thread = new Thread(Game_Loop);
             graphics_thread.Start();
@@ -138,10 +138,28 @@ namespace _3D_Racer
                     Current_camera.Translate(Current_camera.World_Direction.Normalise() * -30);
                     break;
                 case Keys.Q:
+                    // Pan up
                     Current_camera.Translate(Current_camera.World_Direction_Up.Normalise() * 30);
                     break;
                 case Keys.E:
+                    // Pan down
                     Current_camera.Translate(Current_camera.World_Direction_Up.Normalise() * -30);
+                    break;
+                case Keys.Up:
+                    // Rotate up
+                    Current_camera.World_Direction = new Vector3D(Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation(Current_camera.World_Direction.Cross_Product(Current_camera.World_Direction_Up), (float)Math.PI / 20)) * new Vector4D(Current_camera.World_Direction));
+                    break;
+                case Keys.Left:
+                    // Rotate left
+                    Current_camera.World_Direction = new Vector3D(Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation(Current_camera.World_Direction_Up, (float)Math.PI / 20)) * new Vector4D(Current_camera.World_Direction));
+                    break;
+                case Keys.Right:
+                    // Rotate right
+                    Current_camera.World_Direction = new Vector3D(Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation(Current_camera.World_Direction_Up, (float)-Math.PI / 20)) * new Vector4D(Current_camera.World_Direction));
+                    break;
+                case Keys.Down:
+                    // Rotate down
+                    Current_camera.World_Direction = new Vector3D(Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation(Current_camera.World_Direction.Cross_Product(Current_camera.World_Direction_Up), (float)-Math.PI / 20)) * new Vector4D(Current_camera.World_Direction));
                     break;
             }
         }

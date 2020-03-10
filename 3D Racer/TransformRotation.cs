@@ -104,17 +104,18 @@ namespace _3D_Racer
             }
         }
 
-        public static Quaternion Quaternion_Rotation(Vector3D axis, float angle) => new Quaternion((float)Math.Cos(angle / 2), axis * (float)Math.Sin(angle / 2)).Normalise();
+        public static Quaternion Quaternion_Rotation(Vector3D axis, float angle) => new Quaternion((float)Math.Cos(angle / 2), axis.Normalise() * (float)Math.Sin(angle / 2)).Normalise();
 
         public static Quaternion Quaternion_Rotation_Between_Vectors(Vector3D v1, Vector3D v2)
         {
-            Vector3D axis = v1.Cross_Product(v2).Normalise();
+            Vector3D axis = v1.Cross_Product(v2);
             float angle = v1.Angle(v2);
             return (angle == 0) ? new Quaternion(1, 0, 0, 0) : Quaternion_Rotation(axis, angle);
         }
 
         public static Matrix4x4 Quaternion_to_Matrix(Quaternion q) =>
-            // RIGHT HANDED ROTATION (ANTI CLOCKWISE POINTING TO ORIGIN)
+            // RIGHT HANDED ROTATION
+            //(ANTI CLOCKWISE WHEN LOOKING AT ORIGIN FROM ARROW TIP TO BEGINNING)
             new Matrix4x4(
                 1 - 2 * (float)(Math.Pow(q.Q3, 2) + Math.Pow(q.Q4, 2)),
                 2 * (q.Q2 * q.Q3 - q.Q4 * q.Q1),
