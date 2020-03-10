@@ -97,16 +97,14 @@ namespace _3D_Racer
 
         public void Scale_to_Screen(int width, int height)
         {
-            Camera_Origin = Transform.Translate(new Vector3D(1, 1, 0)) * Camera_Origin;
-            Camera_Origin = Transform.Scale_X(0.5f * width) * Camera_Origin;
-            Camera_Origin = Transform.Scale_Y(0.5f * height) * Camera_Origin;
+            Camera_Origin = Transform.Scale_Y(0.5f * height) * Transform.Scale_X(0.5f * width) * Transform.Translate(new Vector3D(1, 1, 0)) * Camera_Origin;
+            for (int i = 0; i < Camera_Vertices.Length; i++) Camera_Vertices[i] = Transform.Scale_Y(0.5f * height) * Transform.Scale_X(0.5f * width) * Transform.Translate(new Vector3D(1, 1, 0)) * Camera_Vertices[i];
+        }
 
-            for (int i = 0; i < Camera_Vertices.Length; i++)
-            {
-                Camera_Vertices[i] = Transform.Translate(new Vector3D(1, 1, 0)) * Camera_Vertices[i];
-                Camera_Vertices[i] = Transform.Scale_X(0.5f * width) * Camera_Vertices[i];
-                Camera_Vertices[i] = Transform.Scale_Y(0.5f * height) * Camera_Vertices[i];
-            }
+        public void Change_Y_Axis(int height)
+        {
+            Camera_Origin = Transform.Translate(new Vector3D(0, height, 0)) * Transform.Scale_Y(-1) * Camera_Origin;
+            for (int i = 0; i < Camera_Vertices.Length; i++) Camera_Vertices[i] = Transform.Translate(new Vector3D(0, height, 0)) * Transform.Scale_Y(-1) * Camera_Vertices[i];
         }
     }
 }

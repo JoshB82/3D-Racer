@@ -36,7 +36,7 @@ namespace _3D_Racer
 
             Draw_Faces = false;
 
-            Scaling = new Vector3D((end_position - start_position).Magnitude(), 0, 0);
+            Scaling = new Vector3D(end_position.X - start_position.X, end_position.Y - start_position.Y, end_position.Z - start_position.Z);
             Translation = start_position;
 
             Debug.WriteLine("Line created at (" + start_position.X + "," + start_position.Y + "," + start_position.Z + ")");

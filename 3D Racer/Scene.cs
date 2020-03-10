@@ -39,9 +39,9 @@ namespace _3D_Racer
         {
             lock (locker)
             {
+                camera.Calculate_Up_Vector();
                 camera.Calculate_Model_to_World_Matrix();
                 camera.Calculate_World_to_Screen_Matrix();
-                camera.Calculate_Up_Vector();
 
                 Bitmap temp = new Bitmap(Width, Height);
 
@@ -54,6 +54,7 @@ namespace _3D_Racer
                         shape.Apply_Camera_Matrices(camera);
                         shape.Divide_by_W();
                         shape.Scale_to_Screen(Width, Height);
+                        shape.Change_Y_Axis(Height);
 
                         using (SolidBrush face_brush = new SolidBrush(shape.Face_Colour))
                         using (SolidBrush vertex_brush = new SolidBrush(shape.Vertex_Colour))

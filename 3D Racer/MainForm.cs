@@ -31,8 +31,12 @@ namespace _3D_Racer
             default_cube.Selected = true;
             scene.Add(default_cube);
 
-            Line test_line = new Line(new Vector3D(0,0,0),new Vector3D(100,0,0));
-            scene.Add(test_line);
+            Line x_axis = new Line(new Vector3D(0,0,0), new Vector3D(200,0,0), null, Color.Red);
+            Line y_axis = new Line(new Vector3D(0, 0, 0), new Vector3D(0, 200, 0), null, Color.Green);
+            Line z_axis = new Line(new Vector3D(0, 0, 0), new Vector3D(0, 0, 200), null, Color.Blue);
+            scene.Add(x_axis);
+            scene.Add(y_axis);
+            scene.Add(z_axis);
 
             //World_Point origin = new World_Point(0, 0, 0);
             //Entity_List.Add(origin);
@@ -134,10 +138,10 @@ namespace _3D_Racer
                     Current_camera.Translate(Current_camera.World_Direction.Normalise() * -30);
                     break;
                 case Keys.Q:
-                    Current_camera.Translate(Current_camera.World_Direction_Up.Normalise() * 30); // UPSIDE DOWN
+                    Current_camera.Translate(Current_camera.World_Direction_Up.Normalise() * 30);
                     break;
                 case Keys.E:
-                    Current_camera.Translate(Current_camera.World_Direction_Up.Normalise() * -30); // UPSIDE DOWN
+                    Current_camera.Translate(Current_camera.World_Direction_Up.Normalise() * -30);
                     break;
             }
         }

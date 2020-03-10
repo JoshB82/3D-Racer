@@ -21,11 +21,11 @@ namespace _3D_Racer
         public Matrix4x4 Camera_to_screen { get; protected set; }
         public Matrix4x4 World_to_screen { get; set; }
 
-        public void Calculate_Model_to_World_Matrix() => Model_to_world = Transform.Translate(Translation) * Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(Model_Direction, World_Direction));
+        public void Calculate_Model_to_World_Matrix() => Model_to_world = Transform.Translate(Translation) * Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(Model_Direction_Up, World_Direction_Up)) * Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(Model_Direction, World_Direction));
 
         public void Calculate_World_to_Screen_Matrix()
         {
-            World_to_camera = Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(World_Direction, Model_Direction)) * Transform.Translate(-Translation);
+            World_to_camera = Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(World_Direction, Model_Direction)) * Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(World_Direction_Up, Model_Direction_Up)) * Transform.Translate(-Translation);
             World_to_screen = Camera_to_screen * World_to_camera;
         }
 
