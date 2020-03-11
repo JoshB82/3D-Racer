@@ -60,7 +60,6 @@ namespace _3D_Racer
         public int P3 { get; set; }
         public Color Colour { get; set; }
         public bool Visible { get; set; }
-        public int Z_index { get; set; }
 
         public Face(int p1, int p2, int p3, Color colour, bool visibility = true)
         {

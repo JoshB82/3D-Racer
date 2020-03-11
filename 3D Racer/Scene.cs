@@ -1,6 +1,6 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace _3D_Racer
@@ -10,7 +10,9 @@ namespace _3D_Racer
         private static readonly object locker = new object();
         public readonly List<Shape> Objects = new List<Shape>();
         public Bitmap Canvas { get; set; }
-
+        public Color Background_colour { get; set; } = Color.Black;
+        private float[][] z_buffer;
+        private float[][] colour_buffer;
         public int Width { get; set; }
         public int Height { get; set; }
 
@@ -19,6 +21,20 @@ namespace _3D_Racer
             Width = width;
             Height = height;
             Canvas = new Bitmap(width, height);
+            z_buffer = new float[Width][];
+            for (int i = 0; i < Width; i++) z_buffer[i] = new float[Height];
+            colour_buffer = new float[Width][];
+            for (int i = 0; i < Width; i++) colour_buffer[i] = new float[Height];
+        }
+
+        private void Reset_Z_Buffer()
+        {
+            for (int i = 0; i < Width; i++) for (int j = 0; j < Height; j++) z_buffer[Width][Height] = 1;
+        }
+
+        private void Reset_Colour_Buffer()
+        {
+            for (int i = 0; i < Width; i++) for (int j = 0; j < Height; j++) colour_buffer[Width][Height] = 1;
         }
 
         public void Add(Shape shape)
@@ -57,10 +73,65 @@ namespace _3D_Racer
                         shape.Change_Y_Axis(Height);
                     }
 
-                    //List<Shape> Sorted_Objects = Objects.OrderBy(x => x.Camera_Origin).ToList();
-                    List<Shape> Sorted_Objects = Objects;
+                    Reset_Z_Buffer();
+                    Reset_Colour_Buffer();
 
-                    foreach (Shape shape in Sorted_Objects)
+                    foreach (Shape shape in Objects)
+                    {
+                        foreach (Face face in shape.Faces)
+                        {
+                            Vector3D v1 = new Vector3D(shape.Camera_Vertices[face.P2].X, shape.Camera_Vertices[face.P2].Y, shape.Camera_Vertices[face.P2].Z) - new Vector3D(shape.Camera_Vertices[face.P1].X, shape.Camera_Vertices[face.P1].Y, shape.Camera_Vertices[face.P1].Z);
+                            Vector3D v2 = new Vector3D(shape.Camera_Vertices[face.P3].X, shape.Camera_Vertices[face.P3].Y, shape.Camera_Vertices[face.P3].Z) - new Vector3D(shape.Camera_Vertices[face.P1].X, shape.Camera_Vertices[face.P1].Y, shape.Camera_Vertices[face.P1].Z);
+                            Vector3D normal = v1.Cross_Product(v2);
+                            float a = normal.X;
+                            float b = normal.Y;
+                            float c = normal.Z;
+                            float d = -(a * shape.Camera_Vertices[face.P1].X + b * shape.Camera_Vertices[face.P1].Y + c * shape.Camera_Vertices[face.P1].Z);
+
+                            // Get height of triangle
+                            float height1 = Math.Abs(shape.Camera_Vertices[face.P1].Y - shape.Camera_Vertices[face.P2].Y);
+                            float height2 = Math.Abs(shape.Camera_Vertices[face.P1].Y - shape.Camera_Vertices[face.P3].Y);
+                            float height3 = Math.Abs(shape.Camera_Vertices[face.P2].Y - shape.Camera_Vertices[face.P3].Y);
+                            float height = Math.Max(Math.Max(height1, height2), height3);
+
+                            // Get lowest point (Round camera vertices to ints later)
+                            int lowest = (int)Math.Min(Math.Min(shape.Camera_Vertices[face.P1].Y, shape.Camera_Vertices[face.P2].Y), shape.Camera_Vertices[face.P3].Y);
+
+                            int min_x = (int)Math.Min(Math.Min(shape.Camera_Vertices[face.P1].X, shape.Camera_Vertices[face.P2].X), shape.Camera_Vertices[face.P3].X);
+                            int max_x = (int)Math.Max(Math.Max(shape.Camera_Vertices[face.P1].X, shape.Camera_Vertices[face.P2].X), shape.Camera_Vertices[face.P3].X);
+
+                            float z_value = z_init;
+
+                            // Iterate over all possible lines
+                            for (int i = lowest; i <= lowest + height; i++)
+                            {
+                                int x1 = (int)((i - shape.Camera_Vertices[face.P1].Y) * (shape.Camera_Vertices[face.P2].X - shape.Camera_Vertices[face.P1].X) / (shape.Camera_Vertices[face.P1].Y - shape.Camera_Vertices[face.P2].Y));
+                                int x2 = (int)((i - shape.Camera_Vertices[face.P1].Y) * (shape.Camera_Vertices[face.P3].X - shape.Camera_Vertices[face.P1].X) / (shape.Camera_Vertices[face.P1].Y - shape.Camera_Vertices[face.P3].Y));
+                                int x3 = (int)((i - shape.Camera_Vertices[face.P2].Y) * (shape.Camera_Vertices[face.P3].X - shape.Camera_Vertices[face.P2].X) / (shape.Camera_Vertices[face.P2].Y - shape.Camera_Vertices[face.P3].Y));
+
+                                int final_x_1, final_x_2;
+
+                                if (x1 >= min_x && x1 <= max_x)
+                                {
+                                    final_x_1 = x1;
+                                    final_x_2 = (x2 >= min_x && x2 <= max_x) ? x2 : x3;
+                                }
+                                else
+                                {
+                                    final_x_1 = x1;
+                                    final_x_2 = x2;
+                                }
+
+                                
+                                for (int j = final_x_1; j <= final_x_2; j++)
+                                {
+                                    z_value -= a / c;
+                                }
+                            }
+                        }
+                    }
+
+                    foreach (Shape shape in Objects)
                     {
                         using (SolidBrush face_brush = new SolidBrush(shape.Face_Colour))
                         using (SolidBrush vertex_brush = new SolidBrush(shape.Vertex_Colour))
