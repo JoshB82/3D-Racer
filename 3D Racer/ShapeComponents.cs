@@ -1,11 +1,12 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 
 namespace _3D_Racer
 {
     public partial class Vertex : Vector4D
     {
         public Color Colour { get; set; }
-        public float Radius { get; set; }
+        public int Diameter { get; set; }
         public bool Visible { get; set; }
 
         /// <summary>
@@ -15,25 +16,26 @@ namespace _3D_Racer
         /// <param name="y">y - co-ordinate of the vertex.</param>
         /// <param name="z">z - co-ordinate of the vertex.</param>
         /// <param name="colour">Eight digit hexadecimal ARGB colour value.</param>
-        public Vertex(float x, float y, float z, Color colour, bool visibility = true, float radius = 10) : base(x, y, z, 1)
+        public Vertex(float x, float y, float z, Color? colour = null, bool visibility = true, int radius = 10) : this(x, y, z, 1, colour, visibility, radius) {}
+
+        public Vertex(float x, float y, float z, float w, Color? colour = null, bool visibility = true, int diameter = 10) : base(x, y, z, w)
         {
-            Colour = colour;
-            Radius = radius;
+            Colour = colour ?? Color.Black;
+            Diameter = diameter;
             Visible = visibility;
         }
 
-        public Vertex(float x, float y, float z, float w, Color colour, bool visibility = true, float radius = 10) : base(x, y, z, w)
+        public void Round()
         {
-            Colour = colour;
-            Radius = radius;
-            Visible = visibility;
+            X = (int)Math.Round(X, MidpointRounding.AwayFromZero);
+            Y = (int)Math.Round(Y, MidpointRounding.AwayFromZero);
         }
 
         #region Vertex Operations (Operator Overloading)
-        public static Vertex operator +(Vertex v1, Vector4D v2) => new Vertex(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z, v1.Colour, v1.Visible, v1.Radius);
-        public static Vertex operator -(Vertex v1, Vector4D v2) => new Vertex(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z, v1.Colour, v1.Visible, v1.Radius);
-        public static Vertex operator *(Vertex v, float scalar) => new Vertex(v.X * scalar, v.Y * scalar, v.Z * scalar, v.Colour, v.Visible, v.Radius);
-        public static Vertex operator /(Vertex v, float scalar) => new Vertex(v.X / scalar, v.Y / scalar, v.Z / scalar, v.Colour, v.Visible, v.Radius);
+        public static Vertex operator +(Vertex v1, Vector4D v2) => new Vertex(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z, v1.Colour, v1.Visible, v1.Diameter);
+        public static Vertex operator -(Vertex v1, Vector4D v2) => new Vertex(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z, v1.Colour, v1.Visible, v1.Diameter);
+        public static Vertex operator *(Vertex v, float scalar) => new Vertex(v.X * scalar, v.Y * scalar, v.Z * scalar, v.Colour, v.Visible, v.Diameter);
+        public static Vertex operator /(Vertex v, float scalar) => new Vertex(v.X / scalar, v.Y / scalar, v.Z / scalar, v.Colour, v.Visible, v.Diameter);
         #endregion
     }
 

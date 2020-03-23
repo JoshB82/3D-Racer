@@ -4,22 +4,26 @@ namespace _3D_Racer
 {
     public abstract partial class Camera
     {
+        // Origins
         public Vector4D Model_Origin { get; } = Vector4D.Zero;
         public Vector4D World_Origin { get; protected set; }
         public Vector4D Camera_Origin { get; protected set; }
 
+        // Directions
         public Vector3D Model_Direction { get; } = Vector3D.Unit_Negative_Z;
         public Vector3D Model_Direction_Up { get; } = Vector3D.Unit_Y;
         public Vector3D World_Direction { get; set; }
         public Vector3D World_Direction_Up { get; set; }
 
+        // Transformations
         public Vector3D Scaling { get; protected set; }
         public Vector3D Translation { get; protected set; }
 
+        // Matrices
         public Matrix4x4 Model_to_world { get; protected set; }
         public Matrix4x4 World_to_camera { get; protected set; }
         public Matrix4x4 Camera_to_screen { get; protected set; }
-        public Matrix4x4 World_to_screen { get; set; }
+        public Matrix4x4 World_to_screen { get; protected set; }
 
         public void Calculate_Model_to_World_Matrix() => Model_to_world = Transform.Translate(Translation) * Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(Model_Direction_Up, World_Direction_Up)) * Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(Model_Direction, World_Direction));
 
@@ -88,7 +92,7 @@ namespace _3D_Racer
             Debug.WriteLine("Orthogonal camera created at (" + position.X + "," + position.Y + "," + position.Z + ")");
         }
         
-        public Orthogonal_Camera(Vector3D position, Shape pointed_at, float width, float height, float z_near, float z_far) : this(position, new Vector3D(pointed_at.World_Origin) - position, width, height, z_near, z_far) {}
+        public Orthogonal_Camera(Vector3D position, Mesh pointed_at, float width, float height, float z_near, float z_far) : this(position, new Vector3D(pointed_at.World_Origin) - position, width, height, z_near, z_far) {}
     }
 
     public class Perspective_Camera : Camera
@@ -145,6 +149,6 @@ namespace _3D_Racer
             Debug.WriteLine("Perspective camera created at (" + position.X + "," + position.Y + "," + position.Z + ")");
         }
 
-        public Perspective_Camera(Vector3D position, Shape pointed_at, float width, float height, float z_near, float z_far) : this(position, new Vector3D(pointed_at.World_Origin) - position, width, height, z_near, z_far) {}
+        public Perspective_Camera(Vector3D position, Mesh pointed_at, float width, float height, float z_near, float z_far) : this(position, new Vector3D(pointed_at.World_Origin) - position, width, height, z_near, z_far) {}
     }
 }

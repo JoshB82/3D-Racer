@@ -1,6 +1,6 @@
 ﻿namespace _3D_Racer
 {
-    public abstract partial class Shape
+    public abstract partial class Mesh
     {
         public void Translate_X(float distance) => Translation += new Vector3D(distance, 0, 0);
         public void Translate_Y(float distance) => Translation += new Vector3D(0, distance, 0);

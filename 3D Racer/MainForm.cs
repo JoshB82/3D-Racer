@@ -28,27 +28,35 @@ namespace _3D_Racer
 
             scene = new Scene(Canvas_Box.Width, Canvas_Box.Height);
 
-            Cube default_cube = new Cube(new Vector3D(0, 0, 0), 50);
-            default_cube.Selected = true;
-            scene.Add(default_cube);
+            Cube cube_mesh = new Cube(new Vector3D(0, 0, 0), 50, true, null, null, Color.Green);
+            Shape default_shape = new Shape(cube_mesh, true);
 
-            Cuboid cuboid = new Cuboid(new Vector3D(100, 0, 100), 30, 40, 90);
+            scene.Add(default_shape);
+
+            Cuboid cuboid_mesh = new Cuboid(new Vector3D(100, 0, 100), 30, 40, 90, true, null, null, Color.Purple);
+            Shape cuboid = new Shape(cuboid_mesh);
             scene.Add(cuboid);
 
-            Plane plane = new Plane(new Vector3D(0, 0, -30), Vector3D.Unit_Y, 100, 100);
+            // ONLY ONE COLOUYR NEEDED?
+            Plane plane_mesh = new Plane(new Vector3D(0, 0, -30), Vector3D.Unit_Y, 100, 100, null, null, Color.Aqua);
+            Shape plane = new Shape(plane_mesh);
             scene.Add(plane);
 
             // Create axes
-            Line x_axis = new Line(new Vector3D(0, 0, 0), new Vector3D(250, 0, 0), null, Color.Red);
-            Line y_axis = new Line(new Vector3D(0, 0, 0), new Vector3D(0, 250, 0), null, Color.Green);
-            Line z_axis = new Line(new Vector3D(0, 0, 0), new Vector3D(0, 0, 250), null, Color.Blue);
+            Line x_axis_mesh = new Line(new Vector3D(0, 0, 0), new Vector3D(250, 0, 0), null, Color.Red);
+            Line y_axis_mesh = new Line(new Vector3D(0, 0, 0), new Vector3D(0, 250, 0), null, Color.Green);
+            Line z_axis_mesh = new Line(new Vector3D(0, 0, 0), new Vector3D(0, 0, 250), null, Color.Blue);
+            // EMPTY MESH?
+            Shape x_axis = new Shape(x_axis_mesh);
+            Shape y_axis = new Shape(y_axis_mesh);
+            Shape z_axis = new Shape(z_axis_mesh);
             scene.Add(x_axis);
             scene.Add(y_axis);
             scene.Add(z_axis);
 
             //World_Point origin = new World_Point(0, 0, 0);
             //Entity_List.Add(origin);
-            Current_camera = new Perspective_Camera(new Vector3D(0, 0, 500), default_cube, 100, 100, 50, 750);
+            Current_camera = new Perspective_Camera(new Vector3D(0, 0, 500), cube_mesh, 100, 100, 50, 750);
 
             Thread graphics_thread = new Thread(Game_Loop);
             graphics_thread.Start();
@@ -120,7 +128,7 @@ namespace _3D_Racer
         {
             if (e.Button == MouseButtons.Right)
             {
-                scene.Add(new Cube(new Vector3D(e.X, e.Y, 100), 100));
+                scene.Add(new Shape(new Cube(new Vector3D(e.X, e.Y, 100), 100)));
             }
         }
 
