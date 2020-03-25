@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Camera transformation.cs" />
     <Compile Include="Cuboid.cs" />
+    <Compile Include="Drawing Algorithms.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
