@@ -9,6 +9,7 @@ namespace _3D_Racer
         public int Diameter { get; set; }
         public bool Visible { get; set; }
 
+        public Vertex(Vector3D position, Color? colour = null, bool visibility = true, int diameter = 10) : this(position, 1, colour, visibility, diameter) { }
         /// <summary>
         /// Create a new vertex.
         /// </summary>
@@ -16,8 +17,9 @@ namespace _3D_Racer
         /// <param name="y">y - co-ordinate of the vertex.</param>
         /// <param name="z">z - co-ordinate of the vertex.</param>
         /// <param name="colour">Eight digit hexadecimal ARGB colour value.</param>
-        public Vertex(float x, float y, float z, Color? colour = null, bool visibility = true, int radius = 10) : this(x, y, z, 1, colour, visibility, radius) {}
+        public Vertex(float x, float y, float z, Color? colour = null, bool visibility = true, int diameter = 10) : this(x, y, z, 1, colour, visibility, diameter) {}
 
+        public Vertex(Vector3D position, float w, Color? colour = null, bool visibility = true, int diameter = 10) : this(position.X, position.Y, position.Z, w, colour, visibility, diameter) { }
         public Vertex(float x, float y, float z, float w, Color? colour = null, bool visibility = true, int diameter = 10) : base(x, y, z, w)
         {
             Colour = colour ?? Color.Black;
@@ -64,6 +66,24 @@ namespace _3D_Racer
         public bool Visible { get; set; }
 
         public Face(int p1, int p2, int p3, Color colour, bool visibility = true)
+        {
+            P1 = p1;
+            P2 = p2;
+            P3 = p3;
+            Colour = colour;
+            Visible = visibility;
+        }
+    }
+
+    public class Face_2
+    {
+        public Vector3D P1 { get; set; }
+        public Vector3D P2 { get; set; }
+        public Vector3D P3 { get; set; }
+        public Color Colour { get; set; }
+        public bool Visible { get; set; }
+        
+        public Face_2(Vector3D p1, Vector3D p2, Vector3D p3, Color colour, bool visibility = true)
         {
             P1 = p1;
             P2 = p2;

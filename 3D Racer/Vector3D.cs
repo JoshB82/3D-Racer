@@ -32,6 +32,17 @@ namespace _3D_Racer
             Z = v.Z;
         }
 
+        public static Vector3D Line_Intersect_Plane(Vector3D line_start, Vector3D line_finish, Vector3D plane_point, Vector3D plane_normal)
+        {
+            // Needs to take into account the whole line being on the plane
+            Vector3D line = (line_finish - line_start).Normalise();
+            if (line * plane_normal == 0) return null; // No intersection
+            float d = ((plane_point - line_start) * plane_normal) / (line * plane_normal);
+            return line * d + line_start;
+        }
+
+        public static Vector3D Normal_To_Plane(Vector3D p1, Vector3D p2, Vector3D p3) => (p2 - p1).Cross_Product(p3 - p1).Normalise();
+
         #region Common Vectors
         public static readonly Vector3D Zero = new Vector3D(0, 0, 0);
         public static readonly Vector3D Unit_X = new Vector3D(1, 0, 0);

@@ -63,6 +63,84 @@ namespace _3D_Racer
             lock (locker) Shape_List.RemoveAll(x => x.ID == ID);
         }
 
+        private static float Point_Distance_From_Plane(Vector3D point, Vector3D plane_point, Vector3D plane_normal) => point * plane_normal - plane_point * plane_normal;
+
+        // What if intersects at a corner?
+        private static int Clip(Vector3D plane_point, Vector3D plane_normal, Face_2 f, out Face_2 f1, out Face_2 f2)
+        {
+            f1 = null; f2 = null;
+            Vector3D point_1 = new Vector3D(f.P1.X, f.P1.Y, f.P1.Z);
+            Vector3D point_2 = new Vector3D(f.P2.X, f.P2.Y, f.P2.Z);
+            Vector3D point_3 = new Vector3D(f.P3.X, f.P3.Y, f.P3.Z);
+            int inside_point_count = 0, outside_point_count = 0;
+            List<Vector3D> inside_points = new List<Vector3D>(3);
+            List<Vector3D> outside_points = new List<Vector3D>(3);
+
+            if (Point_Distance_From_Plane(point_1, plane_point, plane_normal) >= 0)
+            {
+                inside_point_count++;
+                inside_points.Add(point_1);
+            }
+            else
+            {
+                outside_point_count++;
+                outside_points.Add(point_1);
+            }
+
+            if (Point_Distance_From_Plane(point_2, plane_point, plane_normal) >= 0)
+            {
+                inside_point_count++;
+                inside_points.Add(point_2);
+            }
+            else
+            {
+                outside_point_count++;
+                outside_points.Add(point_2);
+            }
+            
+            if (Point_Distance_From_Plane(point_3, plane_point, plane_normal) >= 0)
+            {
+                inside_point_count++;
+                inside_points.Add(point_3);
+            }
+            else
+            {
+                outside_point_count++;
+                outside_points.Add(point_3);
+            }
+
+            Vector3D first_intersection, second_intersection;
+
+            switch (inside_point_count)
+            {
+                case 0:
+                    // All points are on the outside, so no valid triangles to return
+                    f1 = null; f2 = null;
+                    return 0;
+                case 1:
+                    // One point is on the inside, so a quadrilateral is formed and split into two triangles
+                    first_intersection = Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[0], plane_point, plane_normal);
+                    second_intersection = Vector3D.Line_Intersect_Plane(inside_points[1], outside_points[0], plane_point, plane_normal);
+                    f1 = new Face_2(inside_points[0], inside_points[1], first_intersection, f.Colour, f.Visible);
+                    f2 = new Face_2(inside_points[1], second_intersection, first_intersection, f.Colour, f.Visible);
+                    return 2;
+                case 2:
+                    // Two point are on the inside, so only a smaller triangle is needed
+                    first_intersection = Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[0], plane_point, plane_normal);
+                    second_intersection = Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[1], plane_point, plane_normal);
+                    f1 = new Face_2(inside_points[0], first_intersection, second_intersection, f.Colour, f.Visible);
+                    f2 = null;
+                    return 1;
+                case 3:
+                    // All points are on the inside, so return the triangle unchanged
+                    f1 = new Face_2(f.P1, f.P2, f.P3, f.Colour, f.Visible);
+                    f2 = null;
+                    return 1;
+            }
+
+            return 0;
+        }
+
         public void Render(PictureBox canvas_box, Camera camera)
         {
             lock (locker)
@@ -74,6 +152,16 @@ namespace _3D_Racer
                 // Calculate camera matrices
                 camera.Calculate_Model_to_World_Matrix();
                 camera.Calculate_World_to_Screen_Matrix();
+
+                // Clipping planes
+                List<Clipping_Plane> clipping_planes = new List<Clipping_Plane>
+                {
+                    new Clipping_Plane(Vector3D.Zero, Vector3D.Unit_Y), // Bottom
+                    new Clipping_Plane(Vector3D.Zero, Vector3D.Unit_X), // Left
+                    new Clipping_Plane(new Vector3D(Width, 0, 0), Vector3D.Unit_Negative_X), // Right
+                    new Clipping_Plane(new Vector3D(0, Height, 0), Vector3D.Unit_Negative_Y), // Top
+                    new Clipping_Plane(new Vector3D(0, 0, -1), Vector3D.Unit_Z) // Near z
+                };
 
                 // Create temporary canvas
                 Bitmap temp_canvas = new Bitmap(Width, Height);
@@ -106,279 +194,45 @@ namespace _3D_Racer
                                 int point_3_y = (int)shape.Render_Mesh.Camera_Vertices[face.P3].Y;
                                 float point_3_z = shape.Render_Mesh.Camera_Vertices[face.P3].Z;
 
-                                // Calculate normal
-                                Vector3D v1 = new Vector3D(point_2_x, point_2_y, point_2_z) - new Vector3D(point_1_x, point_1_y, point_1_z);
-                                Vector3D v2 = new Vector3D(point_3_x, point_3_y, point_3_z) - new Vector3D(point_1_x, point_1_y, point_1_z);
-                                Vector3D normal = v1.Cross_Product(v2);
-                                float a_over_c = normal.X / normal.Z, b_over_c = normal.Y / normal.Z;
+                                // Triangle vectors
+                                Vector3D point_1 = new Vector3D(point_1_x, point_1_y, point_1_z);
+                                Vector3D point_2 = new Vector3D(point_2_x, point_2_y, point_2_z);
+                                Vector3D point_3 = new Vector3D(point_3_x, point_3_y, point_3_z);
 
-                                // Get furthest left and right points
-                                int min_x = Math.Min(Math.Min(point_1_x, point_2_x), point_3_x);
-                                int max_x = Math.Max(Math.Max(point_1_x, point_2_x), point_3_x);
+                                Queue<Face_2> face_clip = new Queue<Face_2>();
 
-                                // Get lowest and highest points
-                                int min_y = Math.Min(Math.Min(point_1_y, point_2_y), point_3_y);
-                                int max_y = Math.Max(Math.Max(point_1_y, point_2_y), point_3_y);
+                                // Add initial triangle
+                                face_clip.Enqueue(new Face_2(point_1, point_2, point_3, shape.Render_Mesh.Face_Colour, shape.Render_Mesh.Visible));
+                                int no_triangles = 1;
 
-                                // Get starting z_value
-                                float z_value;
-                                if (min_y == point_1_y)
+                                foreach (Clipping_Plane clipping_plane in clipping_planes)
                                 {
-                                    z_value = point_1_z;
-                                }
-                                else
-                                {
-                                    z_value = (min_y == point_2_y) ? point_2_z : point_3_z;
-                                }
-
-                                // Check for triangle where all vertices have the same x - co-ordinate. In this case, the triangle should appear as a vertical line.
-                                if (point_1_x == point_2_x && point_2_x == point_3_x)
-                                {
-                                    for (int y = min_y; y <= max_y; y++)
+                                    while(no_triangles > 0)
                                     {
-                                        // Check against z buffer
-                                        if (z_buffer[point_1_x][y] > z_value)
-                                        {
-                                            z_buffer[point_1_x][y] = z_value;
-                                            colour_buffer[point_1_x][y] = shape.Render_Mesh.Face_Colour;
-                                        }
-                                        z_value -= b_over_c;
+                                        Face_2 triangle = face_clip.Dequeue();
+                                        Face_2[] triangles = new Face_2[2];
+                                        int num_intersection_points = Clip(clipping_plane.Point, clipping_plane.Normal, triangle, out triangles[0], out triangles[1]);
+                                        for (int i = 0; i < num_intersection_points; i++) face_clip.Enqueue(triangles[i]);
+                                        no_triangles--;
                                     }
-                                    continue;
+                                    no_triangles = face_clip.Count;
                                 }
 
-                                // Check for triangle where all vertices have the same y - co-ordinate. In this case, the triangle should appear as a horizontal line.
-                                if (point_1_y == point_2_y && point_2_y == point_3_y)
+                                // Draw clipped triangles
+                                foreach (Face_2 triangle in face_clip)
                                 {
-                                    for (int x = min_x; x <= max_x; x++)
-                                    {
-                                        // Check against z buffer
-                                        if (z_buffer[x][point_1_y] > z_value)
-                                        {
-                                            z_buffer[x][point_1_y] = z_value;
-                                            colour_buffer[x][point_1_y] = shape.Render_Mesh.Face_Colour;
-                                        }
-                                        z_value -= a_over_c;
-                                    }
-                                    continue;
-                                }
+                                    // More variable simplification
+                                    point_1_x = (int)Math.Round(triangle.P1.X, MidpointRounding.AwayFromZero);
+                                    point_1_y = (int)Math.Round(triangle.P1.Y, MidpointRounding.AwayFromZero);
+                                    point_1_z = triangle.P1.Z;
+                                    point_2_x = (int)Math.Round(triangle.P2.X, MidpointRounding.AwayFromZero);
+                                    point_2_y = (int)Math.Round(triangle.P2.Y, MidpointRounding.AwayFromZero);
+                                    point_2_z = triangle.P2.Z;
+                                    point_3_x = (int)Math.Round(triangle.P3.X, MidpointRounding.AwayFromZero);
+                                    point_3_y = (int)Math.Round(triangle.P3.Y, MidpointRounding.AwayFromZero);
+                                    point_3_z = triangle.P3.Z;
 
-                                int x_1, x_2, y_1, y_2;
-                                int prev_x = 0, prev_y = 0;
-                                int start_x_value, final_x_value, start_y_value, final_y_value;
-
-                                // Check for triangle where two vertices have the same x - co-ordinate. In this case, the triangle should appear with one vertical line.
-                                if (point_1_x == point_2_x)
-                                {
-                                    for (int x = min_x; x <= max_x; x++)
-                                    {
-                                        y_1 = point_1_y + (point_3_y - point_1_y) * (x - point_1_x) / (point_3_x - point_1_x);
-                                        y_2 = point_2_y + (point_3_y - point_2_y) * (x - point_2_x) / (point_3_x - point_2_x);
-                                        start_y_value = Math.Min(y_1, y_2);
-                                        final_y_value = Math.Max(y_1, y_2);
-
-                                        // Reset to beginning of new line
-                                        if (x != min_x) z_value -= (start_y_value - prev_y) * b_over_c;
-
-                                        for (int y = start_y_value; y <= final_y_value; y++)
-                                        {
-                                            // Check against z buffer
-                                            if (z_buffer[x][y] > z_value)
-                                            {
-                                                z_buffer[x][y] = z_value;
-                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
-                                            }
-                                            z_value -= b_over_c;
-                                        }
-                                        z_value += b_over_c * (final_y_value - start_y_value + 1);
-                                        prev_y = start_y_value;
-                                        z_value -= a_over_c;
-                                    }
-                                    continue;
-                                }
-                                if (point_1_x == point_3_x)
-                                {
-                                    for (int x = min_x; x <= max_x; x++)
-                                    {
-                                        y_1 = point_1_y + (point_2_y - point_1_y) * (x - point_1_x) / (point_2_x - point_1_x);
-                                        y_2 = point_2_y + (point_3_y - point_2_y) * (x - point_2_x) / (point_3_x - point_2_x);
-                                        start_y_value = Math.Min(y_1, y_2);
-                                        final_y_value = Math.Max(y_1, y_2);
-
-                                        // Reset to beginning of new line
-                                        if (x != min_x) z_value -= (start_y_value - prev_y) * b_over_c;
-
-                                        for (int y = start_y_value; y <= final_y_value; y++)
-                                        {
-                                            // Check against z buffer
-                                            if (z_buffer[x][y] > z_value)
-                                            {
-                                                z_buffer[x][y] = z_value;
-                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
-                                            }
-                                            z_value -= b_over_c;
-                                        }
-                                        z_value += b_over_c * (final_y_value - start_y_value + 1);
-                                        prev_y = start_y_value;
-                                        z_value -= a_over_c;
-                                    }
-                                    continue;
-                                }
-                                if (point_2_x == point_3_x)
-                                {
-                                    for (int x = min_x; x <= max_x; x++)
-                                    {
-                                        y_1 = point_1_y + (point_2_y - point_1_y) * (x - point_1_x) / (point_2_x - point_1_x);
-                                        y_2 = point_1_y + (point_3_y - point_1_y) * (x - point_1_x) / (point_3_x - point_1_x);
-                                        start_y_value = Math.Min(y_1, y_2);
-                                        final_y_value = Math.Max(y_1, y_2);
-
-                                        // Reset to beginning of new line
-                                        if (x != min_x) z_value -= (start_y_value - prev_y) * b_over_c;
-
-                                        for (int y = start_y_value; y <= final_y_value; y++)
-                                        {
-                                            // Check against z buffer
-                                            if (z_buffer[x][y] > z_value)
-                                            {
-                                                z_buffer[x][y] = z_value;
-                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
-                                            }
-                                            z_value -= b_over_c;
-                                        }
-                                        z_value += b_over_c * (final_y_value - start_y_value + 1);
-                                        prev_y = start_y_value;
-                                        z_value -= a_over_c;
-                                    }
-                                    continue;
-                                }
-
-                                // Check for triangle where two vertices have the same y - co-ordinate. In this case, the triangle should appear with one horizontal line.
-                                if (point_1_y == point_2_y)
-                                {
-                                    for (int y = min_y; y <= max_y; y++)
-                                    {
-                                        x_1 = (y - point_3_y) * (point_1_x - point_3_x) / (point_1_y - point_3_y) + point_3_x;
-                                        x_2 = (y - point_3_y) * (point_2_x - point_3_x) / (point_2_y - point_3_y) + point_3_x;
-                                        start_x_value = Math.Min(x_1, x_2);
-                                        final_x_value = Math.Max(x_1, x_2);
-
-                                        // Reset to beginning of new line
-                                        if (y != min_y) z_value -= (start_x_value - prev_x) * a_over_c;
-
-                                        for (int x = start_x_value; x <= final_x_value; x++)
-                                        {
-                                            // Check against z buffer
-                                            if (z_buffer[x][y] > z_value)
-                                            {
-                                                z_buffer[x][y] = z_value;
-                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
-                                            }
-                                            z_value -= a_over_c;
-                                        }
-                                        z_value += a_over_c * (final_x_value - start_x_value + 1);
-                                        prev_x = start_x_value;
-                                        z_value -= b_over_c;
-                                    }
-                                    continue;
-                                }
-                                if (point_1_y == point_3_y)
-                                {
-                                    for (int y = min_y; y <= max_y; y++)
-                                    {
-                                        x_1 = (y - point_2_y) * (point_1_x - point_2_x) / (point_1_y - point_2_y) + point_2_x;
-                                        x_2 = (y - point_3_y) * (point_2_x - point_3_x) / (point_2_y - point_3_y) + point_3_x;
-                                        start_x_value = Math.Min(x_1, x_2);
-                                        final_x_value = Math.Max(x_1, x_2);
-
-                                        // Reset to beginning of new line
-                                        if (y != min_y) z_value -= (start_x_value - prev_x) * a_over_c;
-
-                                        for (int x = start_x_value; x <= final_x_value; x++)
-                                        {
-                                            // Check against z buffer
-                                            if (z_buffer[x][y] > z_value)
-                                            {
-                                                z_buffer[x][y] = z_value;
-                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
-                                            }
-                                            z_value -= a_over_c;
-                                        }
-                                        z_value += a_over_c * (final_x_value - start_x_value + 1);
-                                        prev_x = start_x_value;
-                                        z_value -= b_over_c;
-                                    }
-                                    continue;
-                                }
-                                if (point_2_y == point_3_y)
-                                {
-                                    for (int y = min_y; y <= max_y; y++)
-                                    {
-                                        x_1 = (y - point_1_y) * (point_2_x - point_1_x) / (point_2_y - point_1_y) + point_1_x;
-                                        x_2 = (y - point_3_y) * (point_1_x - point_3_x) / (point_1_y - point_3_y) + point_3_x;
-                                        start_x_value = Math.Min(x_1, x_2);
-                                        final_x_value = Math.Max(x_1, x_2);
-
-                                        // Reset to beginning of new line
-                                        if (y != min_y) z_value -= (start_x_value - prev_x) * a_over_c;
-
-                                        for (int x = start_x_value; x <= final_x_value; x++)
-                                        {
-                                            // Check against z buffer
-                                            if (z_buffer[x][y] > z_value)
-                                            {
-                                                z_buffer[x][y] = z_value;
-                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
-                                            }
-                                            z_value -= a_over_c;
-                                        }
-                                        z_value += a_over_c * (final_x_value - start_x_value + 1);
-                                        prev_x = start_x_value;
-                                        z_value -= b_over_c;
-                                    }
-                                    continue;
-                                }
-
-                                int x_3, final_x_1, final_x_2;
-
-                                // Otherwise the triangle's vertices have no co-ordinates in common.
-                                for (int y = min_y; y <= max_y; y++)
-                                {
-                                    x_1 = (y - point_2_y) * (point_1_x - point_2_x) / (point_1_y - point_2_y) + point_2_x;
-                                    x_2 = (y - point_3_y) * (point_1_x - point_3_x) / (point_1_y - point_3_y) + point_3_x;
-                                    x_3 = (y - point_3_y) * (point_2_x - point_3_x) / (point_2_y - point_3_y) + point_3_x;
-
-                                    if (x_1 >= min_x && x_1 <= max_x)
-                                    {
-                                        final_x_1 = x_1;
-                                        final_x_2 = (x_2 >= min_x && x_2 <= max_x) ? x_2 : x_3;
-                                    }
-                                    else
-                                    {
-                                        final_x_1 = x_2;
-                                        final_x_2 = x_3;
-                                    }
-
-                                    start_x_value = Math.Min(final_x_1, final_x_2);
-                                    final_x_value = Math.Max(final_x_1, final_x_2);
-
-                                    // Reset to beginning of new line
-                                    if (y != min_y) z_value -= (start_x_value - prev_x) * a_over_c;
-
-                                    for (int x = start_x_value; x <= final_x_value; x++)
-                                    {
-                                        // Check against z buffer
-                                        if (z_buffer[x][y] > z_value)
-                                        {
-                                            z_buffer[x][y] = z_value;
-                                            colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
-                                        }
-                                        if (x != final_x_value) z_value -= a_over_c;
-                                    }
-
-                                    z_value += a_over_c * (final_x_value - start_x_value);
-                                    prev_x = start_x_value;
-                                    z_value -= b_over_c;
+                                    Triangle(point_1_x, point_1_y, point_1_z, point_2_x, point_2_y, point_2_z, point_3_x, point_3_y, point_3_z, shape.Render_Mesh.Face_Colour);
                                 }
                             }
                         }
@@ -397,53 +251,6 @@ namespace _3D_Racer
                                     int point_2_x = (int)shape.Render_Mesh.Camera_Vertices[edge.P2].X;
                                     int point_2_y = (int)shape.Render_Mesh.Camera_Vertices[edge.P2].Y;
                                     float point_2_z = shape.Render_Mesh.Camera_Vertices[edge.P2].Z;
-
-                                    // Calculate furthest left and right values
-                                    int min_x = Math.Min(point_1_x, point_2_x);
-                                    int max_x = Math.Max(point_1_x, point_2_x);
-
-                                    // Calculate lowest and highest points
-                                    int min_y = Math.Min(point_1_y, point_2_y);
-                                    int max_y = Math.Max(point_1_y, point_2_y);
-
-                                    // Get starting z_value
-                                    float z_value_x = (min_x == point_1_x) ? point_1_z : point_2_z;
-                                    float z_value_y = (min_y == point_1_y) ? point_1_z : point_2_z;
-
-                                    float z_increase_x = (point_1_z - point_2_z) / (point_1_x - point_2_x);
-                                    float z_increase_y = (point_1_z - point_2_z) / (point_1_y - point_2_y);
-
-                                    // Check for line where both vertices have the same x - co-ordinate. In this case, the line is vertical.
-                                    if (point_1_x == point_2_x)
-                                    {
-                                        for (int y = min_y; y <= max_y; y++)
-                                        {
-                                            // Check against z buffer
-                                            if (z_buffer[point_1_x][y] > z_value_y)
-                                            {
-                                                z_buffer[point_1_x][y] = z_value_y;
-                                                colour_buffer[point_1_x][y] = shape.Render_Mesh.Edge_Colour;
-                                            }
-                                            z_value_y += z_increase_y;
-                                        }
-                                        continue;
-                                    }
-
-                                    // Check for line where both vertices have the same y - co-ordinate. In this case, the line is horizontal.
-                                    if (point_1_y == point_2_y)
-                                    {
-                                        for (int x = min_x; x <= max_x; x++)
-                                        {
-                                            // Check against z buffer
-                                            if (z_buffer[x][point_1_y] > z_value_x)
-                                            {
-                                                z_buffer[x][point_1_y] = z_value_x;
-                                                colour_buffer[x][point_1_y] = shape.Render_Mesh.Edge_Colour;
-                                            }
-                                            z_value_x += z_increase_x;
-                                        }
-                                        continue;
-                                    }
 
                                     Line(point_1_x, point_1_y, point_1_z, point_2_x, point_2_y, point_2_z, shape.Render_Mesh.Edge_Colour);
                                 }
@@ -494,29 +301,278 @@ namespace _3D_Racer
                 canvas_box.Invalidate();
             }
         }
-
-        /*
-         * float y_1 = point_1_y + (point_2_y - point_1_y) * (min_x - point_1_x) / (point_2_x - point_1_x);
-                                    float gradient = (point_2_y - point_1_y) / (point_2_x - point_1_x);
-                                    int prev_y = (int)y_1;
-                                    int round_y;
-
-                                    // Otherwise the lines vertices have no co-ordinates in common.
-                                    for (int x = min_x; x < max_x; x++)
-                                    {
-                                        y_1 += gradient;
-                                        round_y = (int)Math.Round(y_1, MidpointRounding.AwayFromZero);
-
-                                        // Check against z buffer
-                                        if (z_buffer[x][round_y] > z_value_x)
-                                        {
-                                            z_buffer[x][round_y] = z_value_x;
-                                            colour_buffer[x][round_y] = shape.Render_Mesh.Edge_Colour;
-                                        }
-
-                                        z_value_x += z_increase_x + z_increase_y * (round_y - prev_y);
-                                        prev_y = round_y;
-                                    }
-                                    */
     }
 }
+
+/*
+
+
+// Get furthest left and right points
+int min_x = Math.Min(Math.Min(point_1_x, point_2_x), point_3_x);
+int max_x = Math.Max(Math.Max(point_1_x, point_2_x), point_3_x);
+
+// Get lowest and highest points
+int min_y = Math.Min(Math.Min(point_1_y, point_2_y), point_3_y);
+int max_y = Math.Max(Math.Max(point_1_y, point_2_y), point_3_y);
+
+// Get starting z_value
+float z_value;
+                                if (min_y == point_1_y)
+                                {
+                                    z_value = point_1_z;
+                                }
+                                else
+                                {
+                                    z_value = (min_y == point_2_y) ? point_2_z : point_3_z;
+                                }
+
+                                // Check for triangle where all vertices have the same x - co-ordinate. In this case, the triangle should appear as a vertical line.
+                                if (point_1_x == point_2_x && point_2_x == point_3_x)
+                                {
+                                    for (int y = min_y; y <= max_y; y++)
+                                    {
+                                        // Check against z buffer
+                                        if (z_buffer[point_1_x][y] > z_value)
+                                        {
+                                            z_buffer[point_1_x][y] = z_value;
+                                            colour_buffer[point_1_x][y] = shape.Render_Mesh.Face_Colour;
+                                        }
+                                        z_value -= b_over_c;
+                                    }
+                                    continue;
+                                }
+
+                                // Check for triangle where all vertices have the same y - co-ordinate. In this case, the triangle should appear as a horizontal line.
+                                if (point_1_y == point_2_y && point_2_y == point_3_y)
+                                {
+                                    for (int x = min_x; x <= max_x; x++)
+                                    {
+                                        // Check against z buffer
+                                        if (z_buffer[x][point_1_y] > z_value)
+                                        {
+                                            z_buffer[x][point_1_y] = z_value;
+                                            colour_buffer[x][point_1_y] = shape.Render_Mesh.Face_Colour;
+                                        }
+                                        z_value -= a_over_c;
+                                    }
+                                    continue;
+                                }
+
+                                int x_1, x_2, y_1, y_2;
+int prev_x = 0, prev_y = 0;
+int start_x_value, final_x_value, start_y_value, final_y_value;
+
+                                // Check for triangle where two vertices have the same x - co-ordinate. In this case, the triangle should appear with one vertical line.
+                                if (point_1_x == point_2_x)
+                                {
+                                    for (int x = min_x; x <= max_x; x++)
+                                    {
+                                        y_1 = point_1_y + (point_3_y - point_1_y) * (x - point_1_x) / (point_3_x - point_1_x);
+                                        y_2 = point_2_y + (point_3_y - point_2_y) * (x - point_2_x) / (point_3_x - point_2_x);
+                                        start_y_value = Math.Min(y_1, y_2);
+                                        final_y_value = Math.Max(y_1, y_2);
+
+                                        // Reset to beginning of new line
+                                        if (x != min_x) z_value -= (start_y_value - prev_y) * b_over_c;
+
+                                        for (int y = start_y_value; y <= final_y_value; y++)
+                                        {
+                                            // Check against z buffer
+                                            if (z_buffer[x][y] > z_value)
+                                            {
+                                                z_buffer[x][y] = z_value;
+                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
+                                            }
+                                            z_value -= b_over_c;
+                                        }
+                                        z_value += b_over_c* (final_y_value - start_y_value + 1);
+                                        prev_y = start_y_value;
+                                        z_value -= a_over_c;
+                                    }
+                                    continue;
+                                }
+                                if (point_1_x == point_3_x)
+                                {
+                                    for (int x = min_x; x <= max_x; x++)
+                                    {
+                                        y_1 = point_1_y + (point_2_y - point_1_y) * (x - point_1_x) / (point_2_x - point_1_x);
+                                        y_2 = point_2_y + (point_3_y - point_2_y) * (x - point_2_x) / (point_3_x - point_2_x);
+                                        start_y_value = Math.Min(y_1, y_2);
+                                        final_y_value = Math.Max(y_1, y_2);
+
+                                        // Reset to beginning of new line
+                                        if (x != min_x) z_value -= (start_y_value - prev_y) * b_over_c;
+
+                                        for (int y = start_y_value; y <= final_y_value; y++)
+                                        {
+                                            // Check against z buffer
+                                            if (z_buffer[x][y] > z_value)
+                                            {
+                                                z_buffer[x][y] = z_value;
+                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
+                                            }
+                                            z_value -= b_over_c;
+                                        }
+                                        z_value += b_over_c* (final_y_value - start_y_value + 1);
+                                        prev_y = start_y_value;
+                                        z_value -= a_over_c;
+                                    }
+                                    continue;
+                                }
+                                if (point_2_x == point_3_x)
+                                {
+                                    for (int x = min_x; x <= max_x; x++)
+                                    {
+                                        y_1 = point_1_y + (point_2_y - point_1_y) * (x - point_1_x) / (point_2_x - point_1_x);
+                                        y_2 = point_1_y + (point_3_y - point_1_y) * (x - point_1_x) / (point_3_x - point_1_x);
+                                        start_y_value = Math.Min(y_1, y_2);
+                                        final_y_value = Math.Max(y_1, y_2);
+
+                                        // Reset to beginning of new line
+                                        if (x != min_x) z_value -= (start_y_value - prev_y) * b_over_c;
+
+                                        for (int y = start_y_value; y <= final_y_value; y++)
+                                        {
+                                            // Check against z buffer
+                                            if (z_buffer[x][y] > z_value)
+                                            {
+                                                z_buffer[x][y] = z_value;
+                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
+                                            }
+                                            z_value -= b_over_c;
+                                        }
+                                        z_value += b_over_c* (final_y_value - start_y_value + 1);
+                                        prev_y = start_y_value;
+                                        z_value -= a_over_c;
+                                    }
+                                    continue;
+                                }
+
+                                // Check for triangle where two vertices have the same y - co-ordinate. In this case, the triangle should appear with one horizontal line.
+                                if (point_1_y == point_2_y)
+                                {
+                                    for (int y = min_y; y <= max_y; y++)
+                                    {
+                                        x_1 = (y - point_3_y) * (point_1_x - point_3_x) / (point_1_y - point_3_y) + point_3_x;
+                                        x_2 = (y - point_3_y) * (point_2_x - point_3_x) / (point_2_y - point_3_y) + point_3_x;
+                                        start_x_value = Math.Min(x_1, x_2);
+                                        final_x_value = Math.Max(x_1, x_2);
+
+                                        // Reset to beginning of new line
+                                        if (y != min_y) z_value -= (start_x_value - prev_x) * a_over_c;
+
+                                        for (int x = start_x_value; x <= final_x_value; x++)
+                                        {
+                                            // Check against z buffer
+                                            if (z_buffer[x][y] > z_value)
+                                            {
+                                                z_buffer[x][y] = z_value;
+                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
+                                            }
+                                            z_value -= a_over_c;
+                                        }
+                                        z_value += a_over_c* (final_x_value - start_x_value + 1);
+                                        prev_x = start_x_value;
+                                        z_value -= b_over_c;
+                                    }
+                                    continue;
+                                }
+                                if (point_1_y == point_3_y)
+                                {
+                                    for (int y = min_y; y <= max_y; y++)
+                                    {
+                                        x_1 = (y - point_2_y) * (point_1_x - point_2_x) / (point_1_y - point_2_y) + point_2_x;
+                                        x_2 = (y - point_3_y) * (point_2_x - point_3_x) / (point_2_y - point_3_y) + point_3_x;
+                                        start_x_value = Math.Min(x_1, x_2);
+                                        final_x_value = Math.Max(x_1, x_2);
+
+                                        // Reset to beginning of new line
+                                        if (y != min_y) z_value -= (start_x_value - prev_x) * a_over_c;
+
+                                        for (int x = start_x_value; x <= final_x_value; x++)
+                                        {
+                                            // Check against z buffer
+                                            if (z_buffer[x][y] > z_value)
+                                            {
+                                                z_buffer[x][y] = z_value;
+                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
+                                            }
+                                            z_value -= a_over_c;
+                                        }
+                                        z_value += a_over_c* (final_x_value - start_x_value + 1);
+                                        prev_x = start_x_value;
+                                        z_value -= b_over_c;
+                                    }
+                                    continue;
+                                }
+                                if (point_2_y == point_3_y)
+                                {
+                                    for (int y = min_y; y <= max_y; y++)
+                                    {
+                                        x_1 = (y - point_1_y) * (point_2_x - point_1_x) / (point_2_y - point_1_y) + point_1_x;
+                                        x_2 = (y - point_3_y) * (point_1_x - point_3_x) / (point_1_y - point_3_y) + point_3_x;
+                                        start_x_value = Math.Min(x_1, x_2);
+                                        final_x_value = Math.Max(x_1, x_2);
+
+                                        // Reset to beginning of new line
+                                        if (y != min_y) z_value -= (start_x_value - prev_x) * a_over_c;
+
+                                        for (int x = start_x_value; x <= final_x_value; x++)
+                                        {
+                                            // Check against z buffer
+                                            if (z_buffer[x][y] > z_value)
+                                            {
+                                                z_buffer[x][y] = z_value;
+                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
+                                            }
+                                            z_value -= a_over_c;
+                                        }
+                                        z_value += a_over_c* (final_x_value - start_x_value + 1);
+                                        prev_x = start_x_value;
+                                        z_value -= b_over_c;
+                                    }
+                                    continue;
+                                }
+
+                                int x_3, final_x_1, final_x_2;
+
+                                // Otherwise the triangle's vertices have no co-ordinates in common.
+                                for (int y = min_y; y <= max_y; y++)
+                                {
+                                    x_1 = (y - point_2_y) * (point_1_x - point_2_x) / (point_1_y - point_2_y) + point_2_x;
+                                    x_2 = (y - point_3_y) * (point_1_x - point_3_x) / (point_1_y - point_3_y) + point_3_x;
+                                    x_3 = (y - point_3_y) * (point_2_x - point_3_x) / (point_2_y - point_3_y) + point_3_x;
+
+                                    if (x_1 >= min_x && x_1 <= max_x)
+                                    {
+                                        final_x_1 = x_1;
+                                        final_x_2 = (x_2 >= min_x && x_2 <= max_x) ? x_2 : x_3;
+                                    }
+                                    else
+                                    {
+                                        final_x_1 = x_2;
+                                        final_x_2 = x_3;
+                                    }
+
+                                    start_x_value = Math.Min(final_x_1, final_x_2);
+                                    final_x_value = Math.Max(final_x_1, final_x_2);
+
+                                    // Reset to beginning of new line
+                                    if (y != min_y) z_value -= (start_x_value - prev_x) * a_over_c;
+
+                                    for (int x = start_x_value; x <= final_x_value; x++)
+                                    {
+                                        // Check against z buffer
+                                        if (z_buffer[x][y] > z_value)
+                                        {
+                                            z_buffer[x][y] = z_value;
+                                            colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
+                                        }
+                                        if (x != final_x_value) z_value -= a_over_c;
+                                    }
+
+                                    z_value += a_over_c* (final_x_value - start_x_value);
+                                    prev_x = start_x_value;
+                                    z_value -= b_over_c;
+                                }
+                                */
