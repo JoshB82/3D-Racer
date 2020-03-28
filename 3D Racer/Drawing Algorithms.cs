@@ -7,7 +7,8 @@ namespace _3D_Racer
     {
         private void Check_Against_Z_Buffer(int x, int y, float z, Color new_colour)
         {
-            if (z_buffer[x][y] > z)
+            x -= 1; y -= 1;
+            if (z < z_buffer[x][y])
             {
                 z_buffer[x][y] = z;
                 colour_buffer[x][y] = new_colour;

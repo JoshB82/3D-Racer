@@ -57,6 +57,22 @@ namespace _3D_Racer
         }
     }
 
+    public class Edge_2
+    {
+        public Vector3D P1 { get; set; }
+        public Vector3D P2 { get; set; }
+        public Color Colour { get; set; }
+        public bool Visible { get; set; }
+
+        public Edge_2(Vector3D p1, Vector3D p2, Color colour, bool visibility = true)
+        {
+            P1 = p1;
+            P2 = p2;
+            Colour = colour;
+            Visible = visibility;
+        }
+    }
+
     public class Face
     {
         public int P1 { get; set; }

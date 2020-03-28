@@ -65,14 +65,38 @@ namespace _3D_Racer
 
         private static float Point_Distance_From_Plane(Vector3D point, Vector3D plane_point, Vector3D plane_normal) => point * plane_normal - plane_point * plane_normal;
 
-        // What if intersects at a corner?
-        private static int Clip(Vector3D plane_point, Vector3D plane_normal, Face_2 f, out Face_2 f1, out Face_2 f2)
+        private static Edge_2 Clip_Line(Vector3D plane_point, Vector3D plane_normal, Edge_2 e)
+        {
+            Vector3D point_1 = e.P1, point_2 = e.P2;
+            float point_1_distance = Point_Distance_From_Plane(point_1, plane_point, plane_normal);
+            float point_2_distance = Point_Distance_From_Plane(point_2, plane_point, plane_normal);
+
+            if (point_1_distance >= 0 && point_2_distance >= 0)
+            {
+                // Both points are on the inside, so return line unchanged
+                return e;
+            }
+            if (point_1_distance >= 0 && point_2_distance < 0)
+            {
+                // One point is on the inside, the other on the outside, so clip the line
+                Vector3D intersection = Vector3D.Line_Intersect_Plane(point_1, point_2, plane_point, plane_normal);
+                return new Edge_2(point_1, intersection, e.Colour, e.Visible);
+            }
+            if (point_1_distance < 0 && point_2_distance >= 0)
+            {
+                // One point is on the outside, the other on the inside, so clip the line
+                Vector3D intersection = Vector3D.Line_Intersect_Plane(point_2, point_1, plane_point, plane_normal);
+                return new Edge_2(point_2, intersection, e.Colour, e.Visible);
+            }
+            // Both points are on the outside, so discard the line
+            return null;
+        }
+
+        private static int Clip_Face(Vector3D plane_point, Vector3D plane_normal, Face_2 f, out Face_2 f1, out Face_2 f2)
         {
             f1 = null; f2 = null;
-            Vector3D point_1 = new Vector3D(f.P1.X, f.P1.Y, f.P1.Z);
-            Vector3D point_2 = new Vector3D(f.P2.X, f.P2.Y, f.P2.Z);
-            Vector3D point_3 = new Vector3D(f.P3.X, f.P3.Y, f.P3.Z);
-            int inside_point_count = 0, outside_point_count = 0;
+            Vector3D point_1 = f.P1, point_2 = f.P2, point_3 = f.P3;
+            int inside_point_count = 0;
             List<Vector3D> inside_points = new List<Vector3D>(3);
             List<Vector3D> outside_points = new List<Vector3D>(3);
 
@@ -83,7 +107,6 @@ namespace _3D_Racer
             }
             else
             {
-                outside_point_count++;
                 outside_points.Add(point_1);
             }
 
@@ -94,7 +117,6 @@ namespace _3D_Racer
             }
             else
             {
-                outside_point_count++;
                 outside_points.Add(point_2);
             }
             
@@ -105,7 +127,6 @@ namespace _3D_Racer
             }
             else
             {
-                outside_point_count++;
                 outside_points.Add(point_3);
             }
 
@@ -115,26 +136,23 @@ namespace _3D_Racer
             {
                 case 0:
                     // All points are on the outside, so no valid triangles to return
-                    f1 = null; f2 = null;
                     return 0;
                 case 1:
-                    // One point is on the inside, so a quadrilateral is formed and split into two triangles
+                    // One point is on the inside, so only a smaller triangle is needed
+                    first_intersection = Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[0], plane_point, plane_normal);
+                    second_intersection = Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[1], plane_point, plane_normal);
+                    f1 = new Face_2(inside_points[0], first_intersection, second_intersection, f.Colour, f.Visible);
+                    return 1;
+                case 2:
+                    // Two points are on the inside, so a quadrilateral is formed and split into two triangles
                     first_intersection = Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[0], plane_point, plane_normal);
                     second_intersection = Vector3D.Line_Intersect_Plane(inside_points[1], outside_points[0], plane_point, plane_normal);
                     f1 = new Face_2(inside_points[0], inside_points[1], first_intersection, f.Colour, f.Visible);
                     f2 = new Face_2(inside_points[1], second_intersection, first_intersection, f.Colour, f.Visible);
                     return 2;
-                case 2:
-                    // Two point are on the inside, so only a smaller triangle is needed
-                    first_intersection = Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[0], plane_point, plane_normal);
-                    second_intersection = Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[1], plane_point, plane_normal);
-                    f1 = new Face_2(inside_points[0], first_intersection, second_intersection, f.Colour, f.Visible);
-                    f2 = null;
-                    return 1;
                 case 3:
                     // All points are on the inside, so return the triangle unchanged
                     f1 = new Face_2(f.P1, f.P2, f.P3, f.Colour, f.Visible);
-                    f2 = null;
                     return 1;
             }
 
@@ -146,7 +164,7 @@ namespace _3D_Racer
             lock (locker)
             {
                 // Reset buffers
-                for (int i = 0; i < Width; i++) for (int j = 0; j < Height; j++) z_buffer[i][j] = 1;
+                for (int i = 0; i < Width; i++) for (int j = 0; j < Height; j++) z_buffer[i][j] = 2; // 2 is always greater than anything to be rendered.
                 for (int i = 0; i < Width; i++) for (int j = 0; j < Height; j++) colour_buffer[i][j] = Background_colour;
 
                 // Calculate camera matrices
@@ -154,13 +172,14 @@ namespace _3D_Racer
                 camera.Calculate_World_to_Screen_Matrix();
 
                 // Clipping planes
-                List<Clipping_Plane> clipping_planes = new List<Clipping_Plane>
+                Clipping_Plane[] clipping_planes = new Clipping_Plane[]
                 {
-                    new Clipping_Plane(Vector3D.Zero, Vector3D.Unit_Y), // Bottom
-                    new Clipping_Plane(Vector3D.Zero, Vector3D.Unit_X), // Left
+                    new Clipping_Plane(new Vector3D(1, 1, 0), Vector3D.Unit_Y), // Bottom
+                    new Clipping_Plane(new Vector3D(1, 1, 0), Vector3D.Unit_X), // Left
                     new Clipping_Plane(new Vector3D(Width, 0, 0), Vector3D.Unit_Negative_X), // Right
                     new Clipping_Plane(new Vector3D(0, Height, 0), Vector3D.Unit_Negative_Y), // Top
-                    new Clipping_Plane(new Vector3D(0, 0, -1), Vector3D.Unit_Z) // Near z
+                    new Clipping_Plane(new Vector3D(0, 0, -1), Vector3D.Unit_Z), // Near z
+                    new Clipping_Plane(new Vector3D(0, 0, 1),Vector3D.Unit_Negative_Z) // Far z
                 };
 
                 // Create temporary canvas
@@ -211,7 +230,7 @@ namespace _3D_Racer
                                     {
                                         Face_2 triangle = face_clip.Dequeue();
                                         Face_2[] triangles = new Face_2[2];
-                                        int num_intersection_points = Clip(clipping_plane.Point, clipping_plane.Normal, triangle, out triangles[0], out triangles[1]);
+                                        int num_intersection_points = Clip_Face(clipping_plane.Point, clipping_plane.Normal, triangle, out triangles[0], out triangles[1]);
                                         for (int i = 0; i < num_intersection_points; i++) face_clip.Enqueue(triangles[i]);
                                         no_triangles--;
                                     }
@@ -252,11 +271,45 @@ namespace _3D_Racer
                                     int point_2_y = (int)shape.Render_Mesh.Camera_Vertices[edge.P2].Y;
                                     float point_2_z = shape.Render_Mesh.Camera_Vertices[edge.P2].Z;
 
-                                    Line(point_1_x, point_1_y, point_1_z, point_2_x, point_2_y, point_2_z, shape.Render_Mesh.Edge_Colour);
+                                    // Line points
+                                    Vector3D point_1 = new Vector3D(point_1_x, point_1_y, point_1_z);
+                                    Vector3D point_2 = new Vector3D(point_2_x, point_2_y, point_2_z);
+
+                                    Edge_2 new_edge = new Edge_2(point_1, point_2, shape.Render_Mesh.Edge_Colour, shape.Render_Mesh.Visible);
+                                    Edge_2 new_edge_2 = null;
+                                    bool draw_edge = true;
+
+                                    foreach (Clipping_Plane clipping_plane in clipping_planes)
+                                    {
+                                        new_edge_2 = Clip_Line(clipping_plane.Point, clipping_plane.Normal, new_edge);
+                                        if (new_edge_2 == null)
+                                        {
+                                            draw_edge = false;
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            new_edge = new_edge_2;
+                                        }
+                                    }
+
+                                    if (draw_edge)
+                                    {
+                                        // More variable simplification (line intersection should probably return integer anyway...)
+                                        point_1_x = (int)new_edge_2.P1.X;
+                                        point_1_y = (int)new_edge_2.P1.Y;
+                                        point_1_z = new_edge_2.P1.Z;
+                                        point_2_x = (int)new_edge_2.P2.X;
+                                        point_2_y = (int)new_edge_2.P2.Y;
+                                        point_2_z = new_edge_2.P2.Z;
+
+                                        Line(point_1_x, point_1_y, point_1_z, point_2_x, point_2_y, point_2_z, shape.Render_Mesh.Edge_Colour);
+                                    }
                                 }
                             }
                         }
 
+                        /*
                         // Draw vertices
                         if (shape.Render_Mesh.Camera_Vertices != null && shape.Render_Mesh.Draw_Vertices)
                         {
@@ -284,6 +337,7 @@ namespace _3D_Racer
                                 }
                             }
                         }
+                        */
                     }
                     
                     // Does foreach use ref?

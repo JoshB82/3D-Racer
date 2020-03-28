@@ -13,8 +13,8 @@ namespace _3D_Racer
         private int selected_shape;
 
         private const float grav_acc = -9.81f;
-        private const float camera_pan = 0.02f;
-        private const float camera_tilt = 0.00001f;
+        private const float camera_pan = 0.002f;
+        private const float camera_tilt = 0.000001f;
 
         private const int max_frames_per_second = 60;
         private const int max_updates_per_second = 60;
