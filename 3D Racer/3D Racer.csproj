@@ -68,6 +68,7 @@
     <Compile Include="Group.cs" />
     <Compile Include="Shape.cs" />
     <Compile Include="ShapeTransformation.cs" />
+    <Compile Include="Sphere.cs" />
     <Compile Include="TransformRotation.cs" />
     <Compile Include="TransformScaling.cs" />
     <Compile Include="TransformTranslation.cs" />

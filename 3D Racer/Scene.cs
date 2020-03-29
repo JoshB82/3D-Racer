@@ -8,7 +8,7 @@ namespace _3D_Racer
     public sealed partial class Scene
     {
         private static readonly object locker = new object();
-        public readonly List<Shape> Shape_List = new List<Shape>();
+        private readonly List<Shape> Shape_List = new List<Shape>();
         public Bitmap Canvas { get; set; }
         public Color Background_colour { get; set; }
 
@@ -19,8 +19,17 @@ namespace _3D_Racer
         // Scene dimensions
         public int Offset_x { get; set; }
         public int Offset_y { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
+
+        private int width, height;
+        public int Width
+        {
+            get { return width; }
+            set { lock (locker) { width = value; Set_Buffer(); } }
+        }
+        public int Height {
+            get { return height; }
+            set { lock (locker) { height = value; Set_Buffer(); } }
+        }
 
         public Scene(int width, int height, Color? background_colour = null)
         {
@@ -29,10 +38,14 @@ namespace _3D_Racer
             Background_colour = background_colour ?? Color.White;
 
             Canvas = new Bitmap(width, height);
-            z_buffer = new float[Width][];
-            for (int i = 0; i < Width; i++) z_buffer[i] = new float[Height];
-            colour_buffer = new Color[Width][];
-            for (int i = 0; i < Width; i++) colour_buffer[i] = new Color[Height];
+        }
+
+        private void Set_Buffer()
+        {
+            z_buffer = new float[width][];
+            colour_buffer = new Color[width][];
+            for (int i = 0; i < width; i++) z_buffer[i] = new float[height];
+            for (int i = 0; i < width; i++) colour_buffer[i] = new Color[height];
         }
 
         /// <summary>
