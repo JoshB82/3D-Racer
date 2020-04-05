@@ -1,6 +1,10 @@
 ﻿namespace _3D_Racer
 {
-    class Sphere
+    public class Sphere : Mesh
     {
+        public Sphere()
+        {
+
+        }
     }
 }

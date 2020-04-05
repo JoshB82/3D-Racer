@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -49,7 +50,9 @@
     <Compile Include="Camera transformation.cs" />
     <Compile Include="Clipping Plane.cs" />
     <Compile Include="Cuboid.cs" />
+    <Compile Include="Distant_Light.cs" />
     <Compile Include="Drawing Algorithms.cs" />
+    <Compile Include="Light.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>

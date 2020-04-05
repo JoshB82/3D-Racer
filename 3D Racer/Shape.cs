@@ -10,6 +10,7 @@
         /// Determines if the shape is selected or not.
         /// </summary>
         public bool Selected { get; set; }
+        public bool Visible { get; set; }
 
         public int ID { get; protected set; }
         private static int next_id = -1;

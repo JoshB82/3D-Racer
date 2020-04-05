@@ -3,22 +3,25 @@ using System.Drawing;
 
 namespace _3D_Racer
 {
+    /// <summary>
+    /// Handles creation of a cuboid mesh.
+    /// </summary>
     public sealed class Cuboid : Mesh
     {
-        public Cuboid(Vector3D position, float length, float width, float height, bool visible,
+        public Cuboid(Vector3D position, double length, double width, double height, bool visible = true,
             Color? vertex_colour = null,
             Color? edge_colour = null,
             Color? face_colour = null)
         {
-            Vertex_Colour = vertex_colour ?? Color.FromArgb(0xFF, 0x00, 0x00, 0xFF);
-            Edge_Colour = edge_colour ?? Color.FromArgb(0xFF, 0x00, 0x00, 0x00);
-            Face_Colour = face_colour ?? Color.FromArgb(0xFF, 0x00, 0xFF, 0x00);
+            Vertex_Colour = vertex_colour ?? Color.Blue;
+            Edge_Colour = edge_colour ?? Color.Black;
+            Face_Colour = face_colour ?? Color.FromArgb(0xFF, 0x00, 0xFF, 0x00); // Green
+
             Visible = visible;
 
-            Model_Origin = new Vertex(0, 0, 0, 1);
             World_Origin = new Vertex(position.X, position.Y, position.Z, 1);
-            Model_Direction = Vector3D.Unit_X;
-            World_Direction = Vector3D.Unit_X;
+
+            Set_Shape_Direction_1(Vector3D.Unit_X, Vector3D.Unit_Y);
 
             Model_Vertices = new Vertex[8]
             {
@@ -76,7 +79,7 @@ namespace _3D_Racer
             Scaling = new Vector3D(length, width, height);
             Translation = new Vector3D(position.X, position.Y, position.Z);
 
-            Debug.WriteLine("Cuboid created at (" + position.X + "," + position.Y + "," + position.Z + ")");
+            Debug.WriteLine($"Cuboid created at ({position.X}, {position.Y}, {position.Z})");
         }
     }
 }

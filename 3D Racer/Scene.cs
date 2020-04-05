@@ -13,13 +13,10 @@ namespace _3D_Racer
         public Color Background_colour { get; set; }
 
         // Buffers
-        private float[][] z_buffer;
+        private double[][] z_buffer;
         private Color[][] colour_buffer;
 
         // Scene dimensions
-        public int Offset_x { get; set; }
-        public int Offset_y { get; set; }
-
         private int width, height;
         public int Width
         {
@@ -42,25 +39,25 @@ namespace _3D_Racer
 
         private void Set_Buffer()
         {
-            z_buffer = new float[width][];
+            z_buffer = new double[width][];
             colour_buffer = new Color[width][];
-            for (int i = 0; i < width; i++) z_buffer[i] = new float[height];
+            for (int i = 0; i < width; i++) z_buffer[i] = new double[height];
             for (int i = 0; i < width; i++) colour_buffer[i] = new Color[height];
         }
 
         /// <summary>
-        /// Add a shape to the scene
+        /// Add a shape to the scene.
         /// </summary>
-        /// <param name="shape">Shape to add</param>
+        /// <param name="shape">Shape to add.</param>
         public void Add(Shape shape)
         {
             lock (locker) Shape_List.Add(shape);
         }
 
         /// <summary>
-        /// Add multiple shapes to the scene
+        /// Add multiple shapes to the scene.
         /// </summary>
-        /// <param name="shapes">Array of shapes to add</param>
+        /// <param name="shapes">Array of shapes to add.</param>
         public void Add(Shape[] shapes)
         {
             lock (locker) foreach (Shape shape in shapes) Shape_List.Add(shape);
@@ -76,13 +73,11 @@ namespace _3D_Racer
             lock (locker) Shape_List.RemoveAll(x => x.ID == ID);
         }
 
-        private static float Point_Distance_From_Plane(Vector3D point, Vector3D plane_point, Vector3D plane_normal) => point * plane_normal - plane_point * plane_normal;
-
-        private static Edge_2 Clip_Line(Vector3D plane_point, Vector3D plane_normal, Edge_2 e)
+        private static Clipped_Edge Clip_Line(Vector3D plane_point, Vector3D plane_normal, Clipped_Edge e)
         {
-            Vector3D point_1 = e.P1, point_2 = e.P2;
-            float point_1_distance = Point_Distance_From_Plane(point_1, plane_point, plane_normal);
-            float point_2_distance = Point_Distance_From_Plane(point_2, plane_point, plane_normal);
+            Vector3D point_1 = new Vector3D(e.P1), point_2 = new Vector3D(e.P2);
+            double point_1_distance = Vector3D.Point_Distance_From_Plane(point_1, plane_point, plane_normal);
+            double point_2_distance = Vector3D.Point_Distance_From_Plane(point_2, plane_point, plane_normal);
 
             if (point_1_distance >= 0 && point_2_distance >= 0)
             {
@@ -92,28 +87,28 @@ namespace _3D_Racer
             if (point_1_distance >= 0 && point_2_distance < 0)
             {
                 // One point is on the inside, the other on the outside, so clip the line
-                Vector3D intersection = Vector3D.Line_Intersect_Plane(point_1, point_2, plane_point, plane_normal);
-                return new Edge_2(point_1, intersection, e.Colour, e.Visible);
+                Vector4D intersection = new Vector4D(Vector3D.Line_Intersect_Plane(point_1, point_2, plane_point, plane_normal));
+                return new Clipped_Edge(new Vector4D(point_1), intersection, e.Colour, e.Visible);
             }
             if (point_1_distance < 0 && point_2_distance >= 0)
             {
                 // One point is on the outside, the other on the inside, so clip the line
-                Vector3D intersection = Vector3D.Line_Intersect_Plane(point_2, point_1, plane_point, plane_normal);
-                return new Edge_2(point_2, intersection, e.Colour, e.Visible);
+                Vector4D intersection = new Vector4D(Vector3D.Line_Intersect_Plane(point_2, point_1, plane_point, plane_normal));
+                return new Clipped_Edge(new Vector4D(point_2), intersection, e.Colour, e.Visible);
             }
             // Both points are on the outside, so discard the line
             return null;
         }
 
-        private static int Clip_Face(Vector3D plane_point, Vector3D plane_normal, Face_2 f, out Face_2 f1, out Face_2 f2)
+        private static int Clip_Face(Vector3D plane_point, Vector3D plane_normal, Clipped_Face f, out Clipped_Face f1, out Clipped_Face f2)
         {
             f1 = null; f2 = null;
-            Vector3D point_1 = f.P1, point_2 = f.P2, point_3 = f.P3;
+            Vector3D point_1 = new Vector3D(f.P1), point_2 = new Vector3D(f.P2), point_3 = new Vector3D(f.P3);
             int inside_point_count = 0;
             List<Vector3D> inside_points = new List<Vector3D>(3);
             List<Vector3D> outside_points = new List<Vector3D>(3);
 
-            if (Point_Distance_From_Plane(point_1, plane_point, plane_normal) >= 0)
+            if (Vector3D.Point_Distance_From_Plane(point_1, plane_point, plane_normal) >= 0)
             {
                 inside_point_count++;
                 inside_points.Add(point_1);
@@ -123,7 +118,7 @@ namespace _3D_Racer
                 outside_points.Add(point_1);
             }
 
-            if (Point_Distance_From_Plane(point_2, plane_point, plane_normal) >= 0)
+            if (Vector3D.Point_Distance_From_Plane(point_2, plane_point, plane_normal) >= 0)
             {
                 inside_point_count++;
                 inside_points.Add(point_2);
@@ -133,7 +128,7 @@ namespace _3D_Racer
                 outside_points.Add(point_2);
             }
             
-            if (Point_Distance_From_Plane(point_3, plane_point, plane_normal) >= 0)
+            if (Vector3D.Point_Distance_From_Plane(point_3, plane_point, plane_normal) >= 0)
             {
                 inside_point_count++;
                 inside_points.Add(point_3);
@@ -143,7 +138,7 @@ namespace _3D_Racer
                 outside_points.Add(point_3);
             }
 
-            Vector3D first_intersection, second_intersection;
+            Vector4D first_intersection, second_intersection;
 
             switch (inside_point_count)
             {
@@ -152,144 +147,165 @@ namespace _3D_Racer
                     return 0;
                 case 1:
                     // One point is on the inside, so only a smaller triangle is needed
-                    first_intersection = Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[0], plane_point, plane_normal);
-                    second_intersection = Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[1], plane_point, plane_normal);
-                    f1 = new Face_2(inside_points[0], first_intersection, second_intersection, f.Colour, f.Visible);
+                    first_intersection = new Vector4D(Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[0], plane_point, plane_normal));
+                    second_intersection = new Vector4D(Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[1], plane_point, plane_normal));
+                    f1 = new Clipped_Face(new Vector4D(inside_points[0]), first_intersection, second_intersection, f.Colour, f.Visible);
                     return 1;
                 case 2:
                     // Two points are on the inside, so a quadrilateral is formed and split into two triangles
-                    first_intersection = Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[0], plane_point, plane_normal);
-                    second_intersection = Vector3D.Line_Intersect_Plane(inside_points[1], outside_points[0], plane_point, plane_normal);
-                    f1 = new Face_2(inside_points[0], inside_points[1], first_intersection, f.Colour, f.Visible);
-                    f2 = new Face_2(inside_points[1], second_intersection, first_intersection, f.Colour, f.Visible);
+                    first_intersection = new Vector4D(Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[0], plane_point, plane_normal));
+                    second_intersection = new Vector4D(Vector3D.Line_Intersect_Plane(inside_points[1], outside_points[0], plane_point, plane_normal));
+                    f1 = new Clipped_Face(new Vector4D(inside_points[0]), new Vector4D(inside_points[1]), first_intersection, f.Colour, f.Visible);
+                    f2 = new Clipped_Face(new Vector4D(inside_points[1]), second_intersection, first_intersection, f.Colour, f.Visible);
                     return 2;
                 case 3:
                     // All points are on the inside, so return the triangle unchanged
-                    f1 = new Face_2(f.P1, f.P2, f.P3, f.Colour, f.Visible);
+                    f1 = new Clipped_Face(f.P1, f.P2, f.P3, f.Colour, f.Visible);
                     return 1;
             }
 
             return 0;
         }
 
-        public void Render(PictureBox canvas_box, Camera camera)
+        public void Render(PictureBox canvas_box, Perspective_Camera camera, bool check)
         {
             lock (locker)
             {
+                // Create temporary canvas
+                Bitmap temp_canvas = new Bitmap(Width, Height);
+
                 // Reset buffers
                 for (int i = 0; i < Width; i++) for (int j = 0; j < Height; j++) z_buffer[i][j] = 2; // 2 is always greater than anything to be rendered.
                 for (int i = 0; i < Width; i++) for (int j = 0; j < Height; j++) colour_buffer[i][j] = Background_colour;
 
                 // Calculate camera matrices
                 camera.Calculate_Model_to_World_Matrix();
+                camera.Apply_World_Matrix();
                 camera.Calculate_World_to_Screen_Matrix();
-
-                // Clipping planes
-                Clipping_Plane[] clipping_planes = new Clipping_Plane[]
-                {
-                    new Clipping_Plane(new Vector3D(1, 1, 0), Vector3D.Unit_Y), // Bottom
-                    new Clipping_Plane(new Vector3D(1, 1, 0), Vector3D.Unit_X), // Left
-                    new Clipping_Plane(new Vector3D(Width, 0, 0), Vector3D.Unit_Negative_X), // Right
-                    new Clipping_Plane(new Vector3D(0, Height, 0), Vector3D.Unit_Negative_Y), // Top
-                    new Clipping_Plane(new Vector3D(0, 0, -1), Vector3D.Unit_Z), // Near z
-                    new Clipping_Plane(new Vector3D(0, 0, 1),Vector3D.Unit_Negative_Z) // Far z
-                };
-
-                // Create temporary canvas
-                Bitmap temp_canvas = new Bitmap(Width, Height);
+                Clipping_Plane[] clipping_planes = camera.Calculate_Clipping_Planes();
 
                 using (Graphics g = Graphics.FromImage(temp_canvas))
                 {
                     foreach (Shape shape in Shape_List)
                     {
+                        // Move shapes to world space
                         shape.Render_Mesh.Calculate_Model_to_World_Matrix();
                         shape.Render_Mesh.Apply_World_Matrices();
-                        shape.Render_Mesh.Apply_Camera_Matrices(camera);
-                        shape.Render_Mesh.Divide_by_W();
-                        shape.Render_Mesh.Scale_to_Screen(Width, Height);
-                        shape.Render_Mesh.Round_Vertices();
-                        shape.Render_Mesh.Change_Y_Axis(Height);
 
                         // Draw faces
-                        if (shape.Render_Mesh.Camera_Vertices != null && shape.Render_Mesh.Faces != null && shape.Render_Mesh.Draw_Faces)
+                        if (shape.Render_Mesh.Faces != null && shape.Render_Mesh.Draw_Faces)
                         {
                             foreach (Face face in shape.Render_Mesh.Faces)
                             {
-                                // Variable simplification
-                                int point_1_x = (int)shape.Render_Mesh.Camera_Vertices[face.P1].X;
-                                int point_1_y = (int)shape.Render_Mesh.Camera_Vertices[face.P1].Y;
-                                float point_1_z = shape.Render_Mesh.Camera_Vertices[face.P1].Z;
-                                int point_2_x = (int)shape.Render_Mesh.Camera_Vertices[face.P2].X;
-                                int point_2_y = (int)shape.Render_Mesh.Camera_Vertices[face.P2].Y;
-                                float point_2_z = shape.Render_Mesh.Camera_Vertices[face.P2].Z;
-                                int point_3_x = (int)shape.Render_Mesh.Camera_Vertices[face.P3].X;
-                                int point_3_y = (int)shape.Render_Mesh.Camera_Vertices[face.P3].Y;
-                                float point_3_z = shape.Render_Mesh.Camera_Vertices[face.P3].Z;
-
-                                // Triangle vectors
-                                Vector3D point_1 = new Vector3D(point_1_x, point_1_y, point_1_z);
-                                Vector3D point_2 = new Vector3D(point_2_x, point_2_y, point_2_z);
-                                Vector3D point_3 = new Vector3D(point_3_x, point_3_y, point_3_z);
-
-                                Queue<Face_2> face_clip = new Queue<Face_2>();
-
-                                // Add initial triangle
-                                face_clip.Enqueue(new Face_2(point_1, point_2, point_3, shape.Render_Mesh.Face_Colour, shape.Render_Mesh.Visible));
-                                int no_triangles = 1;
-
-                                foreach (Clipping_Plane clipping_plane in clipping_planes)
+                                if (face.Visible)
                                 {
-                                    while(no_triangles > 0)
+                                    // Variable simplification
+                                    double point_1_x = shape.Render_Mesh.World_Vertices[face.P1].X;
+                                    double point_1_y = shape.Render_Mesh.World_Vertices[face.P1].Y;
+                                    double point_1_z = shape.Render_Mesh.World_Vertices[face.P1].Z;
+                                    double point_2_x = shape.Render_Mesh.World_Vertices[face.P2].X;
+                                    double point_2_y = shape.Render_Mesh.World_Vertices[face.P2].Y;
+                                    double point_2_z = shape.Render_Mesh.World_Vertices[face.P2].Z;
+                                    double point_3_x = shape.Render_Mesh.World_Vertices[face.P3].X;
+                                    double point_3_y = shape.Render_Mesh.World_Vertices[face.P3].Y;
+                                    double point_3_z = shape.Render_Mesh.World_Vertices[face.P3].Z;
+
+                                    // Triangle point vectors
+                                    Vector4D point_1 = new Vector4D(point_1_x, point_1_y, point_1_z);
+                                    Vector4D point_2 = new Vector4D(point_2_x, point_2_y, point_2_z);
+                                    Vector4D point_3 = new Vector4D(point_3_x, point_3_y, point_3_z);
+
+                                    Queue<Clipped_Face> face_clip = new Queue<Clipped_Face>();
+
+                                    // Add initial triangle to clipping queue
+                                    face_clip.Enqueue(new Clipped_Face(point_1, point_2, point_3, shape.Render_Mesh.Face_Colour, shape.Render_Mesh.Visible));
+                                    int no_triangles = 1;
+
+                                    // Clip face against each clipping plane
+                                    foreach (Clipping_Plane clipping_plane in clipping_planes)
                                     {
-                                        Face_2 triangle = face_clip.Dequeue();
-                                        Face_2[] triangles = new Face_2[2];
-                                        int num_intersection_points = Clip_Face(clipping_plane.Point, clipping_plane.Normal, triangle, out triangles[0], out triangles[1]);
-                                        for (int i = 0; i < num_intersection_points; i++) face_clip.Enqueue(triangles[i]);
-                                        no_triangles--;
+                                        while (no_triangles > 0)
+                                        {
+                                            Clipped_Face triangle = face_clip.Dequeue();
+                                            Clipped_Face[] triangles = new Clipped_Face[2];
+                                            int num_intersection_points = Clip_Face(clipping_plane.Point, clipping_plane.Normal, triangle, out triangles[0], out triangles[1]);
+                                            for (int i = 0; i < num_intersection_points; i++) face_clip.Enqueue(triangles[i]);
+                                            no_triangles--;
+                                        }
+                                        no_triangles = face_clip.Count;
                                     }
-                                    no_triangles = face_clip.Count;
-                                }
 
-                                // Draw clipped triangles
-                                foreach (Face_2 triangle in face_clip)
-                                {
-                                    // More variable simplification
-                                    point_1_x = (int)Math.Round(triangle.P1.X, MidpointRounding.AwayFromZero);
-                                    point_1_y = (int)Math.Round(triangle.P1.Y, MidpointRounding.AwayFromZero);
-                                    point_1_z = triangle.P1.Z;
-                                    point_2_x = (int)Math.Round(triangle.P2.X, MidpointRounding.AwayFromZero);
-                                    point_2_y = (int)Math.Round(triangle.P2.Y, MidpointRounding.AwayFromZero);
-                                    point_2_z = triangle.P2.Z;
-                                    point_3_x = (int)Math.Round(triangle.P3.X, MidpointRounding.AwayFromZero);
-                                    point_3_y = (int)Math.Round(triangle.P3.Y, MidpointRounding.AwayFromZero);
-                                    point_3_z = triangle.P3.Z;
+                                    Clipped_Face[] face_clip_array = face_clip.ToArray();
+                                    if (face_clip_array.Length > 0)
+                                    {
+                                        for (int i = 0; i < face_clip_array.Length; i++)
+                                        {
+                                            // Move remaining faces into view space and ----
+                                            face_clip_array[i].P1 = camera.Apply_Camera_Matrices(face_clip_array[i].P1);
+                                            face_clip_array[i].P2 = camera.Apply_Camera_Matrices(face_clip_array[i].P2);
+                                            face_clip_array[i].P3 = camera.Apply_Camera_Matrices(face_clip_array[i].P3);
 
-                                    Triangle(point_1_x, point_1_y, point_1_z, point_2_x, point_2_y, point_2_z, point_3_x, point_3_y, point_3_z, shape.Render_Mesh.Face_Colour);
+                                            Vector4D new_point_1 = camera.Divide_By_W(face_clip_array[i].P1);
+                                            Vector4D new_point_2 = camera.Divide_By_W(face_clip_array[i].P2);
+                                            Vector4D new_point_3 = camera.Divide_By_W(face_clip_array[i].P3);
+
+                                            // Scale to screen space?
+                                            new_point_1 = Scale_to_screen(new_point_1);
+                                            new_point_2 = Scale_to_screen(new_point_2);
+                                            new_point_3 = Scale_to_screen(new_point_3);
+
+                                            // WHHY?
+                                            new_point_1 = Change_Y_Axis(new_point_1);
+                                            new_point_2 = Change_Y_Axis(new_point_2);
+                                            new_point_3 = Change_Y_Axis(new_point_3);
+
+                                            // More variable simplification
+                                            int new_point_1_x = (int)Math.Round(new_point_1.X, MidpointRounding.AwayFromZero);
+                                            int new_point_1_y = (int)Math.Round(new_point_1.Y, MidpointRounding.AwayFromZero);
+                                            double new_point_1_z = new_point_1.Z;
+                                            int new_point_2_x = (int)Math.Round(new_point_2.X, MidpointRounding.AwayFromZero);
+                                            int new_point_2_y = (int)Math.Round(new_point_2.Y, MidpointRounding.AwayFromZero);
+                                            double new_point_2_z = new_point_2.Z;
+                                            int new_point_3_x = (int)Math.Round(new_point_3.X, MidpointRounding.AwayFromZero);
+                                            int new_point_3_y = (int)Math.Round(new_point_3.Y, MidpointRounding.AwayFromZero);
+                                            double new_point_3_z = new_point_3.Z;
+
+                                            // between [-1,1]
+                                            // between [0,2] (+1)
+                                            // => between [0,1] (/2)
+                                            // => between [0,width-1] (*(width-1))
+
+                                            // RANGE TO DRAW X: [0,WIDTH-1] Y: [0,HEIGHT-1]
+                                            Triangle(new_point_1_x, new_point_1_y, new_point_1_z, new_point_2_x, new_point_2_y, new_point_2_z, new_point_3_x, new_point_3_y, new_point_3_z, shape.Render_Mesh.Face_Colour);
+
+                                            // ROUDNING?
+                                        }
+                                    }
                                 }
                             }
                         }
 
                         // Draw edges
-                        if (shape.Render_Mesh.Camera_Vertices != null && shape.Render_Mesh.Edges != null && shape.Render_Mesh.Draw_Edges)
+                        if (shape.Render_Mesh.Edges != null && shape.Render_Mesh.Draw_Edges)
                         {
                             foreach (Edge edge in shape.Render_Mesh.Edges)
                             {
                                 if (edge.Visible)
                                 {
                                     // Variable simplification
-                                    int point_1_x = (int)shape.Render_Mesh.Camera_Vertices[edge.P1].X;
-                                    int point_1_y = (int)shape.Render_Mesh.Camera_Vertices[edge.P1].Y;
-                                    float point_1_z = shape.Render_Mesh.Camera_Vertices[edge.P1].Z;
-                                    int point_2_x = (int)shape.Render_Mesh.Camera_Vertices[edge.P2].X;
-                                    int point_2_y = (int)shape.Render_Mesh.Camera_Vertices[edge.P2].Y;
-                                    float point_2_z = shape.Render_Mesh.Camera_Vertices[edge.P2].Z;
+                                    double point_1_x = shape.Render_Mesh.World_Vertices[edge.P1].X;
+                                    double point_1_y = shape.Render_Mesh.World_Vertices[edge.P1].Y;
+                                    double point_1_z = shape.Render_Mesh.World_Vertices[edge.P1].Z;
+                                    double point_2_x = shape.Render_Mesh.World_Vertices[edge.P2].X;
+                                    double point_2_y = shape.Render_Mesh.World_Vertices[edge.P2].Y;
+                                    double point_2_z = shape.Render_Mesh.World_Vertices[edge.P2].Z;
 
                                     // Line points
-                                    Vector3D point_1 = new Vector3D(point_1_x, point_1_y, point_1_z);
-                                    Vector3D point_2 = new Vector3D(point_2_x, point_2_y, point_2_z);
+                                    Vector4D point_1 = new Vector4D(point_1_x, point_1_y, point_1_z);
+                                    Vector4D point_2 = new Vector4D(point_2_x, point_2_y, point_2_z);
 
-                                    Edge_2 new_edge = new Edge_2(point_1, point_2, shape.Render_Mesh.Edge_Colour, shape.Render_Mesh.Visible);
-                                    Edge_2 new_edge_2 = null;
+                                    Clipped_Edge new_edge = new Clipped_Edge(point_1, point_2, shape.Render_Mesh.Edge_Colour, shape.Render_Mesh.Visible);
+                                    Clipped_Edge new_edge_2 = null;
                                     bool draw_edge = true;
 
                                     foreach (Clipping_Plane clipping_plane in clipping_planes)
@@ -308,15 +324,29 @@ namespace _3D_Racer
 
                                     if (draw_edge)
                                     {
-                                        // More variable simplification (line intersection should probably return integer anyway...)
-                                        point_1_x = (int)new_edge_2.P1.X;
-                                        point_1_y = (int)new_edge_2.P1.Y;
-                                        point_1_z = new_edge_2.P1.Z;
-                                        point_2_x = (int)new_edge_2.P2.X;
-                                        point_2_y = (int)new_edge_2.P2.Y;
-                                        point_2_z = new_edge_2.P2.Z;
+                                        // Move remaining faces into view space and ----
+                                        new_edge_2.P1 = camera.Apply_Camera_Matrices(new_edge_2.P1);
+                                        new_edge_2.P2 = camera.Apply_Camera_Matrices(new_edge_2.P2);
 
-                                        Line(point_1_x, point_1_y, point_1_z, point_2_x, point_2_y, point_2_z, shape.Render_Mesh.Edge_Colour);
+                                        Vector4D new_point_1 = camera.Divide_By_W(new_edge_2.P1);
+                                        Vector4D new_point_2 = camera.Divide_By_W(new_edge_2.P2);
+
+                                        // Scale to screen space?
+                                        new_point_1 = Scale_to_screen(new_point_1);
+                                        new_point_2 = Scale_to_screen(new_point_2);
+
+                                        // WHHY?
+                                        new_point_1 = Change_Y_Axis(new_point_1);
+                                        new_point_2 = Change_Y_Axis(new_point_2);
+
+                                        int new_point_1_x = (int)Math.Round(new_point_1.X, MidpointRounding.AwayFromZero);
+                                        int new_point_1_y = (int)Math.Round(new_point_1.Y, MidpointRounding.AwayFromZero);
+                                        double new_point_1_z = new_point_1.Z;
+                                        int new_point_2_x = (int)Math.Round(new_point_2.X, MidpointRounding.AwayFromZero);
+                                        int new_point_2_y = (int)Math.Round(new_point_2.Y, MidpointRounding.AwayFromZero);
+                                        double new_point_2_z = new_point_2.Z;
+
+                                        Line(new_point_1_x, new_point_1_y, new_point_1_z, new_point_2_x, new_point_2_y, new_point_2_z, shape.Render_Mesh.Edge_Colour);
                                     }
                                 }
                             }
@@ -333,7 +363,7 @@ namespace _3D_Racer
                                     // Variable simplification
                                     int point_x = (int)vertex.X;
                                     int point_y = (int)vertex.Y;
-                                    float point_z = vertex.Z;
+                                    double point_z = vertex.Z;
 
                                     for (int x = point_x - vertex.Diameter / 2; x <= point_x + vertex.Diameter / 2; x++)
                                     {
@@ -353,8 +383,7 @@ namespace _3D_Racer
                         */
                     }
                     
-                    // Does foreach use ref?
-                    // Draw each pixel in z-buffer
+                    // Draw each pixel from colour buffer
                     for (int x = 0; x < Width; x++)
                     {
                         for (int y = 0; y < Height; y++)
@@ -368,278 +397,23 @@ namespace _3D_Racer
                 canvas_box.Invalidate();
             }
         }
+
+        public Vector4D Scale_to_screen(Vector4D vertex) => Transform.Scale(0.5f * (Width - 1), 0.5f * (Height - 1), 1) * Transform.Translate(new Vector3D(1, 1, 0)) * vertex;
+
+        // Only do at drawing stage? v
+        public Vector4D Change_Y_Axis(Vector4D vertex) => Transform.Translate(new Vector3D(0, Height - 1, 0)) * Transform.Scale_Y(-1) * vertex;
     }
 }
 
-/*
-
-
-// Get furthest left and right points
-int min_x = Math.Min(Math.Min(point_1_x, point_2_x), point_3_x);
-int max_x = Math.Max(Math.Max(point_1_x, point_2_x), point_3_x);
-
-// Get lowest and highest points
-int min_y = Math.Min(Math.Min(point_1_y, point_2_y), point_3_y);
-int max_y = Math.Max(Math.Max(point_1_y, point_2_y), point_3_y);
-
-// Get starting z_value
-float z_value;
-                                if (min_y == point_1_y)
-                                {
-                                    z_value = point_1_z;
-                                }
-                                else
-                                {
-                                    z_value = (min_y == point_2_y) ? point_2_z : point_3_z;
-                                }
-
-                                // Check for triangle where all vertices have the same x - co-ordinate. In this case, the triangle should appear as a vertical line.
-                                if (point_1_x == point_2_x && point_2_x == point_3_x)
-                                {
-                                    for (int y = min_y; y <= max_y; y++)
-                                    {
-                                        // Check against z buffer
-                                        if (z_buffer[point_1_x][y] > z_value)
-                                        {
-                                            z_buffer[point_1_x][y] = z_value;
-                                            colour_buffer[point_1_x][y] = shape.Render_Mesh.Face_Colour;
-                                        }
-                                        z_value -= b_over_c;
-                                    }
-                                    continue;
-                                }
-
-                                // Check for triangle where all vertices have the same y - co-ordinate. In this case, the triangle should appear as a horizontal line.
-                                if (point_1_y == point_2_y && point_2_y == point_3_y)
-                                {
-                                    for (int x = min_x; x <= max_x; x++)
-                                    {
-                                        // Check against z buffer
-                                        if (z_buffer[x][point_1_y] > z_value)
-                                        {
-                                            z_buffer[x][point_1_y] = z_value;
-                                            colour_buffer[x][point_1_y] = shape.Render_Mesh.Face_Colour;
-                                        }
-                                        z_value -= a_over_c;
-                                    }
-                                    continue;
-                                }
-
-                                int x_1, x_2, y_1, y_2;
-int prev_x = 0, prev_y = 0;
-int start_x_value, final_x_value, start_y_value, final_y_value;
-
-                                // Check for triangle where two vertices have the same x - co-ordinate. In this case, the triangle should appear with one vertical line.
-                                if (point_1_x == point_2_x)
-                                {
-                                    for (int x = min_x; x <= max_x; x++)
-                                    {
-                                        y_1 = point_1_y + (point_3_y - point_1_y) * (x - point_1_x) / (point_3_x - point_1_x);
-                                        y_2 = point_2_y + (point_3_y - point_2_y) * (x - point_2_x) / (point_3_x - point_2_x);
-                                        start_y_value = Math.Min(y_1, y_2);
-                                        final_y_value = Math.Max(y_1, y_2);
-
-                                        // Reset to beginning of new line
-                                        if (x != min_x) z_value -= (start_y_value - prev_y) * b_over_c;
-
-                                        for (int y = start_y_value; y <= final_y_value; y++)
-                                        {
-                                            // Check against z buffer
-                                            if (z_buffer[x][y] > z_value)
-                                            {
-                                                z_buffer[x][y] = z_value;
-                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
-                                            }
-                                            z_value -= b_over_c;
-                                        }
-                                        z_value += b_over_c* (final_y_value - start_y_value + 1);
-                                        prev_y = start_y_value;
-                                        z_value -= a_over_c;
-                                    }
-                                    continue;
-                                }
-                                if (point_1_x == point_3_x)
-                                {
-                                    for (int x = min_x; x <= max_x; x++)
-                                    {
-                                        y_1 = point_1_y + (point_2_y - point_1_y) * (x - point_1_x) / (point_2_x - point_1_x);
-                                        y_2 = point_2_y + (point_3_y - point_2_y) * (x - point_2_x) / (point_3_x - point_2_x);
-                                        start_y_value = Math.Min(y_1, y_2);
-                                        final_y_value = Math.Max(y_1, y_2);
-
-                                        // Reset to beginning of new line
-                                        if (x != min_x) z_value -= (start_y_value - prev_y) * b_over_c;
-
-                                        for (int y = start_y_value; y <= final_y_value; y++)
-                                        {
-                                            // Check against z buffer
-                                            if (z_buffer[x][y] > z_value)
-                                            {
-                                                z_buffer[x][y] = z_value;
-                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
-                                            }
-                                            z_value -= b_over_c;
-                                        }
-                                        z_value += b_over_c* (final_y_value - start_y_value + 1);
-                                        prev_y = start_y_value;
-                                        z_value -= a_over_c;
-                                    }
-                                    continue;
-                                }
-                                if (point_2_x == point_3_x)
-                                {
-                                    for (int x = min_x; x <= max_x; x++)
-                                    {
-                                        y_1 = point_1_y + (point_2_y - point_1_y) * (x - point_1_x) / (point_2_x - point_1_x);
-                                        y_2 = point_1_y + (point_3_y - point_1_y) * (x - point_1_x) / (point_3_x - point_1_x);
-                                        start_y_value = Math.Min(y_1, y_2);
-                                        final_y_value = Math.Max(y_1, y_2);
-
-                                        // Reset to beginning of new line
-                                        if (x != min_x) z_value -= (start_y_value - prev_y) * b_over_c;
-
-                                        for (int y = start_y_value; y <= final_y_value; y++)
-                                        {
-                                            // Check against z buffer
-                                            if (z_buffer[x][y] > z_value)
-                                            {
-                                                z_buffer[x][y] = z_value;
-                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
-                                            }
-                                            z_value -= b_over_c;
-                                        }
-                                        z_value += b_over_c* (final_y_value - start_y_value + 1);
-                                        prev_y = start_y_value;
-                                        z_value -= a_over_c;
-                                    }
-                                    continue;
-                                }
-
-                                // Check for triangle where two vertices have the same y - co-ordinate. In this case, the triangle should appear with one horizontal line.
-                                if (point_1_y == point_2_y)
-                                {
-                                    for (int y = min_y; y <= max_y; y++)
-                                    {
-                                        x_1 = (y - point_3_y) * (point_1_x - point_3_x) / (point_1_y - point_3_y) + point_3_x;
-                                        x_2 = (y - point_3_y) * (point_2_x - point_3_x) / (point_2_y - point_3_y) + point_3_x;
-                                        start_x_value = Math.Min(x_1, x_2);
-                                        final_x_value = Math.Max(x_1, x_2);
-
-                                        // Reset to beginning of new line
-                                        if (y != min_y) z_value -= (start_x_value - prev_x) * a_over_c;
-
-                                        for (int x = start_x_value; x <= final_x_value; x++)
-                                        {
-                                            // Check against z buffer
-                                            if (z_buffer[x][y] > z_value)
-                                            {
-                                                z_buffer[x][y] = z_value;
-                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
-                                            }
-                                            z_value -= a_over_c;
-                                        }
-                                        z_value += a_over_c* (final_x_value - start_x_value + 1);
-                                        prev_x = start_x_value;
-                                        z_value -= b_over_c;
-                                    }
-                                    continue;
-                                }
-                                if (point_1_y == point_3_y)
-                                {
-                                    for (int y = min_y; y <= max_y; y++)
-                                    {
-                                        x_1 = (y - point_2_y) * (point_1_x - point_2_x) / (point_1_y - point_2_y) + point_2_x;
-                                        x_2 = (y - point_3_y) * (point_2_x - point_3_x) / (point_2_y - point_3_y) + point_3_x;
-                                        start_x_value = Math.Min(x_1, x_2);
-                                        final_x_value = Math.Max(x_1, x_2);
-
-                                        // Reset to beginning of new line
-                                        if (y != min_y) z_value -= (start_x_value - prev_x) * a_over_c;
-
-                                        for (int x = start_x_value; x <= final_x_value; x++)
-                                        {
-                                            // Check against z buffer
-                                            if (z_buffer[x][y] > z_value)
-                                            {
-                                                z_buffer[x][y] = z_value;
-                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
-                                            }
-                                            z_value -= a_over_c;
-                                        }
-                                        z_value += a_over_c* (final_x_value - start_x_value + 1);
-                                        prev_x = start_x_value;
-                                        z_value -= b_over_c;
-                                    }
-                                    continue;
-                                }
-                                if (point_2_y == point_3_y)
-                                {
-                                    for (int y = min_y; y <= max_y; y++)
-                                    {
-                                        x_1 = (y - point_1_y) * (point_2_x - point_1_x) / (point_2_y - point_1_y) + point_1_x;
-                                        x_2 = (y - point_3_y) * (point_1_x - point_3_x) / (point_1_y - point_3_y) + point_3_x;
-                                        start_x_value = Math.Min(x_1, x_2);
-                                        final_x_value = Math.Max(x_1, x_2);
-
-                                        // Reset to beginning of new line
-                                        if (y != min_y) z_value -= (start_x_value - prev_x) * a_over_c;
-
-                                        for (int x = start_x_value; x <= final_x_value; x++)
-                                        {
-                                            // Check against z buffer
-                                            if (z_buffer[x][y] > z_value)
-                                            {
-                                                z_buffer[x][y] = z_value;
-                                                colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
-                                            }
-                                            z_value -= a_over_c;
-                                        }
-                                        z_value += a_over_c* (final_x_value - start_x_value + 1);
-                                        prev_x = start_x_value;
-                                        z_value -= b_over_c;
-                                    }
-                                    continue;
-                                }
-
-                                int x_3, final_x_1, final_x_2;
-
-                                // Otherwise the triangle's vertices have no co-ordinates in common.
-                                for (int y = min_y; y <= max_y; y++)
-                                {
-                                    x_1 = (y - point_2_y) * (point_1_x - point_2_x) / (point_1_y - point_2_y) + point_2_x;
-                                    x_2 = (y - point_3_y) * (point_1_x - point_3_x) / (point_1_y - point_3_y) + point_3_x;
-                                    x_3 = (y - point_3_y) * (point_2_x - point_3_x) / (point_2_y - point_3_y) + point_3_x;
-
-                                    if (x_1 >= min_x && x_1 <= max_x)
-                                    {
-                                        final_x_1 = x_1;
-                                        final_x_2 = (x_2 >= min_x && x_2 <= max_x) ? x_2 : x_3;
-                                    }
-                                    else
-                                    {
-                                        final_x_1 = x_2;
-                                        final_x_2 = x_3;
-                                    }
-
-                                    start_x_value = Math.Min(final_x_1, final_x_2);
-                                    final_x_value = Math.Max(final_x_1, final_x_2);
-
-                                    // Reset to beginning of new line
-                                    if (y != min_y) z_value -= (start_x_value - prev_x) * a_over_c;
-
-                                    for (int x = start_x_value; x <= final_x_value; x++)
-                                    {
-                                        // Check against z buffer
-                                        if (z_buffer[x][y] > z_value)
-                                        {
-                                            z_buffer[x][y] = z_value;
-                                            colour_buffer[x][y] = shape.Render_Mesh.Face_Colour;
-                                        }
-                                        if (x != final_x_value) z_value -= a_over_c;
-                                    }
-
-                                    z_value += a_over_c* (final_x_value - start_x_value);
-                                    prev_x = start_x_value;
-                                    z_value -= b_over_c;
-                                }
-                                */
+// Clipping planes
+/*Clipping_Plane[] clipping_planes = new Clipping_Plane[]
+{
+    new Clipping_Plane(new Vector3D(1, 1, 0), Vector3D.Unit_Y), // Bottom
+    new Clipping_Plane(new Vector3D(1, 1, 0), Vector3D.Unit_X), // Left
+    new Clipping_Plane(new Vector3D(Width, 0, 0), Vector3D.Unit_Negative_X), // Right
+    new Clipping_Plane(new Vector3D(0, Height, 0), Vector3D.Unit_Negative_Y), // Top
+    new Clipping_Plane(new Vector3D(0, 0, -1), Vector3D.Unit_Z), // Near z
+    new Clipping_Plane(new Vector3D(0, 0, 1), Vector3D.Unit_Negative_Z) // Far z
+};
+*/
+// Back face culling?

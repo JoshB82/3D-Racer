@@ -56,7 +56,7 @@
             this.newGameToolStripMenuItem,
             this.quitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 24);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 26);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // newGameToolStripMenuItem
@@ -75,7 +75,7 @@
             // switchCameraToolStripMenuItem
             // 
             this.switchCameraToolStripMenuItem.Name = "switchCameraToolStripMenuItem";
-            this.switchCameraToolStripMenuItem.Size = new System.Drawing.Size(121, 24);
+            this.switchCameraToolStripMenuItem.Size = new System.Drawing.Size(121, 26);
             this.switchCameraToolStripMenuItem.Text = "Switch Camera";
             this.switchCameraToolStripMenuItem.Click += new System.EventHandler(this.switchCameraToolStripMenuItem_Click);
             // 

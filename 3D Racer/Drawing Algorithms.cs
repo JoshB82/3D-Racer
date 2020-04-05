@@ -1,24 +1,23 @@
 ﻿using System;
+using System.Windows.Forms;
 using System.Drawing;
 
 namespace _3D_Racer
 {
     public sealed partial class Scene
     {
-        private void Check_Against_Z_Buffer(int x, int y, float z, Color new_colour)
+        private void Check_Against_Z_Buffer(int x, int y, double z, Color new_colour)
         {
-            x -= 1; y -= 1;
-            if (z < z_buffer[x][y])
+            if (z <= z_buffer[x][y])
             {
                 z_buffer[x][y] = z;
                 colour_buffer[x][y] = new_colour;
             }
         }
 
-        private void Line(int x1, int y1, float z1, int x2, int y2, float z2, Color colour)
+        private void Line(int x1, int y1, double z1, int x2, int y2, double z2, Color colour)
         {
-            float z_increase_x = (z1 - z2) / (x1 - x2);
-            float z_increase_y = (z1 - z2) / (y1 - y2);
+            double z_increase_x = (z1 - z2) / (x1 - x2), z_increase_y = (z1 - z2) / (y1 - y2);
 
             int delta_x = x2 - x1;
             int delta_y = y2 - y1;
@@ -30,7 +29,7 @@ namespace _3D_Racer
             delta_y = Math.Abs(delta_y);
 
             int x = x1, y = y1, R = 0, D = Math.Max(delta_x, delta_y);
-            float z_value = z1;
+            double z_value = z1;
 
             if (delta_x > delta_y)
             {
@@ -66,39 +65,52 @@ namespace _3D_Racer
             }
         }
 
-        private void Triangle(int x1, int y1, float z1, int x2, int y2, float z2, int x3, int y3, float z3, Color colour)
+        private void Triangle(int x1, int y1, double z1, int x2, int y2, double z2, int x3, int y3, double z3, Color colour)
         {
-            Vector3D normal = Vector3D.Normal_To_Plane(new Vector3D(x1, y1, z1), new Vector3D(x2, y2, z2), new Vector3D(x3, y3, z3));
-            float z_increase_x = -normal.X / normal.Z, z_increase_y = -normal.Y / normal.Z;
+            Vector3D normal = Vector3D.Normal_From_Plane(new Vector3D(x1, y1, z1), new Vector3D(x2, y2, z2), new Vector3D(x3, y3, z3));
+            double z_increase_x = -normal.X / normal.Z, z_increase_y = -normal.Y / normal.Z;
 
             Sort_By_Y(ref x1, ref y1, ref z1, ref x2, ref y2, ref z2, ref x3, ref y3, ref z3);
 
             int x4;
-            if (y2 == y3)
+            if (y1 == y2 && y2 == y3)
             {
-                float z_value = (x2 < x3) ? z2 : z3;
-                Flat_Bottom_Triangle(x2, y2, x3, y3, x1, y1, z_value, z_increase_x, z_increase_y, colour);
+                int start_x_value = Math.Min(Math.Min(x1, x2), x3), final_x_value = Math.Max(Math.Max(x1, x2), x3);
+                double z_value = (start_x_value == x1) ? z1 : (start_x_value == x2) ? z2 : z3;
+                for (int x = start_x_value; x <= final_x_value; x++)
+                {
+                    Check_Against_Z_Buffer(x, y1, z_value, colour);
+                    z_value += z_increase_x;
+                }
             }
             else
             {
-                if (y1 == y2)
+                if (y2 == y3)
                 {
-                    float z_value = z3;
-                    Flat_Top_Triangle(x1, y1, x2, y2, x3, y3, z_value, z_increase_x, z_increase_y, colour);
+                    double z_value = (x2 < x3) ? z2 : z3;
+                    Flat_Bottom_Triangle(x2, y2, x3, y3, x1, y1, z_value, z_increase_x, z_increase_y, colour);
                 }
                 else
                 {
-                    x4 = (int)Math.Round((float)((y2 - y1) * (x3 - x1) / (y3 - y1) + x1), MidpointRounding.AwayFromZero);
-                    int y4 = y2;
-                    float z_value = z3;
+                    if (y1 == y2)
+                    {
+                        double z_value = z3;
+                        Flat_Top_Triangle(x1, y1, x2, y2, x3, y3, z_value, z_increase_x, z_increase_y, colour);
+                    }
+                    else
+                    {
+                        x4 = (int)Math.Round((double)((y2 - y1) * (x3 - x1) / (y3 - y1) + x1), MidpointRounding.AwayFromZero);
+                        int y4 = y2;
+                        double z_value = z3;
 
-                    Flat_Top_Triangle(x2, y2, x4, y4, x3, y3, z_value, z_increase_x, z_increase_y, colour);
-                    Flat_Bottom_Triangle(x2, y2, x4, y4, x1, y1, z_value, z_increase_x, z_increase_y, colour);
+                        Flat_Top_Triangle(x2, y2, x4, y4, x3, y3, z_value, z_increase_x, z_increase_y, colour);
+                        Flat_Bottom_Triangle(x2, y2, x4, y4, x1, y1, z_value, z_increase_x, z_increase_y, colour);
+                    }
                 }
             }
         }
 
-        private void Flat_Bottom_Triangle(int x1, int y1, int x2, int y2, int x3, int y3, float z_value, float z_increase_x, float z_increase_y, Color colour)
+        private void Flat_Bottom_Triangle(int x1, int y1, int x2, int y2, int x3, int y3, double z_value, double z_increase_x, double z_increase_y, Color colour)
         {
             // y1 must equal y2
             int[] start_x_values, final_x_values;
@@ -132,7 +144,7 @@ namespace _3D_Racer
             }
         }
 
-        private void Flat_Top_Triangle(int x1, int y1, int x2, int y2, int x3, int y3, float z_value, float z_increase_x, float z_increase_y, Color colour)
+        private void Flat_Top_Triangle(int x1, int y1, int x2, int y2, int x3, int y3, double z_value, double z_increase_x, double z_increase_y, Color colour)
         {
             // y1 must equal y2
             int[] start_x_values, final_x_values;
@@ -210,16 +222,16 @@ namespace _3D_Racer
                 for (int i = 0; i <= D; i++)
                 {
                     y += increment_y;
-                    if (i != D)
-                    {
-                        y_count++;
-                        x_values[y_count] = x;
-                    }
                     R += 2 * delta_x;
                     if (R >= delta_y)
                     {
                         R -= 2 * delta_y;
                         x += increment_x;
+                    }
+                    if (i != D)
+                    {
+                        y_count++;
+                        x_values[y_count] = x;
                     }
                 }
             }
@@ -230,41 +242,40 @@ namespace _3D_Racer
         /// </summary>
         /// <param name="x1">First variable to be swapped.</param>
         /// <param name="x2">Second variable to be swapped.</param>
-        private static void Swap(ref int x1, ref int x2)
+        private static void Swap_Int(ref int x1, ref int x2)
         {
             int temp = x1;
             x1 = x2;
             x2 = temp;
         }
 
-        private static void Swap_Float(ref float x1, ref float x2)
+        private static void Swap_Double(ref double x1, ref double x2)
         {
-            float temp = x1;
+            double temp = x1;
             x1 = x2;
             x2 = temp;
         }
 
-        // NEED TO UNDERSTAND!
-        public void Sort_By_Y(ref int x1, ref int y1, ref float z1, ref int x2, ref int y2, ref float z2, ref int x3, ref int y3, ref float z3)
+        public void Sort_By_Y(ref int x1, ref int y1, ref double z1, ref int x2, ref int y2, ref double z2, ref int x3, ref int y3, ref double z3)
         {
             // y1 highest; y3 lowest
             if (y1 < y2)
             {
-                Swap(ref x1, ref x2);
-                Swap(ref y1, ref y2);
-                Swap_Float(ref z1, ref z2);
+                Swap_Int(ref x1, ref x2);
+                Swap_Int(ref y1, ref y2);
+                Swap_Double(ref z1, ref z2);
             }
             if (y1 < y3)
             {
-                Swap(ref x1, ref x3);
-                Swap(ref y1, ref y3);
-                Swap_Float(ref z1, ref z3);
+                Swap_Int(ref x1, ref x3);
+                Swap_Int(ref y1, ref y3);
+                Swap_Double(ref z1, ref z3);
             }
             if (y2 < y3)
             {
-                Swap(ref x2, ref x3);
-                Swap(ref y2, ref y3);
-                Swap_Float(ref z2, ref z3);
+                Swap_Int(ref x2, ref x3);
+                Swap_Int(ref y2, ref y3);
+                Swap_Double(ref z2, ref z3);
             }
         }
     }
