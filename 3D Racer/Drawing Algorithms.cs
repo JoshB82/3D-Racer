@@ -17,6 +17,10 @@ namespace _3D_Racer
 
         private void Line(int x1, int y1, double z1, int x2, int y2, double z2, Color colour)
         {
+            if (x1 == x2)
+            {
+                Vertical_Line(x1,y1,z1,x2,y2,z2,colour);
+            }
             double z_increase_x = (z1 - z2) / (x1 - x2), z_increase_y = (z1 - z2) / (y1 - y2);
 
             int delta_x = x2 - x1;
@@ -63,6 +67,16 @@ namespace _3D_Racer
                     }
                 }
             }
+        }
+
+        private void Horizontal_Line(int x1, int y1, double z1, int x2, int y2, double z2, Color colour)
+        {
+        
+        }
+
+        private void Vertical_Line(int x1, int y1, double z1, int x2, int y2, double z2, Color colour)
+        {
+        
         }
 
         private void Triangle(int x1, int y1, double z1, int x2, int y2, double z2, int x3, int y3, double z3, Color colour)
@@ -242,40 +256,33 @@ namespace _3D_Racer
         /// </summary>
         /// <param name="x1">First variable to be swapped.</param>
         /// <param name="x2">Second variable to be swapped.</param>
-        private static void Swap_Int(ref int x1, ref int x2)
+        private static void Swap<T>(ref T x1, ref T x2)
         {
-            int temp = x1;
+            T temp = x1;
             x1 = x2;
             x2 = temp;
         }
 
-        private static void Swap_Double(ref double x1, ref double x2)
-        {
-            double temp = x1;
-            x1 = x2;
-            x2 = temp;
-        }
-
-        public void Sort_By_Y(ref int x1, ref int y1, ref double z1, ref int x2, ref int y2, ref double z2, ref int x3, ref int y3, ref double z3)
+        private void Sort_By_Y(ref int x1, ref int y1, ref double z1, ref int x2, ref int y2, ref double z2, ref int x3, ref int y3, ref double z3)
         {
             // y1 highest; y3 lowest
             if (y1 < y2)
             {
-                Swap_Int(ref x1, ref x2);
-                Swap_Int(ref y1, ref y2);
-                Swap_Double(ref z1, ref z2);
+                Swap(ref x1, ref x2);
+                Swap(ref y1, ref y2);
+                Swap(ref z1, ref z2);
             }
             if (y1 < y3)
             {
-                Swap_Int(ref x1, ref x3);
-                Swap_Int(ref y1, ref y3);
-                Swap_Double(ref z1, ref z3);
+                Swap(ref x1, ref x3);
+                Swap(ref y1, ref y3);
+                Swap(ref z1, ref z3);
             }
             if (y2 < y3)
             {
-                Swap_Int(ref x2, ref x3);
-                Swap_Int(ref y2, ref y3);
-                Swap_Double(ref z2, ref z3);
+                Swap(ref x2, ref x3);
+                Swap(ref y2, ref y3);
+                Swap(ref z2, ref z3);
             }
         }
     }
