@@ -167,7 +167,7 @@ namespace _3D_Racer
             return 0;
         }
 
-        public void Render(PictureBox canvas_box, Perspective_Camera camera, bool check)
+        public void Render(PictureBox canvas_box, Perspective_Camera camera)
         {
             lock (locker)
             {

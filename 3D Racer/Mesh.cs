@@ -78,7 +78,7 @@ namespace _3D_Racer
         public void Apply_World_Matrices()
         {
             World_Origin = Model_to_world * Model_Origin;
-            if (Model_Vertices != null) for (int i = 0; i < Model_Vertices.Length; i++) World_Vertices[i] = Model_to_world * Model_Vertices[i];
+            for (int i = 0; i < Model_Vertices.Length; i++) World_Vertices[i] = Model_to_world * Model_Vertices[i];
         }
     }
 }

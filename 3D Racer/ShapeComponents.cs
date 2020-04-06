@@ -73,14 +73,16 @@ namespace _3D_Racer
         public int P2 { get; set; }
         public int P3 { get; set; }
         public Color Colour { get; set; }
+        public bool Draw_Outline { get; set; }
         public bool Visible { get; set; }
 
-        public Face(int p1, int p2, int p3, Color colour, bool visibility = true)
+        public Face(int p1, int p2, int p3, Color colour, bool draw_outline = false, bool visibility = true)
         {
             P1 = p1;
             P2 = p2;
             P3 = p3;
             Colour = colour;
+            Draw_Outline = draw_outline;
             Visible = visibility;
         }
     }
@@ -91,14 +93,16 @@ namespace _3D_Racer
         public Vector4D P2 { get; set; }
         public Vector4D P3 { get; set; }
         public Color Colour { get; set; }
+        public bool Draw_Outline { get; set; }
         public bool Visible { get; set; }
         
-        public Clipped_Face(Vector4D p1, Vector4D p2, Vector4D p3, Color colour, bool visibility = true)
+        public Clipped_Face(Vector4D p1, Vector4D p2, Vector4D p3, Color colour, bool draw_outline = false, bool visibility = true)
         {
             P1 = p1;
             P2 = p2;
             P3 = p3;
             Colour = colour;
+            Draw_Outline = draw_outline;
             Visible = visibility;
         }
     }

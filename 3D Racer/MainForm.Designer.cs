@@ -88,10 +88,6 @@
             this.Canvas_Box.TabIndex = 1;
             this.Canvas_Box.TabStop = false;
             this.Canvas_Box.Paint += new System.Windows.Forms.PaintEventHandler(this.Canvas_Panel_Paint);
-            this.Canvas_Box.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Canvas_Panel_MouseClick);
-            this.Canvas_Box.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Canvas_Panel_MouseDown);
-            this.Canvas_Box.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Canvas_Panel_MouseMove);
-            this.Canvas_Box.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Canvas_Panel_MouseUp);
             // 
             // MainForm
             // 
