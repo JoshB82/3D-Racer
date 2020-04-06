@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Forms;
 using System.Drawing;
 
 namespace _3D_Racer
@@ -21,49 +20,59 @@ namespace _3D_Racer
             {
                 Vertical_Line(x1,y1,z1,x2,y2,z2,colour);
             }
-            double z_increase_x = (z1 - z2) / (x1 - x2), z_increase_y = (z1 - z2) / (y1 - y2);
-
-            int delta_x = x2 - x1;
-            int delta_y = y2 - y1;
-
-            int increment_x = Math.Sign(delta_x);
-            int increment_y = Math.Sign(delta_y);
-
-            delta_x = Math.Abs(delta_x);
-            delta_y = Math.Abs(delta_y);
-
-            int x = x1, y = y1, R = 0, D = Math.Max(delta_x, delta_y);
-            double z_value = z1;
-
-            if (delta_x > delta_y)
-            {
-                for (int i = 0; i <= D; i++)
-                {
-                    Check_Against_Z_Buffer(x, y, z_value, colour);
-                    x += increment_x;
-                    z_value += z_increase_x * increment_x;
-                    R += 2 * delta_y;
-                    if (R >= delta_x)
-                    {
-                        R -= 2 * delta_x;
-                        y += increment_y;
-                        z_value += z_increase_y * increment_y;
-                    }
-                }
-            }
             else
             {
-                for (int i = 0; i <= D; i++)
+                if (y1 == y2)
                 {
-                    Check_Against_Z_Buffer(x, y, z_value, colour);
-                    y += increment_y;
-                    z_value += z_increase_y * increment_y;
-                    R += 2 * delta_x;
-                    if (R >= delta_y)
+                    Horizontal_Line(x1, y1, z1, x2, y2, z2, colour);
+                }
+                else
+                {
+                    double z_increase_x = (z1 - z2) / (x1 - x2), z_increase_y = (z1 - z2) / (y1 - y2);
+
+                    int delta_x = x2 - x1;
+                    int delta_y = y2 - y1;
+
+                    int increment_x = Math.Sign(delta_x);
+                    int increment_y = Math.Sign(delta_y);
+
+                    delta_x = Math.Abs(delta_x);
+                    delta_y = Math.Abs(delta_y);
+
+                    int x = x1, y = y1, R = 0, D = Math.Max(delta_x, delta_y);
+                    double z_value = z1;
+
+                    if (delta_x > delta_y)
                     {
-                        R -= 2 * delta_y;
-                        x += increment_x;
-                        z_value += z_increase_x * increment_x;
+                        for (int i = 0; i <= D; i++)
+                        {
+                            Check_Against_Z_Buffer(x, y, z_value, colour);
+                            x += increment_x;
+                            z_value += z_increase_x * increment_x;
+                            R += 2 * delta_y;
+                            if (R >= delta_x)
+                            {
+                                R -= 2 * delta_x;
+                                y += increment_y;
+                                z_value += z_increase_y * increment_y;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i <= D; i++)
+                        {
+                            Check_Against_Z_Buffer(x, y, z_value, colour);
+                            y += increment_y;
+                            z_value += z_increase_y * increment_y;
+                            R += 2 * delta_x;
+                            if (R >= delta_y)
+                            {
+                                R -= 2 * delta_y;
+                                x += increment_x;
+                                z_value += z_increase_x * increment_x;
+                            }
+                        }
                     }
                 }
             }
@@ -71,12 +80,50 @@ namespace _3D_Racer
 
         private void Horizontal_Line(int x1, int y1, double z1, int x2, int y2, double z2, Color colour)
         {
-        
+            double z_value, z_increase_x = (z1 - z2) / (x1 - x2);
+            int min_x, max_x;
+            if (x1 < x2)
+            {
+                min_x = x1;
+                max_x = x2;
+                z_value = z1;
+            }
+            else
+            {
+                min_x = x2;
+                max_x = x1;
+                z_value = z2;
+            }
+
+            for (int x = min_x; x <= max_x; x++)
+            {
+                Check_Against_Z_Buffer(x, y1, z_value, colour);
+                z_value += z_increase_x;
+            }
         }
 
         private void Vertical_Line(int x1, int y1, double z1, int x2, int y2, double z2, Color colour)
         {
-        
+            double z_value, z_increase_y = (z1 - z2) / (y1 - y2);
+            int min_y, max_y;
+            if (y1 < y2)
+            {
+                min_y = y1;
+                max_y = y2;
+                z_value = z1;
+            }
+            else
+            {
+                min_y = y2;
+                max_y = y1;
+                z_value = z2;
+            }
+
+            for (int y = min_y; y <= max_y; y++)
+            {
+                Check_Against_Z_Buffer(x1, y, z_value, colour);
+                z_value += z_increase_y;
+            }
         }
 
         private void Triangle(int x1, int y1, double z1, int x2, int y2, double z2, int x3, int y3, double z3, Color colour)

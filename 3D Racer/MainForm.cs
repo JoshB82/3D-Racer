@@ -242,11 +242,6 @@ namespace _3D_Racer
                     // Rotate up
                     Matrix4x4 transformation_up = Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation(current_camera.World_Direction_Right, camera_tilt * update_time));
                     Matrix4x4 rotation = transformation_up;
-                    //MessageBox.Show("ROTATION MATRIX: \n" +
-                    //rotation.Data[0][0] + " | " + rotation.Data[0][1] + " | " + rotation.Data[0][2] + " | " + rotation.Data[0][3] + "\n" +
-                    //rotation.Data[1][0] + " | " + rotation.Data[1][1] + " | " + rotation.Data[1][2] + " | " + rotation.Data[1][3] + "\n" +
-                    //rotation.Data[2][0] + " | " + rotation.Data[2][1] + " | " + rotation.Data[2][2] + " | " + rotation.Data[2][3] + "\n" +
-                    //rotation.Data[3][0] + " | " + rotation.Data[3][1] + " | " + rotation.Data[3][2] + " | " + rotation.Data[3][3]);
                     current_camera.Set_Camera_Direction_3(current_camera.World_Direction_Right, new Vector3D(transformation_up * new Vector4D(current_camera.World_Direction)));
                     break;
                 case Keys.J:
