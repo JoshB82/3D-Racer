@@ -72,7 +72,7 @@ namespace _3D_Racer
         public Vector3D Translation { get; protected set; }
 
         // Scale, then rotate, then translate
-        public void Calculate_Model_to_World_Matrix() => Model_to_world = Transform.Translate(Translation) * Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(Model_Direction, World_Direction)) * Transform.Scale(Scaling.X, Scaling.Y, Scaling.Z);
+        public void Calculate_Model_to_World_Matrix() => Model_to_world = Transform.Translate(Translation) * Transform.Quaternion_Rotation_Matrix(Model_Direction, World_Direction) * Transform.Scale(Scaling.X, Scaling.Y, Scaling.Z);
 
         // direction?
         public void Apply_World_Matrices()

@@ -60,7 +60,6 @@ namespace _3D_Racer
         }
 
         // Transformations
-        public Vector3D Scaling { get; protected set; }
         public Vector3D Translation { get; protected set; }
 
         // Matrices
@@ -71,11 +70,11 @@ namespace _3D_Racer
 
         public void Apply_World_Matrix() => World_Origin = Model_to_world * Model_Origin;
 
-        public void Calculate_Model_to_World_Matrix() => Model_to_world = Transform.Translate(Translation) * Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(Model_Direction_Right, World_Direction_Right)) * Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(Model_Direction_Up, World_Direction_Up)) * Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(Model_Direction, World_Direction));
+        public void Calculate_Model_to_World_Matrix() => Model_to_world = Transform.Translate(Translation) * Transform.Quaternion_Rotation_Matrix(Model_Direction_Right, World_Direction_Right) * Transform.Quaternion_Rotation_Matrix(Model_Direction_Up, World_Direction_Up) * Transform.Quaternion_Rotation_Matrix(Model_Direction, World_Direction);
         
         public void Calculate_World_to_Screen_Matrix()
         {
-            World_to_camera = Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(World_Direction, Model_Direction)) * Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(World_Direction_Up, Model_Direction_Up)) * Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation_Between_Vectors(World_Direction_Right, Model_Direction_Right)) * Transform.Translate(-Translation);
+            World_to_camera = Transform.Quaternion_Rotation_Matrix(World_Direction, Model_Direction) * Transform.Quaternion_Rotation_Matrix(World_Direction_Up, Model_Direction_Up) * Transform.Quaternion_Rotation_Matrix(World_Direction_Right, Model_Direction_Right) * Transform.Translate(-Translation);
             World_to_screen = Camera_to_screen * World_to_camera;
         }
 

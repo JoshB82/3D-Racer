@@ -5,10 +5,10 @@ namespace _3D_Racer
     public static partial class Transform
     {
         /// <summary>
-        /// Creates a matrix for rotation about the x-axis
+        /// Creates a matrix for rotation about the x-axis.
         /// </summary>
-        /// <param name="angle">Angle to rotate</param>
-        /// <returns>Rotation matrix</returns>
+        /// <param name="angle">Angle to rotate.</param>
+        /// <returns>Rotation matrix.</returns>
         public static Matrix4x4 Rotate_X(double angle)
         {
             double sin_angle = Math.Sin(angle);
@@ -22,10 +22,10 @@ namespace _3D_Racer
         }
 
         /// <summary>
-        /// Creates a matrix for rotation about the y-axis
+        /// Creates a matrix for rotation about the y-axis.
         /// </summary>
-        /// <param name="angle">Angle to rotate</param>
-        /// <returns>Rotation matrix</returns>
+        /// <param name="angle">Angle to rotate.</param>
+        /// <returns>Rotation matrix.</returns>
         public static Matrix4x4 Rotate_Y(double angle)
         {
             double sin_angle = Math.Sin(angle);
@@ -39,10 +39,10 @@ namespace _3D_Racer
         }
 
         /// <summary>
-        /// Creates a matrix for rotation about the z-axis
+        /// Creates a matrix for rotation about the z-axis.
         /// </summary>
-        /// <param name="angle">Angle to rotate</param>
-        /// <returns>Rotation matrix</returns>
+        /// <param name="angle">Angle to rotate.</param>
+        /// <returns>Rotation matrix.</returns>
         public static Matrix4x4 Rotate_Z(double angle)
         {
             double sin_angle = Math.Sin(angle);
@@ -136,5 +136,8 @@ namespace _3D_Racer
                 0,
                 1
             );
+
+        public static Matrix4x4 Quaternion_Rotation_Matrix(Vector3D v1, Vector3D v2, Vector3D rotation_axis = null) => Quaternion_to_Matrix(Quaternion_Rotation_Between_Vectors(v1, v2, rotation_axis));
+        public static Matrix4x4 Quaternion_Rotation_Axis_Matrix(Vector3D axis, double angle) => Transform.Quaternion_to_Matrix(Transform.Quaternion_Rotation(axis, angle));
     }
 }
