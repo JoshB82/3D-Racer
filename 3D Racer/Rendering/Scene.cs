@@ -8,7 +8,10 @@ namespace _3D_Racer
     public sealed partial class Scene
     {
         private static readonly object locker = new object();
+
+        private readonly List<Light> Light_List = new List<Light>();
         private readonly List<Shape> Shape_List = new List<Shape>();
+        
         public Bitmap Canvas { get; set; }
         public Color Background_colour { get; set; }
 
@@ -61,6 +64,11 @@ namespace _3D_Racer
         public void Add(Shape[] shapes)
         {
             lock (locker) foreach (Shape shape in shapes) Shape_List.Add(shape);
+        }
+
+        public void Add_Light(Light light)
+        {
+            lock (locker) Light_List.Add(light);
         }
 
         public void Add_From_File(string file)
@@ -226,9 +234,18 @@ namespace _3D_Racer
                                     Vector4D point_1 = new Vector4D(point_1_x, point_1_y, point_1_z);
                                     Vector4D point_2 = new Vector4D(point_2_x, point_2_y, point_2_z);
                                     Vector4D point_3 = new Vector4D(point_3_x, point_3_y, point_3_z);
-
-                                    Vector3D camera_to_face = new Vector3D(point_1 - camera.World_Origin);
                                     Vector3D normal = Vector3D.Normal_From_Plane(new Vector3D(point_1), new Vector3D(point_2), new Vector3D(point_3));
+                                    Vector3D camera_to_face = new Vector3D(point_1 - camera.World_Origin);
+
+                                    // Adjust colour based on lighting
+                                    Color face_colour = face.Colour;
+                                    // if no llights will foreeach loop still run or should if statement b3e addded?
+                                    foreach (Light light in Light_List)
+                                    {
+                                        double dp = Math.Max(0, -light.World_Direction * normal);
+                                        face_colour = Color.FromArgb(face.Colour.A, (int)(face.Colour.R * dp), (int)(face.Colour.G * dp), (int)(face.Colour.B * dp));
+                                    }
+
                                     // Include exemptions to back-face culling?
                                     if (camera_to_face * normal < 0 || shape.Render_Mesh.GetType().Name == "Plane")
                                     {
@@ -236,7 +253,7 @@ namespace _3D_Racer
                                         Queue<Clipped_Face> world_face_clip = new Queue<Clipped_Face>();
 
                                         // Add initial triangle to clipping queue
-                                        world_face_clip.Enqueue(new Clipped_Face(point_1, point_2, point_3, shape.Render_Mesh.Face_Colour, shape.Render_Mesh.Visible));
+                                        world_face_clip.Enqueue(new Clipped_Face(point_1, point_2, point_3, face_colour, shape.Render_Mesh.Visible));
                                         int no_triangles = 1;
 
                                         // Clip face against each world clipping plane
@@ -306,7 +323,7 @@ namespace _3D_Racer
                                                 double result_point_3_z = result_point_3.Z;
 
                                                 // Finally draw the triangle
-                                                Triangle(result_point_1_x, result_point_1_y, result_point_1_z, result_point_2_x, result_point_2_y, result_point_2_z, result_point_3_x, result_point_3_y, result_point_3_z, shape.Render_Mesh.Face_Colour);
+                                                Triangle(result_point_1_x, result_point_1_y, result_point_1_z, result_point_2_x, result_point_2_y, result_point_2_z, result_point_3_x, result_point_3_y, result_point_3_z, face_colour);
                                             }
                                         }
                                     }
