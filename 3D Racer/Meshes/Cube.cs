@@ -40,22 +40,22 @@ namespace _3D_Racer
 
             Edges = new Edge[18]
             {
-                new Edge(0, 1, Edge_Colour), // 0
-                new Edge(1, 2, Edge_Colour), // 1
+                new Edge(0, 1, Edge_Colour, false), // 0
+                new Edge(1, 2, Edge_Colour, false), // 1
                 new Edge(0, 2, Edge_Colour, false), // 2
-                new Edge(2, 3, Edge_Colour), // 3
-                new Edge(0, 3, Edge_Colour), // 4
-                new Edge(1, 5, Edge_Colour), // 5
-                new Edge(5, 6, Edge_Colour), // 6
+                new Edge(2, 3, Edge_Colour, false), // 3
+                new Edge(0, 3, Edge_Colour, false), // 4
+                new Edge(1, 5, Edge_Colour, false), // 5
+                new Edge(5, 6, Edge_Colour, false), // 6
                 new Edge(1, 6, Edge_Colour, false), // 7
-                new Edge(2, 6, Edge_Colour), // 8
-                new Edge(4, 5, Edge_Colour), // 9
-                new Edge(4, 7, Edge_Colour), // 10
+                new Edge(2, 6, Edge_Colour, false), // 8
+                new Edge(4, 5, Edge_Colour, false), // 9
+                new Edge(4, 7, Edge_Colour, false), // 10
                 new Edge(5, 7, Edge_Colour, false), // 11
-                new Edge(6, 7, Edge_Colour), // 12
-                new Edge(0, 4, Edge_Colour), // 13
+                new Edge(6, 7, Edge_Colour, false), // 12
+                new Edge(0, 4, Edge_Colour, false), // 13
                 new Edge(3, 4, Edge_Colour, false),  // 14
-                new Edge(3, 7, Edge_Colour), // 15
+                new Edge(3, 7, Edge_Colour, false), // 15
                 new Edge(3, 6, Edge_Colour, false), // 16
                 new Edge(1, 4, Edge_Colour, false) // 17
             };

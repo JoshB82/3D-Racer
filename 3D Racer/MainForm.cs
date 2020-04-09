@@ -59,7 +59,7 @@ namespace _3D_Racer
             cameras.Add(new Perspective_Camera(new Vector3D(0,0, -500), cube_mesh, Vector3D.Unit_Y, Canvas_Box.Width / 10, Canvas_Box.Height / 10, 10, 1000));
             current_camera = cameras[0];
 
-            Distant_Light light = new Distant_Light(Vector3D.Unit_Y+new Vector3D(1,1,1), cube_mesh, Color.Blue, 1);
+            Distant_Light light = new Distant_Light(new Vector3D(300, 400, 500), cube_mesh, Color.Red, 1);
             scene.Add_Light(light);
 
             /*

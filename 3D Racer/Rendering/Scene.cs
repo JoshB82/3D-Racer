@@ -239,11 +239,29 @@ namespace _3D_Racer
 
                                     // Adjust colour based on lighting
                                     Color face_colour = face.Colour;
-                                    // if no llights will foreeach loop still run or should if statement b3e addded?
-                                    foreach (Light light in Light_List)
+                                    if (Light_List.Count > 0)
                                     {
-                                        double dp = Math.Max(0, -light.World_Direction * normal);
-                                        face_colour = Color.FromArgb(face.Colour.A, (int)(face.Colour.R * dp), (int)(face.Colour.G * dp), (int)(face.Colour.B * dp));
+                                        double max_intensity = 0, true_intensity = 0;
+                                        foreach (Light light in Light_List) max_intensity += light.Intensity;
+                                        foreach (Light light in Light_List)
+                                        {
+                                            switch (light.GetType().Name)
+                                            {
+                                                case "Distant_Light":
+                                                    true_intensity = Math.Max(0, -light.World_Direction * normal) * light.Intensity;
+                                                    break;
+                                                case "Point_Light":
+                                                    true_intensity = Math.Max(0, -new Vector3D(point_1 - light.World_Origin).Normalise() * normal) * light.Intensity;
+                                                    break;
+                                            }
+                                            double scaled_intensity = true_intensity / max_intensity;
+
+                                            int new_red = (int)Math.Round((face.Colour.R + light.Colour.R) * 255 / 510 * scaled_intensity, MidpointRounding.AwayFromZero);
+                                            int new_green = (int)Math.Round((face.Colour.G + light.Colour.G) * 255 / 510 * scaled_intensity, MidpointRounding.AwayFromZero);
+                                            int new_blue = (int)Math.Round((face.Colour.B + light.Colour.B) * 255 / 510 * scaled_intensity, MidpointRounding.AwayFromZero);
+
+                                            face_colour = Color.FromArgb(face.Colour.A, new_red, new_green, new_blue);
+                                        }
                                     }
 
                                     // Include exemptions to back-face culling?
@@ -323,7 +341,15 @@ namespace _3D_Racer
                                                 double result_point_3_z = result_point_3.Z;
 
                                                 // Finally draw the triangle
-                                                Triangle(result_point_1_x, result_point_1_y, result_point_1_z, result_point_2_x, result_point_2_y, result_point_2_z, result_point_3_x, result_point_3_y, result_point_3_z, face_colour);
+                                                if (face.Draw_Outline)
+                                                {
+                                                    // Method for drawing edges?
+                                                    Triangle(result_point_1_x , result_point_1_y, result_point_1_z, result_point_2_x, result_point_2_y, result_point_2_z, result_point_3_x, result_point_3_y, result_point_3_z, face_colour);
+                                                }
+                                                else
+                                                {
+                                                    Triangle(result_point_1_x, result_point_1_y, result_point_1_z, result_point_2_x, result_point_2_y, result_point_2_z, result_point_3_x, result_point_3_y, result_point_3_z, face_colour);
+                                                }
                                             }
                                         }
                                     }

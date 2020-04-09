@@ -49,8 +49,9 @@
   <ItemGroup>
     <Compile Include="Cameras\Camera Transformation.cs" />
     <Compile Include="Clipping Plane.cs" />
+    <Compile Include="Lights\Point Light.cs" />
     <Compile Include="Meshes\Cuboid.cs" />
-    <Compile Include="Lights\Distant_Light.cs" />
+    <Compile Include="Lights\Distant Light.cs" />
     <Compile Include="Rendering\Drawing Algorithms.cs" />
     <Compile Include="Lights\Light.cs" />
     <Compile Include="Meshes\Line.cs" />
