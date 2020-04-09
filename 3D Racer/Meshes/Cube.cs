@@ -62,18 +62,18 @@ namespace _3D_Racer
 
             Faces = new Face[12]
             {
-                new Face(0, 3, 2, Face_Colour), // 0
-                new Face(0, 2, 1, Face_Colour), // 1
-                new Face(1, 2, 6, Face_Colour), // 2
-                new Face(1, 6, 5, Face_Colour), // 3
-                new Face(5, 6, 7, Face_Colour), // 4
-                new Face(5, 7, 4, Face_Colour), // 5
-                new Face(4, 7, 3, Face_Colour), // 6
-                new Face(4, 3, 0, Face_Colour), // 7
-                new Face(3, 7, 6, Face_Colour), // 8
-                new Face(3, 6, 2, Face_Colour), // 9
-                new Face(0, 4, 5, Face_Colour), // 10
-                new Face(0, 5, 1, Face_Colour) // 11
+                new Face(0, 1, 2, Face_Colour), // 0
+                new Face(0, 2, 3, Face_Colour), // 1
+                new Face(1, 6, 2, Face_Colour), // 2
+                new Face(1, 5, 6, Face_Colour), // 3
+                new Face(4, 7, 5, Face_Colour), // 4
+                new Face(5, 7, 6, Face_Colour), // 5
+                new Face(0, 3, 4, Face_Colour), // 6
+                new Face(4, 3, 7, Face_Colour), // 7
+                new Face(7, 3, 6, Face_Colour), // 8
+                new Face(6, 3, 2, Face_Colour), // 9
+                new Face(4, 5, 0, Face_Colour), // 10
+                new Face(5, 1, 0, Face_Colour), // 11
             };
 
             Scaling = new Vector3D(side_length, side_length, side_length);

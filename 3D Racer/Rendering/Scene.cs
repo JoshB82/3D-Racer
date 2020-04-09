@@ -227,91 +227,91 @@ namespace _3D_Racer
                                     Vector4D point_2 = new Vector4D(point_2_x, point_2_y, point_2_z);
                                     Vector4D point_3 = new Vector4D(point_3_x, point_3_y, point_3_z);
 
-                                    // Create a queue
-                                    Queue<Clipped_Face> world_face_clip = new Queue<Clipped_Face>();
-
-                                    // Add initial triangle to clipping queue
-                                    world_face_clip.Enqueue(new Clipped_Face(point_1, point_2, point_3, shape.Render_Mesh.Face_Colour, shape.Render_Mesh.Visible));
-                                    int no_triangles = 1;
-
-                                    // Clip face against each world clipping plane
-                                    foreach (Clipping_Plane world_clipping_plane in world_clipping_planes)
+                                    Vector3D camera_to_face = new Vector3D(point_1 - camera.World_Origin);
+                                    Vector3D normal = Vector3D.Normal_From_Plane(new Vector3D(point_1), new Vector3D(point_2), new Vector3D(point_3));
+                                    // Include exemptions to back-face culling?
+                                    if (camera_to_face * normal < 0 || shape.Render_Mesh.GetType().Name == "Plane")
                                     {
-                                        while (no_triangles > 0)
-                                        {
-                                            Clipped_Face triangle = world_face_clip.Dequeue();
-                                            Clipped_Face[] triangles = new Clipped_Face[2];
-                                            int num_intersection_points = Clip_Face(world_clipping_plane.Point, world_clipping_plane.Normal, triangle, out triangles[0], out triangles[1]);
-                                            for (int i = 0; i < num_intersection_points; i++) world_face_clip.Enqueue(triangles[i]);
-                                            no_triangles--;
-                                        }
-                                        no_triangles = world_face_clip.Count;
-                                    }
+                                        // Create a queue
+                                        Queue<Clipped_Face> world_face_clip = new Queue<Clipped_Face>();
 
-                                    if (no_triangles > 0)
-                                    {
-                                        Queue<Clipped_Face> projection_face_clip = world_face_clip;
+                                        // Add initial triangle to clipping queue
+                                        world_face_clip.Enqueue(new Clipped_Face(point_1, point_2, point_3, shape.Render_Mesh.Face_Colour, shape.Render_Mesh.Visible));
+                                        int no_triangles = 1;
 
-                                        // Move remaining faces into projection space
-                                        foreach (Clipped_Face projection_clipped_face in projection_face_clip)
-                                        {
-                                            projection_clipped_face.P1 = camera.Apply_Camera_Matrices(projection_clipped_face.P1);
-                                            projection_clipped_face.P2 = camera.Apply_Camera_Matrices(projection_clipped_face.P2);
-                                            projection_clipped_face.P3 = camera.Apply_Camera_Matrices(projection_clipped_face.P3);
-
-                                            projection_clipped_face.P1 = camera.Divide_By_W(projection_clipped_face.P1);
-                                            projection_clipped_face.P2 = camera.Divide_By_W(projection_clipped_face.P2);
-                                            projection_clipped_face.P3 = camera.Divide_By_W(projection_clipped_face.P3);
-                                        }
-
-                                        // Clip face against each projection clipping plane
-                                        foreach (Clipping_Plane projection_clipping_plane in projection_clipping_planes)
+                                        // Clip face against each world clipping plane
+                                        foreach (Clipping_Plane world_clipping_plane in world_clipping_planes)
                                         {
                                             while (no_triangles > 0)
                                             {
-                                                Clipped_Face triangle = projection_face_clip.Dequeue();
+                                                Clipped_Face triangle = world_face_clip.Dequeue();
                                                 Clipped_Face[] triangles = new Clipped_Face[2];
-                                                int num_intersection_points = Clip_Face(projection_clipping_plane.Point, projection_clipping_plane.Normal, triangle, out triangles[0], out triangles[1]);
-                                                for (int i = 0; i < num_intersection_points; i++) projection_face_clip.Enqueue(triangles[i]);
+                                                int num_intersection_points = Clip_Face(world_clipping_plane.Point, world_clipping_plane.Normal, triangle, out triangles[0], out triangles[1]);
+                                                for (int i = 0; i < num_intersection_points; i++) world_face_clip.Enqueue(triangles[i]);
                                                 no_triangles--;
                                             }
-                                            no_triangles = projection_face_clip.Count;
+                                            no_triangles = world_face_clip.Count;
                                         }
 
-                                        foreach (Clipped_Face projection_clipped_face in projection_face_clip)
+                                        if (no_triangles > 0)
                                         {
-                                            Vector4D result_point_1 = Scale_to_screen(projection_clipped_face.P1);
-                                            Vector4D result_point_2 = Scale_to_screen(projection_clipped_face.P2);
-                                            Vector4D result_point_3 = Scale_to_screen(projection_clipped_face.P3);
+                                            Queue<Clipped_Face> projection_face_clip = world_face_clip;
 
-                                            // Why? (and check rounding)
-                                            result_point_1 = Change_Y_Axis(result_point_1);
-                                            result_point_2 = Change_Y_Axis(result_point_2);
-                                            result_point_3 = Change_Y_Axis(result_point_3);
+                                            // Move remaining faces into projection space
+                                            foreach (Clipped_Face projection_clipped_face in projection_face_clip)
+                                            {
+                                                projection_clipped_face.P1 = camera.Apply_Camera_Matrices(projection_clipped_face.P1);
+                                                projection_clipped_face.P2 = camera.Apply_Camera_Matrices(projection_clipped_face.P2);
+                                                projection_clipped_face.P3 = camera.Apply_Camera_Matrices(projection_clipped_face.P3);
 
-                                            // More variable simplification
-                                            int result_point_1_x = (int)Math.Round(result_point_1.X, MidpointRounding.AwayFromZero);
-                                            int result_point_1_y = (int)Math.Round(result_point_1.Y, MidpointRounding.AwayFromZero);
-                                            double result_point_1_z = result_point_1.Z;
-                                            int result_point_2_x = (int)Math.Round(result_point_2.X, MidpointRounding.AwayFromZero);
-                                            int result_point_2_y = (int)Math.Round(result_point_2.Y, MidpointRounding.AwayFromZero);
-                                            double result_point_2_z = result_point_2.Z;
-                                            int result_point_3_x = (int)Math.Round(result_point_3.X, MidpointRounding.AwayFromZero);
-                                            int result_point_3_y = (int)Math.Round(result_point_3.Y, MidpointRounding.AwayFromZero);
-                                            double result_point_3_z = result_point_3.Z;
+                                                projection_clipped_face.P1 = camera.Divide_By_W(projection_clipped_face.P1);
+                                                projection_clipped_face.P2 = camera.Divide_By_W(projection_clipped_face.P2);
+                                                projection_clipped_face.P3 = camera.Divide_By_W(projection_clipped_face.P3);
+                                            }
 
-                                            // Finally draw the triangle
-                                            Triangle(result_point_1_x, result_point_1_y, result_point_1_z, result_point_2_x, result_point_2_y, result_point_2_z, result_point_3_x, result_point_3_y, result_point_3_z, shape.Render_Mesh.Face_Colour);
+                                            // Clip face against each projection clipping plane
+                                            foreach (Clipping_Plane projection_clipping_plane in projection_clipping_planes)
+                                            {
+                                                while (no_triangles > 0)
+                                                {
+                                                    Clipped_Face triangle = projection_face_clip.Dequeue();
+                                                    Clipped_Face[] triangles = new Clipped_Face[2];
+                                                    int num_intersection_points = Clip_Face(projection_clipping_plane.Point, projection_clipping_plane.Normal, triangle, out triangles[0], out triangles[1]);
+                                                    for (int i = 0; i < num_intersection_points; i++) projection_face_clip.Enqueue(triangles[i]);
+                                                    no_triangles--;
+                                                }
+                                                no_triangles = projection_face_clip.Count;
+                                            }
+
+                                            foreach (Clipped_Face projection_clipped_face in projection_face_clip)
+                                            {
+                                                Vector4D result_point_1 = Scale_to_screen(projection_clipped_face.P1);
+                                                Vector4D result_point_2 = Scale_to_screen(projection_clipped_face.P2);
+                                                Vector4D result_point_3 = Scale_to_screen(projection_clipped_face.P3);
+
+                                                // Why? (and check rounding)
+                                                result_point_1 = Change_Y_Axis(result_point_1);
+                                                result_point_2 = Change_Y_Axis(result_point_2);
+                                                result_point_3 = Change_Y_Axis(result_point_3);
+
+                                                // More variable simplification
+                                                int result_point_1_x = (int)Math.Round(result_point_1.X, MidpointRounding.AwayFromZero);
+                                                int result_point_1_y = (int)Math.Round(result_point_1.Y, MidpointRounding.AwayFromZero);
+                                                double result_point_1_z = result_point_1.Z;
+                                                int result_point_2_x = (int)Math.Round(result_point_2.X, MidpointRounding.AwayFromZero);
+                                                int result_point_2_y = (int)Math.Round(result_point_2.Y, MidpointRounding.AwayFromZero);
+                                                double result_point_2_z = result_point_2.Z;
+                                                int result_point_3_x = (int)Math.Round(result_point_3.X, MidpointRounding.AwayFromZero);
+                                                int result_point_3_y = (int)Math.Round(result_point_3.Y, MidpointRounding.AwayFromZero);
+                                                double result_point_3_z = result_point_3.Z;
+
+                                                // Finally draw the triangle
+                                                Triangle(result_point_1_x, result_point_1_y, result_point_1_z, result_point_2_x, result_point_2_y, result_point_2_z, result_point_3_x, result_point_3_y, result_point_3_z, shape.Render_Mesh.Face_Colour);
+                                            }
                                         }
-                                    
-                                }
+                                    }
 
                                     /*
-                                    if (face_clip_array.Length > 0)
-                                    {
-                                        for (int i = 0; i < face_clip_array.Length; i++)
-                                        {
-                                            
                                             // between [-1,1]
                                             // between [0,2] (+1)
                                             // => between [0,1] (/2)
@@ -321,8 +321,7 @@ namespace _3D_Racer
                                             
 
                                             // ROUDNING?
-                                        }
-                                    }*/
+                                    */
                                 }
                             }
                         }
@@ -458,5 +457,3 @@ namespace _3D_Racer
         public Vector4D Change_Y_Axis(Vector4D vertex) => Transform.Translate(new Vector3D(0, Height - 1, 0)) * Transform.Scale_Y(-1) * vertex;
     }
 }
-
-// Back face culling?
