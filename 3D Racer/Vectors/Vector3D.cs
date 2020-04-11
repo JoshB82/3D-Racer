@@ -43,6 +43,7 @@ namespace _3D_Racer
         #endregion
 
         #region Vector Operations (Common)
+        // SMALLEST ANGLE
         public double Angle(Vector3D v) => Math.Acos((this * v) / (this.Magnitude() * v.Magnitude()));
 
         public Vector3D Cross_Product(Vector3D v) => new Vector3D(this.Y * v.Z - this.Z * v.Y, this.Z * v.X - this.X * v.Z, this.X * v.Y - this.Y * v.X);

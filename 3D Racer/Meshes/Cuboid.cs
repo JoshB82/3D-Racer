@@ -8,7 +8,7 @@ namespace _3D_Racer
     /// </summary>
     public sealed class Cuboid : Mesh
     {
-        public Cuboid(Vector3D position, double length, double width, double height, bool visible = true,
+        public Cuboid(Vector3D position, double length, double width, double height, bool visible = true, Bitmap_Texture texture = null,
             Color? vertex_colour = null,
             Color? edge_colour = null,
             Color? face_colour = null)
@@ -35,9 +35,6 @@ namespace _3D_Racer
                 new Vertex(0, 1, 1, Vertex_Colour) // 7
             };
 
-            World_Vertices = new Vertex[8];
-            Camera_Vertices = new Vertex[8];
-
             Edges = new Edge[18]
             {
                 new Edge(0, 1, Edge_Colour, false), // 0
@@ -62,18 +59,47 @@ namespace _3D_Racer
 
             Faces = new Face[12]
             {
-                new Face(0, 1, 2, Face_Colour), // 0
-                new Face(0, 2, 3, Face_Colour), // 1
-                new Face(1, 6, 2, Face_Colour), // 2
-                new Face(1, 5, 6, Face_Colour), // 3
-                new Face(4, 7, 5, Face_Colour), // 4
-                new Face(5, 7, 6, Face_Colour), // 5
-                new Face(0, 3, 4, Face_Colour), // 6
-                new Face(4, 3, 7, Face_Colour), // 7
-                new Face(7, 3, 6, Face_Colour), // 8
-                new Face(6, 3, 2, Face_Colour), // 9
-                new Face(4, 5, 0, Face_Colour), // 10
-                new Face(5, 1, 0, Face_Colour), // 11
+                new Face(0, 1, 2, Face_Colour, texture.File_Path), // 0
+                new Face(0, 2, 3, Face_Colour, texture.File_Path), // 1
+                new Face(1, 6, 2, Face_Colour, texture.File_Path), // 2
+                new Face(1, 5, 6, Face_Colour, texture.File_Path), // 3
+                new Face(4, 7, 5, Face_Colour, texture.File_Path), // 4
+                new Face(5, 7, 6, Face_Colour, texture.File_Path), // 5
+                new Face(0, 3, 4, Face_Colour, texture.File_Path), // 6
+                new Face(4, 3, 7, Face_Colour, texture.File_Path), // 7
+                new Face(7, 3, 6, Face_Colour, texture.File_Path), // 8
+                new Face(6, 3, 2, Face_Colour, texture.File_Path), // 9
+                new Face(4, 5, 0, Face_Colour, texture.File_Path), // 10
+                new Face(5, 1, 0, Face_Colour, texture.File_Path) // 11
+            };
+
+            Textures = new Bitmap_Texture[1]
+            {
+                new Bitmap_Texture(texture.File_Path) // 0
+            };
+
+            Texture_Vertices = new Texture_Vertex[4]
+            {
+                new Texture_Vertex(0, 0), // 0
+                new Texture_Vertex(1, 0), // 1
+                new Texture_Vertex(0, 1), // 2
+                new Texture_Vertex(1, 1) // 3
+            };
+
+            Texture_Faces = new Texture_Face[12]
+            {
+                new Texture_Face(3, 2, 0, 0), // 0
+                new Texture_Face(3, 0, 1, 0), // 1
+                new Texture_Face(3, 0, 1, 0), // 2
+                new Texture_Face(3, 2, 0, 0), // 3
+                new Texture_Face(2, 0, 3, 0), // 4
+                new Texture_Face(3, 0, 1, 0), // 5
+                new Texture_Face(2, 0, 3, 0), // 6
+                new Texture_Face(3, 0, 1, 0), // 7
+                new Texture_Face(2, 0, 3, 0), // 8
+                new Texture_Face(3, 0, 1, 0), // 9
+                new Texture_Face(0, 1, 2, 0), // 10
+                new Texture_Face(1, 3, 2, 0) // 11
             };
 
             Scaling = new Vector3D(length, width, height);

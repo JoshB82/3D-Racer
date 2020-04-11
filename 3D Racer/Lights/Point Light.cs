@@ -16,6 +16,6 @@ namespace _3D_Racer
             Debug.WriteLine($"Point light created at ({position.X}, {position.Y}, {position.Z})");
         }
 
-        public Point_Light(Vector3D position, Mesh pointed_at, Color? colour, double intensity) : this(position, new Vector3D(pointed_at.World_Origin) - position, colour, intensity) { }
+        public Point_Light(Vector3D position, Mesh pointed_at, Color? colour, double intensity) : this(position, new Vector3D(pointed_at.World_Origin) - position, colour, intensity) {}
     }
 }

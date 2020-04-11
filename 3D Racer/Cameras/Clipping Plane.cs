@@ -1,5 +1,8 @@
 ﻿namespace _3D_Racer
 {
+    /// <summary>
+    /// Class that defines planes that clip shapes.
+    /// </summary>
     public sealed class Clipping_Plane
     {
         /// <summary>

@@ -10,7 +10,7 @@ namespace _3D_Racer
         public Vector4D World_Origin { get; set; }
         public Vector4D Camera_Origin { get; protected set; }
 
-        // Directions
+        #region Directions
         public Vector3D Model_Direction { get; } = Vector3D.Unit_Negative_Z;
         public Vector3D Model_Direction_Up { get; } = Vector3D.Unit_Y;
         public Vector3D Model_Direction_Right { get; } = Vector3D.Unit_X;
@@ -18,15 +18,14 @@ namespace _3D_Racer
         public Vector3D World_Direction { get; private set; }
         public Vector3D World_Direction_Up { get; private set; }
         public Vector3D World_Direction_Right { get; private set; }
+        #endregion
 
-        // Transformations
-        public Vector3D Translation { get; protected set; }
-
-        // Matrices
+        #region Matrices
         public Matrix4x4 Model_to_world { get; protected set; }
         public Matrix4x4 World_to_camera { get; protected set; }
         public Matrix4x4 Camera_to_screen { get; protected set; }
         public Matrix4x4 World_to_screen { get; protected set; }
+        #endregion
 
         public void Apply_World_Matrix() => World_Origin = Model_to_world * Model_Origin;
 
@@ -92,6 +91,10 @@ namespace _3D_Racer
         }
         
         public Orthogonal_Camera(Vector3D position, Mesh pointed_at, Vector3D direction_up, double width, double height, double z_near, double z_far) : this(position, new Vector3D(pointed_at.World_Origin) - position, direction_up, width, height, z_near, z_far) {}
+
+        public Orthogonal_Camera(Vector3D position, Vector3D direction, Vector3D direction_up, string ignore, double fov_x, double fov_y, double z_near, double z_far) : this(position, direction, direction_up, Math.Tan(fov_x / 2) * z_near * 2, Math.Tan(fov_y / 2) * z_near * 2, z_near, z_far) {}
+
+        public Orthogonal_Camera(Vector3D position, Mesh pointed_at, Vector3D direction_up, string ignore, double fov_x, double fov_y, double z_near, double z_far) : this(position, new Vector3D(pointed_at.World_Origin), direction_up, Math.Tan(fov_x / 2) * z_near * 2, Math.Tan(fov_y / 2) * z_near * 2, z_near, z_far) {}
 
         public Clipping_Plane[] Calculate_Clipping_Planes()
         {
@@ -164,11 +167,6 @@ namespace _3D_Racer
 
         public Perspective_Camera(Vector3D position, Vector3D direction, Vector3D direction_up, double width, double height, double z_near, double z_far) : base(position, direction, direction_up)
         {
-            /*
-            Camera_to_screen.ChangeSingleValue(1, 1, (float)Math.Atan(fov_x / 2));
-            Camera_to_screen.ChangeSingleValue(2, 2, (float)Math.Atan(fov_y / 2));
-            */
-
             Camera_to_screen = new Matrix4x4();
             Camera_to_screen.Data[3][2] = -1;
             
@@ -181,6 +179,10 @@ namespace _3D_Racer
         }
 
         public Perspective_Camera(Vector3D position, Mesh pointed_at, Vector3D direction_up, double width, double height, double z_near, double z_far) : this(position, new Vector3D(pointed_at.World_Origin) - position, direction_up, width, height, z_near, z_far) {}
+
+        public Perspective_Camera(Vector3D position, Vector3D direction, Vector3D direction_up, string ignore, double fov_x, double fov_y, double z_near, double z_far) : this(position, direction, direction_up, Math.Tan(fov_x / 2) * z_near * 2, Math.Tan(fov_y / 2) * z_near * 2, z_near, z_far) { }
+
+        public Perspective_Camera(Vector3D position, Mesh pointed_at, Vector3D direction_up, string ignore, double fov_x, double fov_y, double z_near, double z_far) : this(position, new Vector3D(pointed_at.World_Origin), direction_up, Math.Tan(fov_x / 2) * z_near * 2, Math.Tan(fov_y / 2) * z_near * 2, z_near, z_far) { }
 
         public Clipping_Plane[] Calculate_Clipping_Planes()
         {

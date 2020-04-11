@@ -34,6 +34,7 @@
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.switchCameraToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Canvas_Box = new System.Windows.Forms.PictureBox();
+            this.changeLightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Canvas_Box)).BeginInit();
             this.SuspendLayout();
@@ -43,10 +44,11 @@
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.switchCameraToolStripMenuItem});
+            this.switchCameraToolStripMenuItem,
+            this.changeLightToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(655, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(655, 28);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -56,7 +58,7 @@
             this.newGameToolStripMenuItem,
             this.quitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 26);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 24);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // newGameToolStripMenuItem
@@ -75,19 +77,26 @@
             // switchCameraToolStripMenuItem
             // 
             this.switchCameraToolStripMenuItem.Name = "switchCameraToolStripMenuItem";
-            this.switchCameraToolStripMenuItem.Size = new System.Drawing.Size(121, 26);
+            this.switchCameraToolStripMenuItem.Size = new System.Drawing.Size(121, 24);
             this.switchCameraToolStripMenuItem.Text = "Switch Camera";
             this.switchCameraToolStripMenuItem.Click += new System.EventHandler(this.switchCameraToolStripMenuItem_Click);
             // 
             // Canvas_Box
             // 
             this.Canvas_Box.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Canvas_Box.Location = new System.Drawing.Point(0, 30);
+            this.Canvas_Box.Location = new System.Drawing.Point(0, 28);
             this.Canvas_Box.Name = "Canvas_Box";
-            this.Canvas_Box.Size = new System.Drawing.Size(655, 461);
+            this.Canvas_Box.Size = new System.Drawing.Size(655, 463);
             this.Canvas_Box.TabIndex = 1;
             this.Canvas_Box.TabStop = false;
             this.Canvas_Box.Paint += new System.Windows.Forms.PaintEventHandler(this.Canvas_Panel_Paint);
+            // 
+            // changeLightToolStripMenuItem
+            // 
+            this.changeLightToolStripMenuItem.Name = "changeLightToolStripMenuItem";
+            this.changeLightToolStripMenuItem.Size = new System.Drawing.Size(110, 24);
+            this.changeLightToolStripMenuItem.Text = "Change Light";
+            this.changeLightToolStripMenuItem.Click += new System.EventHandler(this.changeLightToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -117,6 +126,7 @@
         private System.Windows.Forms.ToolStripMenuItem quitToolStripMenuItem;
         private System.Windows.Forms.PictureBox Canvas_Box;
         private System.Windows.Forms.ToolStripMenuItem switchCameraToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem changeLightToolStripMenuItem;
     }
 }
 

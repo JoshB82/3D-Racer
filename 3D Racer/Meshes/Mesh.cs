@@ -5,15 +5,34 @@ namespace _3D_Racer
 {
     public abstract partial class Mesh
     {
-        // Structure
+        #region Structure
         public Vertex Model_Origin { get; } = new Vertex(0, 0, 0, 1);
         public Vertex World_Origin { get; set; }
         public Vertex Camera_Origin { get; protected set; }
 
-        public Vertex[] Model_Vertices { get; protected set; }
-        public Vertex[] World_Vertices { get; set; }
-        public Vertex[] Camera_Vertices { get; set; }
+        private Vertex[] model_vertices;
+        public Vertex[] Model_Vertices {
+            get { return model_vertices; }
+            protected set
+            {
+                model_vertices = value;
+                World_Vertices = new Vertex[value.Length];
+                Camera_Vertices = new Vertex[value.Length];
+            }
+        }
 
+        public Vertex[] World_Vertices { get; private set; }
+        public Vertex[] Camera_Vertices { get; protected set; }
+
+        public Texture_Vertex[] Texture_Vertices { get; protected set; }
+        public Texture_Face[] Texture_Faces { get; protected set; }
+        public Bitmap_Texture[] Textures { get; protected set; }
+
+        public Edge[] Edges { get; protected set; }
+        public Face[] Faces { get; protected set; }
+        #endregion
+
+        #region Directions
         public Vector3D Model_Direction { get; } = Vector3D.Unit_X;
         public Vector3D Model_Direction_Up { get; } = Vector3D.Unit_Y;
         public Vector3D Model_Direction_Right { get; } = Vector3D.Unit_Z;
@@ -46,19 +65,19 @@ namespace _3D_Racer
             World_Direction_Up = new_world_direction_right.Cross_Product(new_world_direction);
             World_Direction_Right = new_world_direction_right;
         }
+        #endregion
 
-        public Edge[] Edges { get; set; }
-        public Face[] Faces { get; set; }
-
-        // Draw settings
+        # region Draw settings
         public bool Draw_Vertices { get; set; } = true;
         public bool Draw_Edges { get; set; } = true;
         public bool Draw_Faces { get; set; } = true;
+        #endregion
 
-        // Colours
-        public Color Vertex_Colour {get; set;}
+        #region Colours
+        public Color Vertex_Colour { get; set; }
         public Color Edge_Colour { get; set; }
         public Color Face_Colour { get; set; }
+        #endregion
 
         // Miscellaneous
         /// <summary>
@@ -74,11 +93,20 @@ namespace _3D_Racer
         // Scale, then rotate, then translate
         public void Calculate_Model_to_World_Matrix() => Model_to_world = Transform.Translate(Translation) * Transform.Quaternion_Rotation_Matrix(Model_Direction, World_Direction) * Transform.Scale(Scaling.X, Scaling.Y, Scaling.Z);
 
-        // direction?
         public void Apply_World_Matrices()
         {
             World_Origin = Model_to_world * Model_Origin;
             for (int i = 0; i < Model_Vertices.Length; i++) World_Vertices[i] = Model_to_world * Model_Vertices[i];
         }
+
+        /*
+        public Mesh(Vertex world_origin, Vertex[] model_vertices, Edge[] edges, Face[] faces)
+        {
+            World_Origin = world_origin;
+            Model_Vertices = model_vertices;
+            Edges = edges;
+            Faces = faces;
+        }
+        */
     }
 }

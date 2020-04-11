@@ -24,9 +24,6 @@ namespace _3D_Racer
                 new Vertex(1, 1, 1, Vertex_Colour)
             };
 
-            World_Vertices = new Vertex[2];
-            Camera_Vertices = new Vertex[2];
-
             Edges = new Edge[1]
             {
                 new Edge(0, 1, Edge_Colour)

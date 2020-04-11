@@ -35,6 +35,42 @@ namespace _3D_Racer
         #endregion
     }
 
+    public class Texture_Vertex : Vector3D
+    {
+        public Texture_Vertex(double x, double y) : base(x, y, 1)
+        {
+
+        }
+    }
+
+    public class Texture_Face
+    {
+        public int P1 { get; set; }
+        public int P2 { get; set; }
+        public int P3 { get; set; }
+        public int Texture { get; set; }
+
+        public Texture_Face(int p1, int p2, int p3, int texture)
+        {
+            P1 = p1;
+            P2 = p2;
+            P3 = p3;
+            Texture = texture;
+        }
+    }
+
+    public class Bitmap_Texture
+    {
+        public string File_Path { get; set; }
+        public Bitmap Texture { get; private set; }
+
+        public Bitmap_Texture(string file_path)
+        {
+            File_Path = file_path;
+            Texture = new Bitmap(file_path);
+        }
+    }
+
     public class Edge
     {
         public int P1 { get; set; }
@@ -75,8 +111,9 @@ namespace _3D_Racer
         public Color Colour { get; set; }
         public bool Draw_Outline { get; set; }
         public bool Visible { get; set; }
+        public string Texture_Path { get; set; }
 
-        public Face(int p1, int p2, int p3, Color colour, bool draw_outline = false, bool visibility = true)
+        public Face(int p1, int p2, int p3, Color colour, string texture_path = "", bool draw_outline = false, bool visibility = true)
         {
             P1 = p1;
             P2 = p2;
@@ -84,6 +121,7 @@ namespace _3D_Racer
             Colour = colour;
             Draw_Outline = draw_outline;
             Visible = visibility;
+            Texture_Path = texture_path;
         }
     }
 
@@ -95,8 +133,9 @@ namespace _3D_Racer
         public Color Colour { get; set; }
         public bool Draw_Outline { get; set; }
         public bool Visible { get; set; }
-        
-        public Clipped_Face(Vector4D p1, Vector4D p2, Vector4D p3, Color colour, bool draw_outline = false, bool visibility = true)
+        public string Texture_Path { get; set; }
+
+        public Clipped_Face(Vector4D p1, Vector4D p2, Vector4D p3, Color colour, string texture_path = "", bool draw_outline = false, bool visibility = true)
         {
             P1 = p1;
             P2 = p2;
@@ -104,6 +143,7 @@ namespace _3D_Racer
             Colour = colour;
             Draw_Outline = draw_outline;
             Visible = visibility;
+            Texture_Path = texture_path;
         }
     }
 }

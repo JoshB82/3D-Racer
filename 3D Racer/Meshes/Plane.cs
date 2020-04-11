@@ -5,7 +5,7 @@ namespace _3D_Racer
 {
     public sealed class Plane : Mesh
     {
-        public Plane(Vector3D position, Vector3D direction, Vector3D normal, double length, double width,
+        public Plane(Vector3D position, Vector3D direction, Vector3D normal, double length, double width, string texture_path = null,
             Color? vertex_colour = null,
             Color? edge_colour = null,
             Color? face_colour = null)
@@ -27,9 +27,6 @@ namespace _3D_Racer
                 new Vertex(0, 0, 1, Vertex_Colour) // 3
             };
 
-            World_Vertices = new Vertex[4];
-            Camera_Vertices = new Vertex[4];
-
             Edges = new Edge[5]
             {
                 new Edge(0, 1, Edge_Colour), // 0
@@ -41,8 +38,8 @@ namespace _3D_Racer
 
             Faces = new Face[2]
             {
-                new Face(0, 1, 2, Face_Colour), // 0
-                new Face(0, 2, 3, Face_Colour) // 1
+                new Face(0, 1, 2, Face_Colour, texture_path), // 0
+                new Face(0, 2, 3, Face_Colour, texture_path) // 1
             };
 
             Scaling = new Vector3D(length, 1, width);

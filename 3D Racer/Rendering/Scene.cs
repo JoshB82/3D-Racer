@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows.Forms;
 
 namespace _3D_Racer
@@ -9,9 +11,11 @@ namespace _3D_Racer
     {
         private static readonly object locker = new object();
 
+        public bool Change_scene { get; set; } = true;
+
         private readonly List<Light> Light_List = new List<Light>();
         private readonly List<Shape> Shape_List = new List<Shape>();
-        
+
         public Bitmap Canvas { get; set; }
         public Color Background_colour { get; set; }
 
@@ -71,9 +75,44 @@ namespace _3D_Racer
             lock (locker) Light_List.Add(light);
         }
 
-        public void Add_From_File(string file)
+        public bool Add_From_OBJ_File(string file_path)
         {
+            if (File.Exists(file_path))
+            {
+                try
+                {
+                    string[] lines = File.ReadAllLines(file_path);
+                    foreach (string line in lines)
+                    {
+                        string[] data = line.Split();
+                        switch (data[0])
+                        {
+                            case "#":
+                                // Comment; ignore line
+                                break;
+                            case "v":
+                                // Vertex
 
+                                break;
+                            case "l":
+                                // Line
+                                break;
+                        }
+                    }
+
+                    return true;
+                }
+                catch(Exception error)
+                {
+                    Debug.WriteLine($"Error: {error.Message}");
+                    return false;
+                }
+            }
+            else
+            {
+                Debug.WriteLine($"{file_path} not found.");
+                return false;
+            }
         }
 
         public void Remove(int ID)
@@ -177,6 +216,9 @@ namespace _3D_Racer
 
         public void Render(PictureBox canvas_box, Perspective_Camera camera)
         {
+            // Only render if a change in scene has taken place.
+            // if (!Change_scene) return;
+
             lock (locker)
             {
                 // Create temporary canvas
@@ -200,15 +242,16 @@ namespace _3D_Racer
                     new Clipping_Plane(near_bottom_left_point, Vector3D.Unit_Y), // Bottom
                     new Clipping_Plane(near_bottom_left_point, Vector3D.Unit_Z), // Near
                     new Clipping_Plane(far_top_right_point, Vector3D.Unit_Negative_X), // Right
-                    new Clipping_Plane(far_top_right_point, Vector3D.Unit_Negative_Y), //Top
+                    new Clipping_Plane(far_top_right_point, Vector3D.Unit_Negative_Y), // Top
                     new Clipping_Plane(far_top_right_point, Vector3D.Unit_Negative_Z) // Far
                 };
 
+                // Draw graphics
                 using (Graphics g = Graphics.FromImage(temp_canvas))
                 {
                     foreach (Shape shape in Shape_List)
                     {
-                        // Move shapes to world space
+                        // Move shapes from model space to world space
                         shape.Render_Mesh.Calculate_Model_to_World_Matrix();
                         shape.Render_Mesh.Apply_World_Matrices();
 
@@ -252,6 +295,13 @@ namespace _3D_Racer
                                                     break;
                                                 case "Point_Light":
                                                     true_intensity = Math.Max(0, -new Vector3D(point_1 - light.World_Origin).Normalise() * normal) * light.Intensity;
+                                                    break;
+                                                case "Spot_Light":
+                                                    Vector3D light_to_shape = new Vector3D(point_1 - light.World_Origin);
+                                                    if (light_to_shape.Angle(light.World_Direction) > ((Spotlight)light).Angle || light_to_shape * light.World_Direction > ((Spotlight)light).Distance) continue;
+                                                    true_intensity = Math.Max(0, -light.World_Direction * normal) * light.Intensity;
+                                                    break;
+                                                case "Ambient_Light":
                                                     break;
                                             }
                                             double scaled_intensity = true_intensity / max_intensity;
@@ -491,10 +541,11 @@ namespace _3D_Racer
 
                 Canvas = temp_canvas;
                 canvas_box.Invalidate();
+                Change_scene = false;
             }
         }
 
-        public Vector4D Scale_to_screen(Vector4D vertex) => Transform.Scale(0.5f * (Width - 1), 0.5f * (Height - 1), 1) * Transform.Translate(new Vector3D(1, 1, 0)) * vertex;
+        public Vector4D Scale_to_screen(Vector4D vertex) => Transform.Scale(0.5 * (Width - 1), 0.5 * (Height - 1), 1) * Transform.Translate(new Vector3D(1, 1, 0)) * vertex;
 
         // Only do at drawing stage? v
         public Vector4D Change_Y_Axis(Vector4D vertex) => Transform.Translate(new Vector3D(0, Height - 1, 0)) * Transform.Scale_Y(-1) * vertex;

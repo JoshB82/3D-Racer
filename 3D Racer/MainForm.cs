@@ -8,9 +8,9 @@ namespace _3D_Racer
 {
     public partial class MainForm : Form
     {
-        private const float grav_acc = -9.81f;
-        private const float camera_pan = 0.002f;
-        private const float camera_tilt = 0.000001f;
+        private const double grav_acc = -9.81;
+        private const double camera_pan = 0.002;
+        private const double camera_tilt = 0.000001;
 
         private const int max_frames_per_second = 60;
         private const int max_updates_per_second = 60;
@@ -21,14 +21,19 @@ namespace _3D_Racer
         private Perspective_Camera current_camera;
         private int camera_selected = 0;
 
+        private List<Light> lights = new List<Light>();
+        private int selected_light = 0;
+
         private long update_time;
 
         public MainForm()
         {
             InitializeComponent();
 
+            // Create scene
             scene = new Scene(Canvas_Box.Width, Canvas_Box.Height);
 
+            // Create default meshes
             Cube cube_mesh = new Cube(new Vector3D(0, 0, 0), 50, true, null, null, Color.Green);
             Shape default_shape = new Shape(cube_mesh, true);
             scene.Add(default_shape);
@@ -56,76 +61,18 @@ namespace _3D_Racer
 
             // Create cameras
             cameras.Add(new Perspective_Camera(new Vector3D(0, 0, 500), cube_mesh, Vector3D.Unit_Y, Canvas_Box.Width / 10, Canvas_Box.Height / 10, 10, 1000));
-            cameras.Add(new Perspective_Camera(new Vector3D(0,0, -500), cube_mesh, Vector3D.Unit_Y, Canvas_Box.Width / 10, Canvas_Box.Height / 10, 10, 1000));
+            cameras.Add(new Perspective_Camera(new Vector3D(0, 0, -500), cube_mesh, Vector3D.Unit_Y, Canvas_Box.Width / 10, Canvas_Box.Height / 10, 10, 1000));
             current_camera = cameras[0];
 
-            Distant_Light light = new Distant_Light(new Vector3D(300, 400, 500), cube_mesh, Color.Red, 1);
-            scene.Add_Light(light);
+            // Create lights
+            lights.Add(new Distant_Light(new Vector3D(300, 400, 500), cube_mesh, Color.Red, 1));
+            scene.Add_Light(lights[0]);
 
-            /*
-            // Show initial viewing frustum
-            double ratio = 750 / 50, width2 = Canvas_Box.Width / 10, height2 = Canvas_Box.Height / 10;
+            //lights.Add(new Spotlight(new Vector3D(0, 500, 0), Vector3D.Unit_Negative_Y, Color.Indigo, 1, Math.PI / 3, 1000));
+            //scene.Add_Light(lights[1]);
 
-            Vector3D near_bottom_left_point = new Vector3D(current_camera.World_Origin) + current_camera.World_Direction * 50 + current_camera.World_Direction_Right * -width2 / 2 - current_camera.World_Direction_Up * height2 / 2;
-            Vector3D near_bottom_right_point = new Vector3D(current_camera.World_Origin) + current_camera.World_Direction * 50 + current_camera.World_Direction_Right * width2 / 2 + current_camera.World_Direction_Up * -height2 / 2;
-            Vector3D near_top_left_point = new Vector3D(current_camera.World_Origin) + current_camera.World_Direction * 50 + current_camera.World_Direction_Right * -width2 / 2 + current_camera.World_Direction_Up * height2 / 2;
-            Vector3D near_top_right_point = new Vector3D(current_camera.World_Origin) + current_camera.World_Direction * 50 + current_camera.World_Direction_Right * width2 / 2 + current_camera.World_Direction_Up * height2 / 2;
-            Vector3D far_top_left_point = new Vector3D(current_camera.World_Origin) + current_camera.World_Direction * 750 + current_camera.World_Direction_Right * -width2 / 2 * ratio + current_camera.World_Direction_Up * height2 / 2 * ratio;
-            Vector3D far_top_right_point = new Vector3D(current_camera.World_Origin) + current_camera.World_Direction * 750 + current_camera.World_Direction_Right * width2 / 2 * ratio + current_camera.World_Direction_Up * height2 / 2 * ratio;
-            Vector3D far_bottom_left_point = new Vector3D(current_camera.World_Origin) + current_camera.World_Direction * 750 + current_camera.World_Direction_Right * -width2 / 2 * ratio + current_camera.World_Direction_Up * -height2 / 2 * ratio;
-            Vector3D far_bottom_right_point = new Vector3D(current_camera.World_Origin) + current_camera.World_Direction * 750 + current_camera.World_Direction_Right * width2 / 2 * ratio + current_camera.World_Direction_Up * -height2 / 2 * ratio;
-
-            Line near_top = new Line(near_top_left_point, near_top_right_point,null,Color.Red);
-            Line near_bottom = new Line(near_bottom_left_point, near_bottom_right_point,null,Color.Orange);
-            Line near_left = new Line(near_top_left_point, near_bottom_left_point,null,Color.Green);
-            Line near_right = new Line(near_top_right_point, near_bottom_right_point,null,Color.Blue);
-
-            Line side_top_left = new Line(near_top_left_point, far_top_left_point, null, Color.Purple);
-            Line side_top_right = new Line(near_top_right_point, far_top_right_point, null, Color.Purple);
-            Line side_bottom_left = new Line(near_bottom_left_point, far_bottom_left_point, null, Color.Purple);
-            Line side_bottom_right = new Line(near_bottom_right_point, far_bottom_right_point, null, Color.Purple);
-
-            Line far_top = new Line(far_top_left_point,far_top_right_point, null, Color.Gold);
-            Line far_bottom = new Line(far_bottom_left_point, far_bottom_right_point, null, Color.Gold);
-            Line far_left = new Line(far_top_left_point, far_bottom_left_point, null, Color.Gold);
-            Line far_right = new Line(far_top_right_point, far_bottom_right_point, null, Color.Gold);
-
-            Shape near_top_mesh = new Shape(near_top);
-            Shape near_bottom_mesh = new Shape(near_bottom);
-            Shape near_left_mesh = new Shape(near_left);
-            Shape near_right_mesh = new Shape(near_right);
-
-            Shape side_top_left_mesh = new Shape(side_top_left);
-            Shape side_top_right_mesh = new Shape(side_top_right);
-            Shape side_bottom_left_mesh = new Shape(side_bottom_left);
-            Shape side_bottom_right_mesh = new Shape(side_bottom_right);
-
-            Shape far_top_mesh = new Shape(far_top);
-            Shape far_bottom_mesh = new Shape(far_bottom);
-            Shape far_left_mesh = new Shape(far_left);
-            Shape far_right_mesh = new Shape(far_right);
-
-            scene.Add(near_top_mesh);
-            scene.Add(near_bottom_mesh);
-            scene.Add(near_left_mesh);
-            scene.Add(near_right_mesh);
-
-            scene.Add(side_top_left_mesh);
-            scene.Add(side_top_right_mesh);
-            scene.Add(side_bottom_left_mesh);
-            scene.Add(side_bottom_right_mesh);
-
-            scene.Add(far_top_mesh);
-            scene.Add(far_bottom_mesh);
-            scene.Add(far_left_mesh);
-            scene.Add(far_right_mesh);
-
-            //scene.Add(new Shape(new Plane(near_bottom_left_point, current_camera.World_Direction, width2, height2, null, null, Color.DarkGreen)));
-            scene.Add(new Shape(new Plane(far_top_left_point, -current_camera.World_Direction, width2 * ratio, height2 * ratio, null, null, Color.Brown)));
-
-            //World_Point origin = new World_Point(0, 0, 0);
-            //Entity_List.Add(origin);
-            */
+            // Create textures
+            Bitmap_Texture brick = new Bitmap_Texture("C:\\Users\\jbrya\\source\\repos\\3D Racer\\3D Racer\\Textures\\brick.bmp");
 
             Thread graphics_thread = new Thread(Game_Loop);
             graphics_thread.Start();
@@ -265,6 +212,14 @@ namespace _3D_Racer
                 scene.Width = Canvas_Box.Width;
                 scene.Height = Canvas_Box.Height;
             }
+        }
+
+        private void changeLightToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Random random = new Random();
+            lights[selected_light].Colour = Color.FromArgb(255, random.Next(256), random.Next(256), random.Next(256));
+
+            lights[selected_light].Colour = Color.White;
         }
     }
 }

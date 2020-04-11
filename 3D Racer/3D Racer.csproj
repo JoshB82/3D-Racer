@@ -48,10 +48,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cameras\Camera Transformation.cs" />
-    <Compile Include="Clipping Plane.cs" />
+    <Compile Include="Cameras\Clipping Plane.cs" />
+    <Compile Include="Lights\Ambient Light.cs" />
     <Compile Include="Lights\Point Light.cs" />
+    <Compile Include="Lights\Spotlight.cs" />
     <Compile Include="Meshes\Cuboid.cs" />
     <Compile Include="Lights\Distant Light.cs" />
+    <Compile Include="Meshes\Custom.cs" />
     <Compile Include="Rendering\Drawing Algorithms.cs" />
     <Compile Include="Lights\Light.cs" />
     <Compile Include="Meshes\Line.cs" />
@@ -108,6 +111,10 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Files\" />
+    <Folder Include="Item Meshes\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Textures\brick.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

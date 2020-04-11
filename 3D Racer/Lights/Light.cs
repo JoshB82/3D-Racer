@@ -26,6 +26,6 @@ namespace _3D_Racer
 
         public Color Colour { get; set; }
         public double Intensity { get; set; }
-        public Mesh TEMP_NAME { get; protected set; }
+        public string Icon { get; } = "";
     }
 }

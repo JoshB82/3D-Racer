@@ -5,6 +5,8 @@ namespace _3D_Racer
     public abstract partial class Camera
     {
         // Transformations
+        public Vector3D Translation { get; protected set; }
+
         public void Set_Camera_Direction_1(Vector3D new_world_direction, Vector3D new_world_direction_up)
         {
             //if (new_world_direction * new_world_direction_up != 0) throw new Exception("Camera direction vectors are not orthogonal.");
