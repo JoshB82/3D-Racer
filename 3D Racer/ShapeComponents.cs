@@ -43,22 +43,6 @@ namespace _3D_Racer
         }
     }
 
-    public class Texture_Face
-    {
-        public int P1 { get; set; }
-        public int P2 { get; set; }
-        public int P3 { get; set; }
-        public int Texture { get; set; }
-
-        public Texture_Face(int p1, int p2, int p3, int texture)
-        {
-            P1 = p1;
-            P2 = p2;
-            P3 = p3;
-            Texture = texture;
-        }
-    }
-
     public class Bitmap_Texture
     {
         public string File_Path { get; set; }
@@ -108,20 +92,38 @@ namespace _3D_Racer
         public int P1 { get; set; }
         public int P2 { get; set; }
         public int P3 { get; set; }
+
+        public int T1 { get; set; }
+        public int T2 { get; set; }
+        public int T3 { get; set; }
+
         public Color Colour { get; set; }
-        public bool Draw_Outline { get; set; }
-        public bool Visible { get; set; }
         public string Texture_Path { get; set; }
 
-        public Face(int p1, int p2, int p3, Color colour, string texture_path = "", bool draw_outline = false, bool visibility = true)
+        public bool Draw_Outline { get; set; }
+        public bool Visible { get; set; }
+
+        public Face(int p1, int p2, int p3, Color colour, bool draw_outline = false, bool visible = true)
         {
             P1 = p1;
             P2 = p2;
             P3 = p3;
             Colour = colour;
             Draw_Outline = draw_outline;
-            Visible = visibility;
+            Visible = visible;
+        }
+
+        public Face(int p1, int p2, int p3, int t1, int t2, int t3, string texture_path, bool draw_outline = false, bool visible = true)
+        {
+            P1 = p1;
+            P2 = p2;
+            P3 = p3;
+            T1 = t1;
+            T2 = t2;
+            T3 = t3;
             Texture_Path = texture_path;
+            Draw_Outline = draw_outline;
+            Visible = visible;
         }
     }
 

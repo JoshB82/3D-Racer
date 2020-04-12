@@ -81,6 +81,10 @@ namespace _3D_Racer
             {
                 try
                 {
+                    List<Vertex> vertices = new List<Vertex>();
+                    List<Edge> edges = new List<Edge>();
+                    List<Face> faces = new List<Face>();
+
                     string[] lines = File.ReadAllLines(file_path);
                     foreach (string line in lines)
                     {
@@ -196,18 +200,18 @@ namespace _3D_Racer
                     // One point is on the inside, so only a smaller triangle is needed
                     first_intersection = new Vector4D(Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[0], plane_point, plane_normal));
                     second_intersection = new Vector4D(Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[1], plane_point, plane_normal));
-                    f1 = new Clipped_Face(new Vector4D(inside_points[0]), first_intersection, second_intersection, f.Colour, f.Visible);
+                    f1 = new Clipped_Face(new Vector4D(inside_points[0]), first_intersection, second_intersection, f.Colour, null, f.Visible);
                     return 1;
                 case 2:
                     // Two points are on the inside, so a quadrilateral is formed and split into two triangles
                     first_intersection = new Vector4D(Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[0], plane_point, plane_normal));
                     second_intersection = new Vector4D(Vector3D.Line_Intersect_Plane(inside_points[1], outside_points[0], plane_point, plane_normal));
-                    f1 = new Clipped_Face(new Vector4D(inside_points[0]), new Vector4D(inside_points[1]), first_intersection, f.Colour, f.Visible);
-                    f2 = new Clipped_Face(new Vector4D(inside_points[1]), second_intersection, first_intersection, f.Colour, f.Visible);
+                    f1 = new Clipped_Face(new Vector4D(inside_points[0]), new Vector4D(inside_points[1]), first_intersection, f.Colour, null, f.Visible);
+                    f2 = new Clipped_Face(new Vector4D(inside_points[1]), second_intersection, first_intersection, f.Colour, null, f.Visible);
                     return 2;
                 case 3:
                     // All points are on the inside, so return the triangle unchanged
-                    f1 = new Clipped_Face(f.P1, f.P2, f.P3, f.Colour, f.Visible);
+                    f1 = new Clipped_Face(f.P1, f.P2, f.P3, f.Colour, null, f.Visible);
                     return 1;
             }
 
@@ -321,7 +325,7 @@ namespace _3D_Racer
                                         Queue<Clipped_Face> world_face_clip = new Queue<Clipped_Face>();
 
                                         // Add initial triangle to clipping queue
-                                        world_face_clip.Enqueue(new Clipped_Face(point_1, point_2, point_3, face_colour, shape.Render_Mesh.Visible));
+                                        world_face_clip.Enqueue(new Clipped_Face(point_1, point_2, point_3, face_colour, null, shape.Render_Mesh.Visible));
                                         int no_triangles = 1;
 
                                         // Clip face against each world clipping plane
@@ -398,7 +402,14 @@ namespace _3D_Racer
                                                 }
                                                 else
                                                 {
-                                                    Triangle(result_point_1_x, result_point_1_y, result_point_1_z, result_point_2_x, result_point_2_y, result_point_2_z, result_point_3_x, result_point_3_y, result_point_3_z, face_colour);
+                                                    if (face.Texture_Path == null)
+                                                    {
+                                                        Triangle(result_point_1_x, result_point_1_y, result_point_1_z, result_point_2_x, result_point_2_y, result_point_2_z, result_point_3_x, result_point_3_y, result_point_3_z, face_colour);
+                                                    }
+                                                    else
+                                                    {
+                                                        Textured_Triangle(result_point_1_x, result_point_1_y, result_point_1_z, result_point_2_x, result_point_2_y, result_point_2_z, result_point_3_x, result_point_3_y, result_point_3_z, );
+                                                    }
                                                 }
                                             }
                                         }

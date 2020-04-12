@@ -126,6 +126,11 @@ namespace _3D_Racer
             }
         }
 
+        private void Textured_Triangle (int x1, int y1, double z1, int x2, int y2, double z2, int x3, int y3, double z3, Color colour)
+        {
+
+        }
+
         private void Triangle(int x1, int y1, double z1, int x2, int y2, double z2, int x3, int y3, double z3, Color colour)
         {
             Vector3D normal = Vector3D.Normal_From_Plane(new Vector3D(x1, y1, z1), new Vector3D(x2, y2, z2), new Vector3D(x3, y3, z3));

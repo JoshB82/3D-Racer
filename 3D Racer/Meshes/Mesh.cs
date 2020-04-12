@@ -6,7 +6,7 @@ namespace _3D_Racer
     public abstract partial class Mesh
     {
         #region Structure
-        public Vertex Model_Origin { get; } = new Vertex(0, 0, 0, 1);
+        public Vertex Model_Origin { get; } = new Vertex(0, 0, 0);
         public Vertex World_Origin { get; set; }
         public Vertex Camera_Origin { get; protected set; }
 
@@ -20,12 +20,10 @@ namespace _3D_Racer
                 Camera_Vertices = new Vertex[value.Length];
             }
         }
-
         public Vertex[] World_Vertices { get; private set; }
         public Vertex[] Camera_Vertices { get; protected set; }
 
         public Texture_Vertex[] Texture_Vertices { get; protected set; }
-        public Texture_Face[] Texture_Faces { get; protected set; }
         public Bitmap_Texture[] Textures { get; protected set; }
 
         public Edge[] Edges { get; protected set; }
