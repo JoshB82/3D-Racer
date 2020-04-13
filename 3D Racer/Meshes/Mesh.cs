@@ -24,7 +24,7 @@ namespace _3D_Racer
         public Vertex[] Camera_Vertices { get; protected set; }
 
         public Texture_Vertex[] Texture_Vertices { get; protected set; }
-        public Bitmap_Texture[] Textures { get; protected set; }
+        public Bitmap[] Textures { get; protected set; }
 
         public Edge[] Edges { get; protected set; }
         public Face[] Faces { get; protected set; }
@@ -78,6 +78,10 @@ namespace _3D_Racer
         #endregion
 
         // Miscellaneous
+        /// <summary>
+        /// Determines if an outline is drawn with the mesh.
+        /// </summary>
+        public bool Draw_Outline { get; set; }
         /// <summary>
         /// Determines if the mesh is visible or not.
         /// </summary>

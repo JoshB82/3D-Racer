@@ -5,12 +5,23 @@ namespace _3D_Racer
 {
     public sealed partial class Scene
     {
+        private static int Round_To_Int(double x) => (int)Math.Round(x, MidpointRounding.AwayFromZero);
+
         private void Check_Against_Z_Buffer(int x, int y, double z, Color new_colour)
         {
             if (z <= z_buffer[x][y])
             {
                 z_buffer[x][y] = z;
                 colour_buffer[x][y] = new_colour;
+            }
+        }
+
+        private void Check_Against_Z_Buffer_Texture(int x, int y, int tx, int ty, double z, Bitmap texture)
+        {
+            if (z <= z_buffer[x][y])
+            {
+                z_buffer[x][y] = z;
+                colour_buffer[x][y] = texture.GetPixel(tx, ty);
             }
         }
 
@@ -126,9 +137,160 @@ namespace _3D_Racer
             }
         }
 
-        private void Textured_Triangle (int x1, int y1, double z1, int x2, int y2, double z2, int x3, int y3, double z3, Color colour)
+        private void Textured_Triangle(int x1, int y1, double z1, int x2, int y2, double z2, int x3, int y3, double z3, int tx1, int ty1, int tx2, int ty2, int tx3, int ty3, Bitmap texture)
         {
+            Vector3D normal = Vector3D.Normal_From_Plane(new Vector3D(x1, y1, z1), new Vector3D(x2, y2, z2), new Vector3D(x3, y3, z3));
+            double z_increase_x = -normal.X / normal.Z, z_increase_y = -normal.Y / normal.Z;
 
+            Sort_By_Y_2(ref x1, ref y1, ref z1, ref x2, ref y2, ref z2, ref x3, ref y3, ref z3, ref tx1, ref ty1, ref tx2, ref ty2, ref tx3, ref ty3);
+
+            int x4, tx4;
+            if (y1 == y2 && y2 == y3)
+            {
+                // Should not even be seeing this face? Maybe after rounding?
+                /*
+                int start_x_value = Math.Min(Math.Min(x1, x2), x3), final_x_value = Math.Max(Math.Max(x1, x2), x3);
+                double z_value = (start_x_value == x1) ? z1 : (start_x_value == x2) ? z2 : z3;
+                for (int x = start_x_value; x <= final_x_value; x++)
+                {
+                    Check_Against_Z_Buffer(x, y1, z_value, colour);
+                    z_value += z_increase_x;
+                }
+                */
+            }
+            else
+            {
+                if (y2 == y3)
+                {
+                    double z_value = (x2 < x3) ? z2 : z3;
+                    Textured_Flat_Bottom_Triangle(x2, y2, x3, y3, x1, y1, tx2, ty2, tx3, ty3, tx1, ty1, z_value, z_increase_x, z_increase_y, texture);
+                }
+                else
+                {
+                    if (y1 == y2)
+                    {
+                        double z_value = z3;
+                        Textured_Flat_Top_Triangle(x1, y1, x2, y2, x3, y3, tx1, ty1, tx2, ty2, tx3, ty3, z_value, z_increase_x, z_increase_y, texture);
+                    }
+                    else
+                    {
+                        x4 = Round_To_Int((y2 - y1) * (x3 - x1) / (y3 - y1) + x1);
+                        tx4 = Round_To_Int((ty2 - ty1) * (tx3 - tx1) / (ty3 - ty1) + tx1);
+                        int y4 = y2;
+                        int ty4 = ty2;
+                        double z_value = z3;
+
+                        Textured_Flat_Top_Triangle(x2, y2, x4, y4, x3, y3, tx2, ty2, tx4, ty4, tx3, ty3, z_value, z_increase_x, z_increase_y, texture);
+                        Textured_Flat_Bottom_Triangle(x2, y2, x4, y4, x1, y1, tx2, ty2, tx4, ty4, tx1, ty1, z_value, z_increase_x, z_increase_y, texture);
+                    }
+                }
+            }
+        }
+
+        private void Textured_Flat_Top_Triangle(int x1, int y1, int x2, int y2, int x3, int y3, int tx1, int ty1, int tx2, int ty2, int tx3, int ty3, double z_value, double z_increase_x, double z_increase_y, Bitmap texture)
+        {
+            // y1 must equal y2
+            int[] start_x_values, final_x_values, start_tx_values, final_tx_values;
+
+            if (x1 < x2)
+            {
+                Line_2(x3, y3, x1, y1, out start_x_values);
+                Line_2(x3, y3, x2, y2, out final_x_values);
+                Line_2(tx3, ty3, tx1, ty1, out start_tx_values);
+                Line_2(tx3, ty3, tx2, ty2, out final_tx_values);
+            }
+            else
+            {
+                Line_2(x3, y3, x2, y2, out start_x_values);
+                Line_2(x3, y3, x1, y1, out final_x_values);
+                Line_2(tx3, ty3, tx2, ty2, out start_tx_values);
+                Line_2(tx3, ty3, tx1, ty1, out final_tx_values);
+            }
+
+            int start_x_value, final_x_value;
+            double start_tx_value, final_tx_value;
+
+            double ty_step = (ty1 - ty3) / (y1 - y3);
+            double ty = ty3;
+
+            int prev_x = 0;
+            for (int y = y3; y <= y1; y++)
+            {
+                start_x_value = start_x_values[y - y3];
+                final_x_value = final_x_values[y - y3];
+                start_tx_value = start_tx_values[y - y3];
+                final_tx_value = final_tx_values[y - y3];
+
+                double tx_step = (final_tx_value - start_tx_value) / (final_x_value - start_x_value);
+                double tx = start_tx_value;
+
+                if (y != y3) z_value += (start_x_value - prev_x) * z_increase_x;
+
+                for (int x = start_x_value; x <= final_x_value; x++)
+                {
+                    Check_Against_Z_Buffer_Texture(x, y, Round_To_Int(tx), Round_To_Int(ty), z_value, texture);
+                    tx += tx_step;
+                    z_value += z_increase_x;
+                }
+
+                ty += ty_step;
+                z_value -= z_increase_x * (final_x_value - start_x_value + 1);
+                prev_x = start_x_value;
+                if (y != y1) z_value += z_increase_y;
+            }
+        }
+
+        private void Textured_Flat_Bottom_Triangle(int x1, int y1, int x2, int y2, int x3, int y3, int tx1, int ty1, int tx2, int ty2, int tx3, int ty3, double z_value, double z_increase_x, double z_increase_y, Bitmap texture)
+        {
+            // y1 must equal y2
+            int[] start_x_values, final_x_values, start_tx_values, final_tx_values;
+
+            if (x1 < x2)
+            {
+                Line_2(x1, y1, x3, y3, out start_x_values);
+                Line_2(x2, y2, x3, y3, out final_x_values);
+                Line_2(tx1, ty1, tx3, ty3, out start_tx_values);
+                Line_2(tx2, ty2, tx3, ty3, out final_tx_values);
+            }
+            else
+            {
+                Line_2(x2, y2, x3, y3, out start_x_values);
+                Line_2(x1, y1, x3, y3, out final_x_values);
+                Line_2(tx2, ty2, tx3, ty3, out start_tx_values);
+                Line_2(tx1, ty1, tx3, ty3, out final_tx_values);
+            }
+
+            int start_x_value, final_x_value;
+            double start_tx_value, final_tx_value;
+
+            double ty_step = (ty3 - ty1) / (y3 - y1);
+            double ty = ty1;
+
+            int prev_x = 0;
+            for (int y = y1; y <= y3; y++)
+            {
+                start_x_value = start_x_values[y - y1];
+                final_x_value = final_x_values[y - y1];
+                start_tx_value = start_tx_values[y - y1];
+                final_tx_value = final_tx_values[y - y1];
+
+                double tx_step = (final_tx_value - start_tx_value) / (final_x_value - start_x_value);
+                double tx = start_tx_value;
+
+                if (y != y1) z_value += (start_x_value - prev_x) * z_increase_x;
+
+                for (int x = start_x_value; x <= final_x_value; x++)
+                {
+                    Check_Against_Z_Buffer_Texture(x, y, Round_To_Int(tx), Round_To_Int(ty), z_value, texture);
+                    tx += tx_step;
+                    z_value += z_increase_x;
+                }
+
+                ty += ty_step;
+                z_value -= z_increase_x * (final_x_value - start_x_value + 1);
+                prev_x = start_x_value;
+                z_value += z_increase_y;
+            }
         }
 
         private void Triangle(int x1, int y1, double z1, int x2, int y2, double z2, int x3, int y3, double z3, Color colour)
@@ -180,6 +342,7 @@ namespace _3D_Racer
         {
             // y1 must equal y2
             int[] start_x_values, final_x_values;
+
             if (x1 < x2)
             {
                 Line_2(x1, y1, x3, y3, out start_x_values);
@@ -214,6 +377,7 @@ namespace _3D_Racer
         {
             // y1 must equal y2
             int[] start_x_values, final_x_values;
+
             if (x1 < x2)
             {
                 Line_2(x3, y3, x1, y1, out start_x_values);
@@ -315,7 +479,7 @@ namespace _3D_Racer
             x2 = temp;
         }
 
-        private void Sort_By_Y(ref int x1, ref int y1, ref double z1, ref int x2, ref int y2, ref double z2, ref int x3, ref int y3, ref double z3)
+        private static void Sort_By_Y(ref int x1, ref int y1, ref double z1, ref int x2, ref int y2, ref double z2, ref int x3, ref int y3, ref double z3)
         {
             // y1 highest; y3 lowest
             if (y1 < y2)
@@ -335,6 +499,35 @@ namespace _3D_Racer
                 Swap(ref x2, ref x3);
                 Swap(ref y2, ref y3);
                 Swap(ref z2, ref z3);
+            }
+        }
+
+        private static void Sort_By_Y_2(ref int x1, ref int y1, ref double z1, ref int x2, ref int y2, ref double z2, ref int x3, ref int y3, ref double z3, ref int tx1, ref int ty1, ref int tx2, ref int ty2, ref int tx3, ref int ty3)
+        {
+            // y1 highest; y3 lowest
+            if (y1 < y2)
+            {
+                Swap(ref x1, ref x2);
+                Swap(ref y1, ref y2);
+                Swap(ref z1, ref z2);
+                Swap(ref tx1, ref tx2);
+                Swap(ref ty1, ref ty2);
+            }
+            if (y1 < y3)
+            {
+                Swap(ref x1, ref x3);
+                Swap(ref y1, ref y3);
+                Swap(ref z1, ref z3);
+                Swap(ref tx1, ref tx3);
+                Swap(ref ty1, ref ty3);
+            }
+            if (y2 < y3)
+            {
+                Swap(ref x2, ref x3);
+                Swap(ref y2, ref y3);
+                Swap(ref z2, ref z3);
+                Swap(ref tx2, ref tx3);
+                Swap(ref ty2, ref ty3);
             }
         }
     }

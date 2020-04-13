@@ -138,13 +138,13 @@ namespace _3D_Racer
             if (point_1_distance >= 0 && point_2_distance < 0)
             {
                 // One point is on the inside, the other on the outside, so clip the line
-                Vector4D intersection = new Vector4D(Vector3D.Line_Intersect_Plane(point_1, point_2, plane_point, plane_normal));
+                Vector4D intersection = new Vector4D(Vector3D.Line_Intersect_Plane(point_1, point_2, plane_point, plane_normal, out double d));
                 return new Clipped_Edge(new Vector4D(point_1), intersection, e.Colour, e.Visible);
             }
             if (point_1_distance < 0 && point_2_distance >= 0)
             {
                 // One point is on the outside, the other on the inside, so clip the line
-                Vector4D intersection = new Vector4D(Vector3D.Line_Intersect_Plane(point_2, point_1, plane_point, plane_normal));
+                Vector4D intersection = new Vector4D(Vector3D.Line_Intersect_Plane(point_2, point_1, plane_point, plane_normal, out double d));
                 return new Clipped_Edge(new Vector4D(point_2), intersection, e.Colour, e.Visible);
             }
             // Both points are on the outside, so discard the line
@@ -155,41 +155,53 @@ namespace _3D_Racer
         {
             f1 = null; f2 = null;
             Vector3D point_1 = new Vector3D(f.P1), point_2 = new Vector3D(f.P2), point_3 = new Vector3D(f.P3);
-            int inside_point_count = 0;
+            int inside_point_count = 0, inside_texture_point_count = 0;
             List<Vector3D> inside_points = new List<Vector3D>(3);
             List<Vector3D> outside_points = new List<Vector3D>(3);
+            List<Vector3D> inside_texture_points = new List<Vector3D>(3);
+            List<Vector3D> outside_texture_points = new List<Vector3D>(3);
 
             if (Vector3D.Point_Distance_From_Plane(point_1, plane_point, plane_normal) >= 0)
             {
                 inside_point_count++;
                 inside_points.Add(point_1);
+                inside_texture_point_count++;
+                inside_texture_points.Add(f.T1);
             }
             else
             {
                 outside_points.Add(point_1);
+                outside_points.Add(f.T1);
             }
 
             if (Vector3D.Point_Distance_From_Plane(point_2, plane_point, plane_normal) >= 0)
             {
                 inside_point_count++;
                 inside_points.Add(point_2);
+                inside_texture_point_count++;
+                inside_texture_points.Add(f.T2);
             }
             else
             {
                 outside_points.Add(point_2);
+                outside_points.Add(f.T2);
             }
             
             if (Vector3D.Point_Distance_From_Plane(point_3, plane_point, plane_normal) >= 0)
             {
                 inside_point_count++;
                 inside_points.Add(point_3);
+                inside_texture_point_count++;
+                inside_texture_points.Add(f.T3);
             }
             else
             {
                 outside_points.Add(point_3);
+                outside_points.Add(f.T3);
             }
 
             Vector4D first_intersection, second_intersection;
+            double d;
 
             switch (inside_point_count)
             {
@@ -198,20 +210,46 @@ namespace _3D_Racer
                     return 0;
                 case 1:
                     // One point is on the inside, so only a smaller triangle is needed
-                    first_intersection = new Vector4D(Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[0], plane_point, plane_normal));
-                    second_intersection = new Vector4D(Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[1], plane_point, plane_normal));
-                    f1 = new Clipped_Face(new Vector4D(inside_points[0]), first_intersection, second_intersection, f.Colour, null, f.Visible);
+                    first_intersection = new Vector4D(Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[0], plane_point, plane_normal, out d));
+                    second_intersection = new Vector4D(Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[1], plane_point, plane_normal, out d));
+                    if (f.Texture == null)
+                    {
+                        f1 = new Clipped_Face(new Vector4D(inside_points[0]), first_intersection, second_intersection, f.Colour, f.Draw_Outline, f.Visible);
+                    }
+                    else
+                    {
+                        Vector3D t_intersection_1 = (outside_texture_points[0] - inside_texture_points[0]) * d + inside_texture_points[0];
+                        Vector3D t_intersection_2 = (outside_texture_points[1] - inside_texture_points[0]) * d + inside_texture_points[0];
+                        f1 = new Clipped_Face(new Vector4D(inside_points[0]), first_intersection, second_intersection, inside_texture_points[0], t_intersection_1, t_intersection_2, f.Texture, f.Draw_Outline, f.Visible);
+                    }
                     return 1;
                 case 2:
                     // Two points are on the inside, so a quadrilateral is formed and split into two triangles
-                    first_intersection = new Vector4D(Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[0], plane_point, plane_normal));
-                    second_intersection = new Vector4D(Vector3D.Line_Intersect_Plane(inside_points[1], outside_points[0], plane_point, plane_normal));
-                    f1 = new Clipped_Face(new Vector4D(inside_points[0]), new Vector4D(inside_points[1]), first_intersection, f.Colour, null, f.Visible);
-                    f2 = new Clipped_Face(new Vector4D(inside_points[1]), second_intersection, first_intersection, f.Colour, null, f.Visible);
+                    first_intersection = new Vector4D(Vector3D.Line_Intersect_Plane(inside_points[0], outside_points[0], plane_point, plane_normal, out d));
+                    second_intersection = new Vector4D(Vector3D.Line_Intersect_Plane(inside_points[1], outside_points[0], plane_point, plane_normal, out d));
+                    if (f.Texture == null)
+                    {
+                        f1 = new Clipped_Face(new Vector4D(inside_points[0]), new Vector4D(inside_points[1]), first_intersection, f.Colour, f.Draw_Outline, f.Visible);
+                        f2 = new Clipped_Face(new Vector4D(inside_points[1]), second_intersection, first_intersection, f.Colour, f.Draw_Outline, f.Visible);
+                    }
+                    else
+                    {
+                        Vector3D t_intersection_1 = (outside_texture_points[0] - inside_texture_points[0]) * d + inside_texture_points[0];
+                        Vector3D t_intersection_2 = (outside_texture_points[0] - inside_texture_points[1]) * d + inside_texture_points[1];
+                        f1 = new Clipped_Face(new Vector4D(inside_points[0]), new Vector4D(inside_points[1]), first_intersection, inside_texture_points[0], inside_texture_points[1], t_intersection_1, f.Texture, f.Draw_Outline, f.Visible);
+                        f2 = new Clipped_Face(new Vector4D(inside_points[1]), second_intersection, first_intersection, inside_texture_points[1], t_intersection_2, t_intersection_1, f.Texture, f.Draw_Outline, f.Visible);
+                    }
                     return 2;
                 case 3:
                     // All points are on the inside, so return the triangle unchanged
-                    f1 = new Clipped_Face(f.P1, f.P2, f.P3, f.Colour, null, f.Visible);
+                    if (f.Texture == null)
+                    {
+                        f1 = new Clipped_Face(f.P1, f.P2, f.P3, f.Colour, f.Draw_Outline, f.Visible);
+                    }
+                    else
+                    {
+                        f1 = new Clipped_Face(f.P1, f.P2, f.P3, f.T1, f.T2, f.T3, f.Texture, f.Draw_Outline, f.Visible);
+                    }
                     return 1;
             }
 
@@ -277,6 +315,22 @@ namespace _3D_Racer
                                     double point_3_y = shape.Render_Mesh.World_Vertices[face.P3].Y;
                                     double point_3_z = shape.Render_Mesh.World_Vertices[face.P3].Z;
 
+                                    double texture_point_1_x = 0, texture_point_1_y = 0, texture_point_2_x = 0, texture_point_2_y = 0, texture_point_3_x = 0, texture_point_3_y = 0;
+                                    Vector3D texture_point_1 = null, texture_point_2 = null, texture_point_3 = null;
+                                    if (face.Texture != null)
+                                    {
+                                        texture_point_1_x = shape.Render_Mesh.Texture_Vertices[face.T1].X;
+                                        texture_point_1_y = shape.Render_Mesh.Texture_Vertices[face.T1].Y;
+                                        texture_point_2_x = shape.Render_Mesh.Texture_Vertices[face.T2].X;
+                                        texture_point_2_y = shape.Render_Mesh.Texture_Vertices[face.T2].Y;
+                                        texture_point_3_x = shape.Render_Mesh.Texture_Vertices[face.T3].X;
+                                        texture_point_3_y = shape.Render_Mesh.Texture_Vertices[face.T3].Y;
+                                        
+                                        texture_point_1 = new Vector3D(texture_point_1_x, texture_point_1_y, 1);
+                                        texture_point_2 = new Vector3D(texture_point_2_x, texture_point_2_y, 1);
+                                        texture_point_3 = new Vector3D(texture_point_3_x, texture_point_3_y, 1);
+                                    }
+
                                     // Triangle point vectors
                                     Vector4D point_1 = new Vector4D(point_1_x, point_1_y, point_1_z);
                                     Vector4D point_2 = new Vector4D(point_2_x, point_2_y, point_2_z);
@@ -325,7 +379,15 @@ namespace _3D_Racer
                                         Queue<Clipped_Face> world_face_clip = new Queue<Clipped_Face>();
 
                                         // Add initial triangle to clipping queue
-                                        world_face_clip.Enqueue(new Clipped_Face(point_1, point_2, point_3, face_colour, null, shape.Render_Mesh.Visible));
+                                        if (face.Texture == null)
+                                        {
+                                            world_face_clip.Enqueue(new Clipped_Face(point_1, point_2, point_3, face.Colour, face.Draw_Outline, face.Visible));
+                                        }
+                                        else
+                                        {
+                                            world_face_clip.Enqueue(new Clipped_Face(point_1, point_2, point_3, texture_point_1, texture_point_2, texture_point_3, face.Texture, face.Draw_Outline, face.Visible));
+                                        }
+                                        
                                         int no_triangles = 1;
 
                                         // Clip face against each world clipping plane
@@ -402,13 +464,23 @@ namespace _3D_Racer
                                                 }
                                                 else
                                                 {
-                                                    if (face.Texture_Path == null)
+                                                    if (face.Texture == null)
                                                     {
                                                         Triangle(result_point_1_x, result_point_1_y, result_point_1_z, result_point_2_x, result_point_2_y, result_point_2_z, result_point_3_x, result_point_3_y, result_point_3_z, face_colour);
                                                     }
                                                     else
                                                     {
-                                                        Textured_Triangle(result_point_1_x, result_point_1_y, result_point_1_z, result_point_2_x, result_point_2_y, result_point_2_z, result_point_3_x, result_point_3_y, result_point_3_z, );
+                                                        // Scale the texture co-ordinates
+                                                        int width = face.Texture.Width;
+                                                        int height = face.Texture.Height;
+                                                        int result_texture_point_1_x = Round_To_Int(texture_point_1_x * width);
+                                                        int result_texture_point_1_y = Round_To_Int(texture_point_1_y * height);
+                                                        int result_texture_point_2_x = Round_To_Int(texture_point_2_x * width);
+                                                        int result_texture_point_2_y = Round_To_Int(texture_point_2_y * height);
+                                                        int result_texture_point_3_x = Round_To_Int(texture_point_3_x * width);
+                                                        int result_texture_point_3_y = Round_To_Int(texture_point_3_y * height);
+
+                                                        Textured_Triangle(result_point_1_x, result_point_1_y, result_point_1_z, result_point_2_x, result_point_2_y, result_point_2_z, result_point_3_x, result_point_3_y, result_point_3_z, result_texture_point_1_x, result_texture_point_1_y, result_texture_point_2_x, result_texture_point_2_y, result_texture_point_3_x, result_texture_point_3_y, face.Texture);
                                                     }
                                                 }
                                             }

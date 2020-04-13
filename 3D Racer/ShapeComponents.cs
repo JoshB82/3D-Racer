@@ -43,18 +43,6 @@ namespace _3D_Racer
         }
     }
 
-    public class Bitmap_Texture
-    {
-        public string File_Path { get; set; }
-        public Bitmap Texture { get; private set; }
-
-        public Bitmap_Texture(string file_path)
-        {
-            File_Path = file_path;
-            Texture = new Bitmap(file_path);
-        }
-    }
-
     public class Edge
     {
         public int P1 { get; set; }
@@ -98,7 +86,7 @@ namespace _3D_Racer
         public int T3 { get; set; }
 
         public Color Colour { get; set; }
-        public string Texture_Path { get; set; }
+        public Bitmap Texture { get; set; }
 
         public bool Draw_Outline { get; set; }
         public bool Visible { get; set; }
@@ -113,7 +101,7 @@ namespace _3D_Racer
             Visible = visible;
         }
 
-        public Face(int p1, int p2, int p3, int t1, int t2, int t3, string texture_path, bool draw_outline = false, bool visible = true)
+        public Face(int p1, int p2, int p3, int t1, int t2, int t3, Bitmap texture, bool draw_outline = false, bool visible = true)
         {
             P1 = p1;
             P2 = p2;
@@ -121,7 +109,7 @@ namespace _3D_Racer
             T1 = t1;
             T2 = t2;
             T3 = t3;
-            Texture_Path = texture_path;
+            Texture = texture;
             Draw_Outline = draw_outline;
             Visible = visible;
         }
@@ -132,20 +120,38 @@ namespace _3D_Racer
         public Vector4D P1 { get; set; }
         public Vector4D P2 { get; set; }
         public Vector4D P3 { get; set; }
+
+        public Vector3D T1 { get; set; }
+        public Vector3D T2 { get; set; }
+        public Vector3D T3 { get; set; }
+
         public Color Colour { get; set; }
+        public Bitmap Texture { get; set; }
+
         public bool Draw_Outline { get; set; }
         public bool Visible { get; set; }
-        public string Texture_Path { get; set; }
 
-        public Clipped_Face(Vector4D p1, Vector4D p2, Vector4D p3, Color colour, string texture_path = "", bool draw_outline = false, bool visibility = true)
+        public Clipped_Face(Vector4D p1, Vector4D p2, Vector4D p3, Color colour, bool draw_outline = false, bool visible = true)
         {
             P1 = p1;
             P2 = p2;
             P3 = p3;
             Colour = colour;
             Draw_Outline = draw_outline;
-            Visible = visibility;
-            Texture_Path = texture_path;
+            Visible = visible;
+        }
+
+        public Clipped_Face(Vector4D p1, Vector4D p2, Vector4D p3, Vector3D t1, Vector3D t2, Vector3D t3, Bitmap texture, bool draw_outline = false, bool visible = true)
+        {
+            P1 = p1;
+            P2 = p2;
+            P3 = p3;
+            T1 = t1;
+            T2 = t2;
+            T3 = t3;
+            Texture = texture;
+            Draw_Outline = draw_outline;
+            Visible = visible;
         }
     }
 }

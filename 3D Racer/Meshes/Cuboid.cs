@@ -48,7 +48,7 @@ namespace _3D_Racer
             }
         }
 
-        public Cuboid(Vector3D position, double length, double width, double height, bool visible = true,
+        public Cuboid(Vector3D position, double length, double width, double height, bool draw_outline = false, bool visible = true,
             Color? vertex_colour = null,
             Color? edge_colour = null,
             Color? face_colour = null)
@@ -57,6 +57,7 @@ namespace _3D_Racer
             Length = length;
             Width = width;
             Height = height;
+            Draw_Outline = draw_outline;
             Visible = visible;
 
             Vertex_Colour = vertex_colour ?? Color.Blue;
@@ -102,24 +103,24 @@ namespace _3D_Racer
 
             Faces = new Face[12]
             {
-                new Face(0, 1, 2, Face_Colour), // 0
-                new Face(0, 2, 3, Face_Colour), // 1
-                new Face(1, 6, 2, Face_Colour), // 2
-                new Face(1, 5, 6, Face_Colour), // 3
-                new Face(4, 7, 5, Face_Colour), // 4
-                new Face(5, 7, 6, Face_Colour), // 5
-                new Face(0, 3, 4, Face_Colour), // 6
-                new Face(4, 3, 7, Face_Colour), // 7
-                new Face(7, 3, 6, Face_Colour), // 8
-                new Face(6, 3, 2, Face_Colour), // 9
-                new Face(4, 5, 0, Face_Colour), // 10
-                new Face(5, 1, 0, Face_Colour) // 11
+                new Face(0, 1, 2, Face_Colour, draw_outline, visible), // 0
+                new Face(0, 2, 3, Face_Colour, draw_outline, visible), // 1
+                new Face(1, 6, 2, Face_Colour, draw_outline, visible), // 2
+                new Face(1, 5, 6, Face_Colour, draw_outline, visible), // 3
+                new Face(4, 7, 5, Face_Colour, draw_outline, visible), // 4
+                new Face(5, 7, 6, Face_Colour, draw_outline, visible), // 5
+                new Face(0, 3, 4, Face_Colour, draw_outline, visible), // 6
+                new Face(4, 3, 7, Face_Colour, draw_outline, visible), // 7
+                new Face(7, 3, 6, Face_Colour, draw_outline, visible), // 8
+                new Face(6, 3, 2, Face_Colour, draw_outline, visible), // 9
+                new Face(4, 5, 0, Face_Colour, draw_outline, visible), // 10
+                new Face(5, 1, 0, Face_Colour, draw_outline, visible) // 11
             };
 
             Debug.WriteLine($"Cuboid created at ({position.X}, {position.Y}, {position.Z})");
         }
 
-        public Cuboid(Vector3D position, double length, double width, double height, Bitmap_Texture texture, bool visible = true,
+        public Cuboid(Vector3D position, double length, double width, double height, Bitmap texture, bool draw_outline = false, bool visible = true,
             Color? vertex_colour = null,
             Color? edge_colour = null)
         {
@@ -127,6 +128,7 @@ namespace _3D_Racer
             Length = length;
             Width = width;
             Height = height;
+            Draw_Outline = draw_outline;
             Visible = visible;
 
             Vertex_Colour = vertex_colour ?? Color.Blue;
@@ -171,23 +173,23 @@ namespace _3D_Racer
 
             Faces = new Face[12]
             {
-                new Face(0, 1, 2, 3, 2, 0, texture.File_Path), // 0
-                new Face(0, 2, 3, 3, 0, 1, texture.File_Path), // 1
-                new Face(1, 6, 2, 3, 0, 1, texture.File_Path), // 2
-                new Face(1, 5, 6, 3, 2, 0, texture.File_Path), // 3
-                new Face(4, 7, 5, 2, 0, 3, texture.File_Path), // 4
-                new Face(5, 7, 6, 3, 0, 1, texture.File_Path), // 5
-                new Face(0, 3, 4, 2, 0, 3, texture.File_Path), // 6
-                new Face(4, 3, 7, 3, 0, 1, texture.File_Path), // 7
-                new Face(7, 3, 6, 2, 0, 3, texture.File_Path), // 8
-                new Face(6, 3, 2, 3, 0, 1, texture.File_Path), // 9
-                new Face(4, 5, 0, 0, 1, 2, texture.File_Path), // 10
-                new Face(5, 1, 0, 1, 3, 2, texture.File_Path) // 11
+                new Face(0, 1, 2, 3, 2, 0, texture, draw_outline, visible), // 0
+                new Face(0, 2, 3, 3, 0, 1, texture, draw_outline, visible), // 1
+                new Face(1, 6, 2, 3, 0, 1, texture, draw_outline, visible), // 2
+                new Face(1, 5, 6, 3, 2, 0, texture, draw_outline, visible), // 3
+                new Face(4, 7, 5, 2, 0, 3, texture, draw_outline, visible), // 4
+                new Face(5, 7, 6, 3, 0, 1, texture, draw_outline, visible), // 5
+                new Face(0, 3, 4, 2, 0, 3, texture, draw_outline, visible), // 6
+                new Face(4, 3, 7, 3, 0, 1, texture, draw_outline, visible), // 7
+                new Face(7, 3, 6, 2, 0, 3, texture, draw_outline, visible), // 8
+                new Face(6, 3, 2, 3, 0, 1, texture, draw_outline, visible), // 9
+                new Face(4, 5, 0, 0, 1, 2, texture, draw_outline, visible), // 10
+                new Face(5, 1, 0, 1, 3, 2, texture, draw_outline, visible) // 11
             };
 
-            Textures = new Bitmap_Texture[1]
+            Textures = new Bitmap[1]
             {
-                new Bitmap_Texture(texture.File_Path) // 0
+                texture // 0
             };
 
             Texture_Vertices = new Texture_Vertex[4]

@@ -33,16 +33,19 @@ namespace _3D_Racer
             // Create scene
             scene = new Scene(Canvas_Box.Width, Canvas_Box.Height);
 
+            // Create textures
+            Bitmap brick = new Bitmap("C:\\Users\\jbrya\\source\\repos\\3D-Racer\\3D Racer\\Textures\\brick.bmp");
+
             // Create default meshes
-            Cube cube_mesh = new Cube(new Vector3D(0, 0, 0), 50, true, null, null, Color.Green);
+            Cube cube_mesh = new Cube(new Vector3D(0, 0, 0), 50, false, true, null, null, Color.Green);
             Shape default_shape = new Shape(cube_mesh, true);
             scene.Add(default_shape);
 
-            Cuboid cuboid_mesh = new Cuboid(new Vector3D(100, 0, 100), 30, 40, 90, true, null, null, Color.Purple);
+            Cuboid cuboid_mesh = new Cuboid(new Vector3D(100, 0, 100), 30, 40, 90, brick, false, true, null, null);
             Shape cuboid = new Shape(cuboid_mesh);
             scene.Add(cuboid);
 
-            Plane plane_mesh = new Plane(new Vector3D(0, 0, -30), Vector3D.Unit_X, Vector3D.Unit_Y, 100, 100, null, null, Color.Aqua);
+            Plane plane_mesh = new Plane(new Vector3D(0, 0, -30), Vector3D.Unit_X, Vector3D.Unit_Y, 100, 100, false, true, null, null, Color.Aqua);
             Shape plane = new Shape(plane_mesh);
             scene.Add(plane);
 
@@ -70,9 +73,6 @@ namespace _3D_Racer
 
             //lights.Add(new Spotlight(new Vector3D(0, 500, 0), Vector3D.Unit_Negative_Y, Color.Indigo, 1, Math.PI / 3, 1000));
             //scene.Add_Light(lights[1]);
-
-            // Create textures
-            Bitmap_Texture brick = new Bitmap_Texture("C:\\Users\\jbrya\\source\\repos\\3D Racer\\3D Racer\\Textures\\brick.bmp");
 
             Thread graphics_thread = new Thread(Game_Loop);
             graphics_thread.Start();

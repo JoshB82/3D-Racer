@@ -54,10 +54,11 @@ namespace _3D_Racer
         #endregion
 
         #region Vector Operations (Geometry)
-        public static Vector3D Line_Intersect_Plane(Vector3D line_start, Vector3D line_finish, Vector3D plane_point, Vector3D plane_normal)
+        public static Vector3D Line_Intersect_Plane(Vector3D line_start, Vector3D line_finish, Vector3D plane_point, Vector3D plane_normal, out double d)
         {
             Vector3D line = (line_finish - line_start).Normalise();
-            double d = ((plane_point - line_start) * plane_normal) / (line * plane_normal);
+            // d = new length / old length
+            d = ((plane_point - line_start) * plane_normal) / (line * plane_normal);
             // Round in direction of normal!?
             // Y-AXES WRONG (upside down)?
             return line * d + line_start;
