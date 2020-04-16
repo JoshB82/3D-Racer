@@ -104,6 +104,7 @@ namespace _3D_Racer
                         }
                     }
 
+                    //Add(new Shape(new Custom()));
                     return true;
                 }
                 catch(Exception error)

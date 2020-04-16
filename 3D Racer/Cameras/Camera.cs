@@ -40,7 +40,11 @@ namespace _3D_Racer
         
         public void Calculate_World_to_Screen_Matrix()
         {
-            World_to_camera = Transform.Quaternion_Rotation_Matrix(World_Direction, Model_Direction) * Transform.Quaternion_Rotation_Matrix(World_Direction_Up, Model_Direction_Up) * Transform.Translate(-Translation);
+            Matrix4x4 translation = Transform.Translate(-Translation);
+            Matrix4x4 direction_up_rotation = Transform.Quaternion_Rotation_Matrix(World_Direction_Up, Model_Direction_Up);
+            Matrix4x4 direction_rotation = Transform.Quaternion_Rotation_Matrix(new Vector3D(direction_up_rotation * new Vector4D(World_Direction)), Model_Direction);
+
+            World_to_camera = direction_rotation * direction_up_rotation * translation;
             World_to_screen = Camera_to_screen * World_to_camera;
         }
 
@@ -105,7 +109,7 @@ namespace _3D_Racer
 
         public Clipping_Plane[] Calculate_Clipping_Planes()
         {
-            double ratio = z_far / z_near;
+            double ratio = Z_Far / Z_Near;
 
             Vector3D near_point = new Vector3D(World_Origin) + World_Direction * Z_Near;
             Vector3D far_point = new Vector3D(World_Origin) + World_Direction * Z_Far;
@@ -193,7 +197,7 @@ namespace _3D_Racer
 
         public Clipping_Plane[] Calculate_Clipping_Planes()
         {
-            double ratio = z_far / z_near;
+            double ratio = Z_Far / Z_Near;
 
             Vector3D near_point = new Vector3D(World_Origin) + World_Direction * Z_Near;
             Vector3D far_point = new Vector3D(World_Origin) + World_Direction * Z_Far;
