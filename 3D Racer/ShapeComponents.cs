@@ -36,7 +36,7 @@ namespace _3D_Racer
 
     public class Texture_Vertex : Vector3D
     {
-        public Texture_Vertex(double x, double y) : base(x, y, 1) {}
+        public Texture_Vertex(double x, double y, double z) : base(x, y, z) {}
     }
 
     public class Edge

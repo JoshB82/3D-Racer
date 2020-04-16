@@ -420,6 +420,13 @@ namespace _3D_Racer
                                                 projection_clipped_face.P1 = camera.Divide_By_W(projection_clipped_face.P1);
                                                 projection_clipped_face.P2 = camera.Divide_By_W(projection_clipped_face.P2);
                                                 projection_clipped_face.P3 = camera.Divide_By_W(projection_clipped_face.P3);
+
+                                                if (face.Texture != null)
+                                                {
+                                                    projection_clipped_face.T1 /= projection_clipped_face.P1.W;
+                                                    projection_clipped_face.T2 /= projection_clipped_face.P1.W;
+                                                    projection_clipped_face.T3 /= projection_clipped_face.P1.W;
+                                                }
                                             }
 
                                             // Clip face against each projection clipping plane

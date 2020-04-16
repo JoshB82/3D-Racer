@@ -144,7 +144,23 @@ namespace _3D_Racer
 
             Sort_By_Y_2(ref x1, ref y1, ref z1, ref x2, ref y2, ref z2, ref x3, ref y3, ref z3, ref tx1, ref ty1, ref tx2, ref ty2, ref tx3, ref ty3);
 
-            int x4;
+            // need abs if y1 is always (?) greater than y2?
+
+            // dx from 2 to 1
+            double tx_step_1 = (double)(tx1 - tx2) / Math.Abs(y2 - y1);
+            // dy from 2 to 1
+            double ty_step_1 = (double)(ty1 - ty2) / Math.Abs(y2 - y1);
+            // dx from 3 to 1
+            double tx_step_2 = (double)(tx1 - tx3) / Math.Abs(y3 - y1);
+            // dy from 3 to 1
+            double ty_step_2 = (double)(ty1 - ty3) / Math.Abs(y3 - y1);
+            // dx from 3 to 2
+            double tx_step_3 = (double)(tx2 - tx3) / Math.Abs(y3 - y2);
+            // dy from 3 to 2 
+            double ty_step_3 = (double)(ty2 - ty3) / Math.Abs(y3 - y2);
+
+            int x4, y4;
+
             if (y1 == y2 && y2 == y3)
             {
                 // Just draw a black line instead
@@ -160,36 +176,23 @@ namespace _3D_Racer
             {
                 if (y2 == y3)
                 {
-                    //double z_value = (x2 < x3) ? z2 : z3;
-                    //Textured_Flat_Bottom_Triangle(x2, y2, x3, y3, x1, y1, tx2, ty2, tx3, ty3, tx1, ty1, z_value, z_increase_x, z_increase_y, texture);
+                    double z_value = (x2 < x3) ? z2 : z3;
+                    x4 = x3; y4 = y3;
+                    Textured_Flat_Bottom_Triangle(x1, y1, x2, y2, x3, y3, x4, y4, tx_step_1, ty_step_1, tx_step_2, ty_step_2, tx2, ty2, tx3, ty3, z_value, z_increase_x, z_increase_y, texture);
                 }
                 else
                 {
                     if (y1 == y2)
                     {
-                        // double z_value = z3;
-                        //Textured_Flat_Top_Triangle(x1, y1, x2, y2, x3, y3, tx1, ty1, tx2, ty2, tx3, ty3, z_value, z_increase_x, z_increase_y, texture);
+                        double z_value = z3;
+                        x4 = x1; y4 = y1;
+                        Textured_Flat_Top_Triangle(x1, y1, x2, y2, x3, y3, x4, y4, tx_step_2, ty_step_2, tx_step_3, ty_step_3, tx3, ty3, z_value, z_increase_x, z_increase_y, texture);
                     }
                     else
                     {
-                        // need abs if y1 is always (?) greater than y2?
-
-                        // dx from 2 to 1
-                        double tx_step_1 = (double)(tx1 - tx2) / Math.Abs(y2 - y1);
-                        // dy from 2 to 1
-                        double ty_step_1 = (double)(ty1 - ty2) / Math.Abs(y2 - y1);
-                        // dx from 3 to 1
-                        double tx_step_2 = (double)(tx1 - tx3) / Math.Abs(y3 - y1);
-                        // dy from 3 to 1
-                        double ty_step_2 = (double)(ty1 - ty3) / Math.Abs(y3 - y1);
-                        // dx from 3 to 2
-                        double tx_step_3 = (double)(tx2 - tx3) / Math.Abs(y3 - y2);
-                        // dy from 3 to 2 
-                        double ty_step_3 = (double)(ty2 - ty3) / Math.Abs(y3 - y2);
-
                         // Needs tending to (SHOULD BE ROUNDED AT ALL?)
                         x4 = (int)Math.Round((double)((y2 - y1) * (x3 - x1) / (y3 - y1) + x1), MidpointRounding.AwayFromZero);
-                        int y4 = y2;
+                        y4 = y2;
                         double z_value = z3;
 
                         Textured_Flat_Top_Triangle(x1, y1, x2, y2, x3, y3, x4, y4, tx_step_2, ty_step_2, tx_step_3, ty_step_3, tx3, ty3, z_value, z_increase_x, z_increase_y, texture);
@@ -203,11 +206,11 @@ namespace _3D_Racer
         {
             // y1 must equal y2
             int[] start_x_values, final_x_values;
-            
+
             if (x2 < x4)
             {
                 Line_2(x2, y2, x1, y1, out start_x_values);
-                Line_2(x4, y4, x1, y1, out final_x_values);                
+                Line_2(x4, y4, x1, y1, out final_x_values);
             }
             else
             {
@@ -232,6 +235,13 @@ namespace _3D_Racer
 
                 double etx = (y - y3) * tx_step_2 + tx3;
                 double ety = (y - y3) * ty_step_2 + ty3;
+
+                if (stx > etx)
+                {
+                    //Swap(ref start_x_value, ref final_x_value);
+                    Swap(ref stx, ref etx);
+                    Swap(ref sty, ref ety);
+                }
 
                 double t = 0;
 
@@ -281,6 +291,13 @@ namespace _3D_Racer
 
                 double etx = (y - y3) * tx_step_1 + tx3;
                 double ety = (y - y3) * ty_step_1 + ty3;
+
+                if (stx > etx)
+                {
+                    //Swap(ref start_x_value, ref final_x_value);
+                    Swap(ref stx, ref etx);
+                    Swap(ref sty, ref ety);
+                }
 
                 double t = 0;
 

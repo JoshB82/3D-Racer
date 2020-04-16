@@ -9,7 +9,7 @@ namespace _3D_Racer
     public partial class MainForm : Form
     {
         private const double grav_acc = -9.81;
-        private const double camera_pan = 0.002;
+        private const double camera_pan = 0.001;
         private const double camera_tilt = 0.0000001;
 
         private const int max_frames_per_second = 60;
@@ -35,13 +35,14 @@ namespace _3D_Racer
 
             // Create textures
             Bitmap brick = new Bitmap("C:\\Users\\jbrya\\source\\repos\\3D Racer\\3D Racer\\Textures\\brick.bmp");
+            Bitmap smiley = new Bitmap("C:\\Users\\jbrya\\source\\repos\\3D Racer\\3D Racer\\Textures\\smiley.jpg");
 
             // Create default meshes
             Cube cube_mesh = new Cube(new Vector3D(0, 0, 0), 50, false, true, null, null, Color.Green);
             Shape default_shape = new Shape(cube_mesh, true);
             scene.Add(default_shape);
 
-            Cuboid cuboid_mesh = new Cuboid(new Vector3D(100, 0, 100), 30, 40, 90, brick, false, true, null, null);
+            Cuboid cuboid_mesh = new Cuboid(new Vector3D(100, 0, 100), 30, 40, 90, smiley, false, true, null, null);
             Shape cuboid = new Shape(cuboid_mesh);
             scene.Add(cuboid);
 
@@ -62,7 +63,7 @@ namespace _3D_Racer
             scene.Add(y_axis);
             scene.Add(z_axis);
 
-            Plane test_plane = new Plane(new Vector3D(100, 100, 100), Vector3D.Unit_Y, Vector3D.Unit_Z, 50, 50, brick);
+            Plane test_plane = new Plane(new Vector3D(100, 100, 100), Vector3D.Unit_Y, Vector3D.Unit_Z, 50, 50, smiley);
             Shape test_plane_shape = new Shape(test_plane);
             scene.Add(test_plane_shape);
 

@@ -171,10 +171,10 @@ namespace _3D_Racer
 
             Texture_Vertices = new Texture_Vertex[4]
             {
-                new Texture_Vertex(0, 0), // 0
-                new Texture_Vertex(1, 0), // 1
-                new Texture_Vertex(0, 1), // 2
-                new Texture_Vertex(1, 1) // 3
+                new Texture_Vertex(0, 0, 1), // 0
+                new Texture_Vertex(1, 0, 1), // 1
+                new Texture_Vertex(0, 1, 1), // 2
+                new Texture_Vertex(1, 1, 1) // 3
             };
 
             Debug.WriteLine($"Cube created at ({position.X}, {position.Y}, {position.Z})");
