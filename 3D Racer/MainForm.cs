@@ -10,7 +10,7 @@ namespace _3D_Racer
     {
         private const double grav_acc = -9.81;
         private const double camera_pan = 0.002;
-        private const double camera_tilt = 0.000001;
+        private const double camera_tilt = 0.0000001;
 
         private const int max_frames_per_second = 60;
         private const int max_updates_per_second = 60;
@@ -34,7 +34,7 @@ namespace _3D_Racer
             scene = new Scene(Canvas_Box.Width, Canvas_Box.Height);
 
             // Create textures
-            Bitmap brick = new Bitmap("C:\\Users\\jbrya\\source\\repos\\3D-Racer\\3D Racer\\Textures\\brick.bmp");
+            Bitmap brick = new Bitmap("C:\\Users\\jbrya\\source\\repos\\3D Racer\\3D Racer\\Textures\\brick.bmp");
 
             // Create default meshes
             Cube cube_mesh = new Cube(new Vector3D(0, 0, 0), 50, false, true, null, null, Color.Green);
@@ -62,9 +62,13 @@ namespace _3D_Racer
             scene.Add(y_axis);
             scene.Add(z_axis);
 
+            Plane test_plane = new Plane(new Vector3D(100, 100, 100), Vector3D.Unit_Y, Vector3D.Unit_Z, 50, 50, brick);
+            Shape test_plane_shape = new Shape(test_plane);
+            scene.Add(test_plane_shape);
+
             // Create cameras
-            cameras.Add(new Perspective_Camera(new Vector3D(0, 0, 500), cube_mesh, Vector3D.Unit_Y, Canvas_Box.Width / 10, Canvas_Box.Height / 10, 10, 1000));
-            cameras.Add(new Perspective_Camera(new Vector3D(0, 0, -500), cube_mesh, Vector3D.Unit_Y, Canvas_Box.Width / 10, Canvas_Box.Height / 10, 10, 1000));
+            cameras.Add(new Perspective_Camera(new Vector3D(0, 0, 200), cube_mesh, Vector3D.Unit_Y, Canvas_Box.Width / 10, Canvas_Box.Height / 10, 50, 750));
+            cameras.Add(new Perspective_Camera(new Vector3D(0, 0, -200), cube_mesh, Vector3D.Unit_Y, Canvas_Box.Width / 10, Canvas_Box.Height / 10, 50, 750));
             current_camera = cameras[0];
 
             // Create lights

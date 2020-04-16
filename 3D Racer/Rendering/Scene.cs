@@ -155,7 +155,7 @@ namespace _3D_Racer
         {
             f1 = null; f2 = null;
             Vector3D point_1 = new Vector3D(f.P1), point_2 = new Vector3D(f.P2), point_3 = new Vector3D(f.P3);
-            int inside_point_count = 0, inside_texture_point_count = 0;
+            int inside_point_count = 0;
             List<Vector3D> inside_points = new List<Vector3D>(3);
             List<Vector3D> outside_points = new List<Vector3D>(3);
             List<Vector3D> inside_texture_points = new List<Vector3D>(3);
@@ -165,39 +165,36 @@ namespace _3D_Racer
             {
                 inside_point_count++;
                 inside_points.Add(point_1);
-                inside_texture_point_count++;
                 inside_texture_points.Add(f.T1);
             }
             else
             {
                 outside_points.Add(point_1);
-                outside_points.Add(f.T1);
+                outside_texture_points.Add(f.T1);
             }
 
             if (Vector3D.Point_Distance_From_Plane(point_2, plane_point, plane_normal) >= 0)
             {
                 inside_point_count++;
                 inside_points.Add(point_2);
-                inside_texture_point_count++;
                 inside_texture_points.Add(f.T2);
             }
             else
             {
                 outside_points.Add(point_2);
-                outside_points.Add(f.T2);
+                outside_texture_points.Add(f.T2);
             }
             
             if (Vector3D.Point_Distance_From_Plane(point_3, plane_point, plane_normal) >= 0)
             {
                 inside_point_count++;
                 inside_points.Add(point_3);
-                inside_texture_point_count++;
                 inside_texture_points.Add(f.T3);
             }
             else
             {
                 outside_points.Add(point_3);
-                outside_points.Add(f.T3);
+                outside_texture_points.Add(f.T3);
             }
 
             Vector4D first_intersection, second_intersection;
@@ -364,9 +361,14 @@ namespace _3D_Racer
                                             }
                                             double scaled_intensity = true_intensity / max_intensity;
 
-                                            int new_red = (int)Math.Round((face.Colour.R + light.Colour.R) * 255 / 510 * scaled_intensity, MidpointRounding.AwayFromZero);
-                                            int new_green = (int)Math.Round((face.Colour.G + light.Colour.G) * 255 / 510 * scaled_intensity, MidpointRounding.AwayFromZero);
-                                            int new_blue = (int)Math.Round((face.Colour.B + light.Colour.B) * 255 / 510 * scaled_intensity, MidpointRounding.AwayFromZero);
+                                            if (face.Texture == null)
+                                            {
+
+                                            }
+
+                                            byte new_red = (byte)Round_To_Int((face.Colour.R + light.Colour.R) * 255 / 510 * scaled_intensity);
+                                            byte new_green = (byte)Round_To_Int((face.Colour.G + light.Colour.G) * 255 / 510 * scaled_intensity);
+                                            byte new_blue = (byte)Round_To_Int((face.Colour.B + light.Colour.B) * 255 / 510 * scaled_intensity);
 
                                             face_colour = Color.FromArgb(face.Colour.A, new_red, new_green, new_blue);
                                         }
@@ -471,8 +473,10 @@ namespace _3D_Racer
                                                     else
                                                     {
                                                         // Scale the texture co-ordinates
-                                                        int width = face.Texture.Width;
-                                                        int height = face.Texture.Height;
+                                                        int width = face.Texture.Width - 1;
+                                                        int height = face.Texture.Height - 1;
+
+                                                        // AFTERWARDS?
                                                         int result_texture_point_1_x = Round_To_Int(texture_point_1_x * width);
                                                         int result_texture_point_1_y = Round_To_Int(texture_point_1_y * height);
                                                         int result_texture_point_2_x = Round_To_Int(texture_point_2_x * width);

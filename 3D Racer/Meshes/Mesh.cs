@@ -93,22 +93,20 @@ namespace _3D_Racer
         public Vector3D Translation { get; protected set; }
 
         // Scale, then rotate, then translate
-        public void Calculate_Model_to_World_Matrix() => Model_to_world = Transform.Translate(Translation) * Transform.Quaternion_Rotation_Matrix(Model_Direction, World_Direction) * Transform.Scale(Scaling.X, Scaling.Y, Scaling.Z);
+        public void Calculate_Model_to_World_Matrix()
+        {
+            Matrix4x4 direction_rotation = Transform.Quaternion_Rotation_Matrix(Model_Direction, World_Direction);
+            Matrix4x4 direction_up_rotation = Transform.Quaternion_Rotation_Matrix(new Vector3D(direction_rotation * new Vector4D(Model_Direction_Up)), World_Direction_Up);
+            Matrix4x4 scale = Transform.Scale(Scaling.X, Scaling.Y, Scaling.Z);
+            Matrix4x4 translation = Transform.Translate(Translation);
+
+            Model_to_world = translation * direction_up_rotation * direction_rotation * scale;
+        }
 
         public void Apply_World_Matrices()
         {
             World_Origin = Model_to_world * Model_Origin;
             for (int i = 0; i < Model_Vertices.Length; i++) World_Vertices[i] = Model_to_world * Model_Vertices[i];
         }
-
-        /*
-        public Mesh(Vertex world_origin, Vertex[] model_vertices, Edge[] edges, Face[] faces)
-        {
-            World_Origin = world_origin;
-            Model_Vertices = model_vertices;
-            Edges = edges;
-            Faces = faces;
-        }
-        */
     }
 }
